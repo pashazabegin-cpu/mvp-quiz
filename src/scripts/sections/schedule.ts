@@ -23,17 +23,21 @@ export function initSchedule(): ScrollTrigger | undefined {
   // «Гармошка»: скролл двигает не список целиком, а каждый пункт — и каждый следующий догоняет
   // чуть медленнее предыдущего, так что при прокрутке пункты расходятся, на остановке собираются
   const scroll = { y: 0 };
-  const movers = items.map((el, i) => gsap.quickTo(el, 'y', { duration: 0.6 + i * 0.16, ease: 'power3.out' }));
+  const movers = items.map((el, i) => gsap.quickTo(el, 'y', { duration: 0.8 + i * 0.28, ease: 'power3.out' }));
+
+  /** нижняя полоса экрана (px макета), где пункт ещё размыт и полупрозрачен — видно, что дальше есть ещё */
+  const EDGE = 200;
 
   const update = () => {
     const vh = window.innerHeight;
     const s = stageScale();
     items.forEach((el, i) => {
-      // где пункт стоял бы без отставания — по нему считаем проявление, чтобы не было обратной связи
+      // где пункт стоял бы без отставания — по нему сдвиг, чтобы не было обратной связи
       const top = el.getBoundingClientRect().top + (scroll.y - Number(gsap.getProperty(el, 'y'))) * s;
-      const vis = gsap.utils.clamp(0, 1, (vh * 0.98 - top) / (vh * 0.3));
-      el.style.opacity = String(0.12 + 0.88 * vis);
-      movers[i](scroll.y + (1 - vis) * 24);
+      const vis = gsap.utils.clamp(0, 1, (vh - top) / (EDGE * s));
+      el.style.opacity = String(0.15 + 0.85 * vis);
+      el.style.filter = vis < 1 ? `blur(${((1 - vis) * 8).toFixed(1)}px)` : '';
+      movers[i](scroll.y + (1 - vis) * 40);
     });
   };
 

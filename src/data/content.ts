@@ -13,7 +13,7 @@ export const site = {
   metaDescription:
     'Кибермейджор, MVP Talks и спортивный квиз: подводим итоги года в спорте, беттинге и киберспорте. 13 декабря 2026, Avulus Cyber Space.',
   /** Слой разметки прототипа: номера экранов, заметки из ТЗ, места под новогодние элементы. В проде — false. */
-  annotations: true,
+  annotations: false,
 };
 
 export const event = {

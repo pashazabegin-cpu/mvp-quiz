@@ -49,6 +49,9 @@ const lines = (text: string) => text.split('\n');
 <style>
   .schedule {
     color: var(--c-text);
+    /* нижние 300 px макета: у края экрана прозрачность 0, к верху полосы — 100% */
+    -webkit-mask-image: linear-gradient(to top, transparent 0, #000 calc(300px * var(--ui-s)));
+    mask-image: linear-gradient(to top, transparent 0, #000 calc(300px * var(--ui-s)));
   }
   .schedule__date {
     left: calc(60px + var(--col));

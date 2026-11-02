@@ -25,8 +25,8 @@ export function initSchedule(): ScrollTrigger | undefined {
   const scroll = { y: 0 };
   const movers = items.map((el, i) => gsap.quickTo(el, 'y', { duration: 1 + i * 0.4, ease: 'power3.out' }));
 
-  /** нижняя полоса экрана (px макета), где пункт ещё размыт и полупрозрачен — видно, что дальше есть ещё */
-  const EDGE = 200;
+  /** нижняя полоса экрана (px макета), в которой пункты проявляются (сама прозрачность — маской в Schedule.astro) */
+  const EDGE = 300;
   const edge = (top: number) => gsap.utils.clamp(0, 1, (window.innerHeight - top) / (EDGE * stageScale()));
 
   // скролл задаёт цель; лёгкий доезд снизу — по положению без отставания, чтобы не было обратной связи
@@ -38,18 +38,6 @@ export function initSchedule(): ScrollTrigger | undefined {
     });
   };
 
-  // размытие и прозрачность — каждый кадр по фактическому положению: работают и при скролле вверх,
-  // и пока пункты ещё доезжают после остановки
-  const shade = () => {
-    const r = section.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > window.innerHeight) return;
-    items.forEach((el) => {
-      const vis = edge(el.getBoundingClientRect().top);
-      el.style.opacity = String(0.15 + 0.85 * vis);
-      el.style.filter = vis < 1 ? `blur(${((1 - vis) * 8).toFixed(1)}px)` : '';
-    });
-  };
-  gsap.ticker.add(shade);
 
   const tl = gsap.timeline({
     defaults: { ease: 'none' },

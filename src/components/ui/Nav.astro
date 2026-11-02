@@ -10,14 +10,14 @@ import Button from './Button.astro';
   <div class="nav__links" data-nav-links>
     <span class="nav__indicator" data-nav-indicator aria-hidden="true"></span>
     {
-      nav.map((item, i) => (
-        <a class="nav__link" href={`#${item.id}`} data-nav-link={item.id} style={`--i:${i}`}>
+      nav.map((item) => (
+        <a class="nav__link" href={`#${item.id}`} data-nav-link={item.id}>
           {item.label}
         </a>
       ))
     }
   </div>
-  <span class="nav__cta-wrap" style={`--i:${nav.length}`}><Button href={event.ticketUrl} class="nav__cta">Билеты</Button></span>
+  <Button href={event.ticketUrl} class="nav__cta">Билеты</Button>
 </nav>
 
 <style>
@@ -91,32 +91,6 @@ import Button from './Button.astro';
     }
   }
   /* на первом экране меню нет (как в макете) — появляется, когда обложка уезжает (scripts/ui/nav.ts) */
-  /* «Гармошка»: при появлении плашка раскрывается от центра, пункты и кнопка подъезжают
-     слева по очереди (--i — номер). Задержки только на появление — прячется меню сразу. */
-  .nav__glass,
-  .nav__link,
-  .nav__cta-wrap {
-    transition:
-      opacity 0.5s var(--ease-out) calc(0.12s + var(--i, 0) * 0.06s),
-      transform 0.8s var(--ease-out) calc(0.12s + var(--i, 0) * 0.06s),
-      color 0.3s;
-  }
-  .nav__glass {
-    --i: -2;
-  }
-  .nav__cta-wrap {
-    display: flex;
-    flex: none;
-  }
-  :global(html.js-motion:not(.is-past-hero)) .nav__glass {
-    transform: scaleX(0.55);
-    transition-delay: 0s;
-  }
-  :global(html.js-motion:not(.is-past-hero)) :is(.nav__link, .nav__cta-wrap) {
-    opacity: 0;
-    transform: translateX(calc(-40px - var(--i) * 18px));
-    transition-delay: 0s;
-  }
   :global(html.js-motion:not(.is-past-hero)) .nav {
     opacity: 0;
     transform: translateY(24px);
@@ -140,6 +114,7 @@ import Button from './Button.astro';
     color: var(--c-muted);
     font-size: 14px;
     white-space: nowrap;
+    transition: color 0.3s;
   }
   .nav__link:hover,
   .nav__link.is-active {

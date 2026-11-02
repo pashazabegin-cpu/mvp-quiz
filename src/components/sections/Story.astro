@@ -33,6 +33,18 @@
     top: 0;
     height: calc(3622px * var(--ui-s));
     background: linear-gradient(to top, var(--c-bg) 0%, var(--c-navy) 30.1%, var(--c-navy) 50.751%, var(--c-bg) 78.388%);
+    /* смешивание в OKLab — переход тёмный → синий ровнее по яркости */
+    background: linear-gradient(to top in oklab, var(--c-bg) 0%, var(--c-navy) 30.1%, var(--c-navy) 50.751%, var(--c-bg) 78.388%);
     will-change: transform;
+  }
+  /* Дизеринг: тонкий шум поверх градиента разбивает «лесенку» оттенков тёмно-синего (8 бит на канал).
+     На глаз не виден, только сглаживает переходы. */
+  .story__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.07;
+    mix-blend-mode: overlay;
   }
 </style>

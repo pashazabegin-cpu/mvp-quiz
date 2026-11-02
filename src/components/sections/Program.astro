@@ -1,0 +1,175 @@
+---
+/**
+ * 03 · «Программа» — Кибермейджор / MVP Talks / Спортивный квиз (Figma: кадры «main» 01–03).
+ * Экран закреплён на три шага скролла. Иконка — WebGL-переход (canvas), картинки ниже —
+ * текстуры для него и запасной вариант без WebGL.
+ * Логика — scripts/sections/program.ts, scripts/effects/icon-morph.ts
+ */
+import Anno from '../ui/Anno.astro';
+import { program } from '../../data/content';
+import { withBase } from '../../lib/paths';
+const pad = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<section class="program stage" id="program" data-program>
+  <div class="stage__ui">
+    <p class="program__label label" data-split="dark">{program.label}</p>
+
+    <ol class="program__list" data-program-list>
+      {program.items.map((it) => <li class="program__item" data-program-item>{it.title}</li>)}
+    </ol>
+
+    <div class="program__icon" data-tilt="10">
+      <div class="program__float" data-program-float>
+        <canvas class="program__canvas" data-icon-morph aria-hidden="true"></canvas>
+        {
+          program.items.map((it, i) => (
+            <img
+              class="program__img"
+              src={withBase(it.icon)}
+              width="441"
+              height="351"
+              alt={it.title}
+              style={i === 0 ? undefined : 'opacity:0'}
+              data-program-img
+            />
+          ))
+        }
+      </div>
+    </div>
+
+    {
+      program.items.map((it, i) => (
+        <div class="program__info" data-program-info>
+          <p class="program__num" data-lines>{pad(i)}</p>
+          <p class="program__lead" data-lines>
+            {it.lead.split('\n').map((line, j) => (
+              <>
+                {j > 0 && <br />}
+                {line}
+              </>
+            ))}
+          </p>
+        </div>
+      ))
+    }
+  </div>
+  <Anno kind="screen">03 · Программа (новый блок)</Anno>
+</section>
+
+<style>
+  .program {
+    color: var(--c-text);
+  }
+  .program__label {
+    left: calc(60px + var(--col));
+    top: calc(50% - 450px + 265px);
+  }
+  .program__list {
+    --step: 82px;
+    left: calc(60px + var(--col));
+    top: calc(50% - 450px + 399px);
+    width: 380px;
+    will-change: transform;
+  }
+  .program__item {
+    height: 45px;
+    margin-bottom: calc(var(--step) - 45px);
+    font-size: 45px;
+    font-weight: 300;
+    line-height: 45px;
+    letter-spacing: -2.25px;
+    white-space: nowrap;
+  }
+  .program__item:nth-child(n + 2) {
+    opacity: 0.05;
+  }
+  /* иконка 441×351: центр — 6-я колонка (535 при 1440) */
+  .program__icon {
+    left: calc(60px + var(--col) * 5);
+    top: calc(50% - 450px + 263px);
+    width: 441px;
+    height: 351px;
+  }
+  .program__float {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .program__canvas,
+  .program__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .program__canvas {
+    display: none;
+  }
+  .program.is-gl .program__canvas {
+    display: block;
+  }
+  .program.is-gl .program__img {
+    visibility: hidden;
+  }
+  /* до запуска скрипта видно только первое описание */
+  .program:not(.is-ready) .program__info ~ .program__info {
+    visibility: hidden;
+  }
+  .program__info {
+    left: calc(60px + var(--col) * 10);
+    top: calc(50% - 450px + 274px);
+    width: 282px;
+    font-weight: 300;
+  }
+  .program__num {
+    font-size: 20px;
+    line-height: 20px;
+  }
+  .program__lead {
+    margin-top: 90px;
+    font-size: 22px;
+    line-height: 32px;
+  }
+
+  @media (max-aspect-ratio: 4/5) {
+    .program__label {
+      left: 16px;
+      top: 64px;
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+    .program__list {
+      --step: 44px;
+      left: 16px;
+      top: 104px;
+      width: 343px;
+    }
+    .program__item {
+      height: 32px;
+      font-size: 30px;
+      line-height: 32px;
+      letter-spacing: -1.5px;
+    }
+    .program__icon {
+      left: 50%;
+      top: 230px;
+      width: 300px;
+      height: 239px;
+      margin-left: -150px;
+    }
+    .program__info {
+      left: 16px;
+      top: 500px;
+      width: 343px;
+    }
+    .program__lead {
+      margin-top: 16px;
+      font-size: 18px;
+      line-height: 26px;
+    }
+    .program__lead :global(br) {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,136 @@
+---
+/**
+ * 02 · «Что мы придумали?» (Figma: кадр «main»/«START» 1440×900).
+ * Экран закреплён: текст закрашивается по словам, теги/снежинки/фото проезжают снизу вверх
+ * на разной глубине — в середине пути стоят ровно как в макете (кадр «2»).
+ * Логика — scripts/sections/intro.ts
+ */
+import Anno from '../ui/Anno.astro';
+import { intro } from '../../data/content';
+import { withBase } from '../../lib/paths';
+const lines = (text: string) => text.split('\n');
+---
+
+<section class="intro stage" id="about" data-intro-section>
+  <div class="stage__ui">
+    <h2 class="intro__title" data-split>
+      {intro.title[0]}<br /><span class="accent">{intro.title[1]}</span>
+    </h2>
+    <div class="intro__lead" data-intro-lead>
+      {
+        intro.paragraphs.map((p) => (
+          <p>
+            {lines(p).map((line, i) => (
+              <>
+                {i > 0 && <br />}
+                {line}
+              </>
+            ))}
+          </p>
+        ))
+      }
+    </div>
+    <div class="intro__floats" aria-hidden="true">
+      {
+        intro.floats.map((f) => (
+          <div
+            class:list={['intro__float', `intro__float--${f.kind}`, 'back' in f && f.back && 'intro__float--back']}
+            data-float
+            data-z={f.z}
+            style={`left:${((f.x / 1440) * 100).toFixed(3)}%;top:${f.y}px;${'w' in f && f.w ? `width:${f.w}px;height:${f.h}px;` : ''}`}
+          >
+            {f.kind === 'tag' ? (
+              <span class="pill" style={`--pill:var(${f.color === 'accent' ? '--c-accent' : '--c-accent-2'})`}>
+                {f.text}
+              </span>
+            ) : (
+              <img src={withBase(f.src!)} width={f.w} height={f.h} alt="" loading="lazy" decoding="async" />
+            )}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  <Anno kind="screen">02 · Что мы придумали?</Anno>
+</section>
+
+<style>
+  .intro {
+    color: var(--c-text);
+  }
+  .intro__title {
+    left: 50%;
+    top: calc(50% - 450px + 110px);
+    width: 380px;
+    margin-left: -190px;
+    font-size: 45px;
+    font-weight: 300;
+    line-height: 45px;
+    letter-spacing: -2.25px;
+    text-align: center;
+  }
+  .accent {
+    color: var(--c-accent);
+  }
+  .intro__lead {
+    left: 50%;
+    top: calc(50% - 450px + 349px);
+    width: 750px;
+    margin-left: -375px;
+    font-size: 26px;
+    line-height: 1.45;
+    text-align: center;
+  }
+  .intro__lead p + p {
+    margin-top: 1.45em;
+  }
+  /* слой проезжающих элементов: по вертикали — кадр 900, по горизонтали растянут на весь экран
+     (x — доля ширины кадра 1440), чтобы крайние снежинки оставались у краёв на широких экранах */
+  .intro__floats {
+    left: 0;
+    top: calc(50% - 450px);
+    width: 100%;
+    height: 900px;
+    pointer-events: none;
+  }
+  .intro__float {
+    position: absolute;
+    will-change: transform;
+  }
+  /* дальний план — за текстом */
+  .intro__float--back {
+    z-index: -1;
+  }
+  .intro__float img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-aspect-ratio: 4/5) {
+    .intro__title {
+      top: 72px;
+      width: 300px;
+      margin-left: -150px;
+      font-size: 34px;
+      line-height: 36px;
+    }
+    .intro__lead {
+      top: 170px;
+      width: 343px;
+      margin-left: -171.5px;
+      font-size: 18px;
+    }
+    .intro__lead :global(br) {
+      display: none;
+    }
+    .intro__floats {
+      left: 50%;
+      top: calc(100% - 210px);
+      width: 1440px;
+      margin-left: -720px;
+      transform: scale(0.36);
+      transform-origin: 50% 0;
+    }
+  }
+</style>

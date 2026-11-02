@@ -1,0 +1,82 @@
+---
+/**
+ * 08 · Партнёры — сетка логотипов как на форуме.
+ * Линии сетки подсвечиваются вокруг курсора (data-pointer задаёт --mx/--my всей сетке).
+ */
+import Anno from '../ui/Anno.astro';
+import Placeholder from '../ui/Placeholder.astro';
+import { partners } from '../../data/content';
+---
+
+<section class="section partners" id="partners">
+  <Anno kind="screen">08 · Партнёры</Anno>
+  <div class="container">
+    <h2 class="h2 partners__title" data-split>{partners.title}</h2>
+    <ul class="partners__grid" data-pointer data-stagger>
+      {
+        partners.items.map((p) => (
+          <li class="partner" data-spotlight>
+            <Placeholder label="Логотип" src={p.logo} class="partner__logo" />
+            <span class="partner__role">{p.role}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <Anno kind="motion">линии сетки светятся вокруг курсора · логотип приподнимается на ховере</Anno>
+  </div>
+</section>
+
+<style>
+  .partners__title {
+    margin-bottom: clamp(32px, 4vw, 56px);
+    text-align: center;
+  }
+  .partners__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-m);
+    /* 1px-зазоры между ячейками = линии сетки; градиент под курсором их «зажигает» */
+    background:
+      radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), var(--c-text), transparent 70%),
+      var(--c-line);
+  }
+  .partner {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 18px;
+    min-height: 200px;
+    padding: 40px 24px;
+    background: var(--c-bg);
+    text-align: center;
+  }
+  .partner :global(.partner__logo) {
+    width: 160px;
+    height: 56px;
+    border-radius: 8px;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .partner:hover :global(.partner__logo) {
+    transform: translateY(-6px) scale(1.04);
+  }
+  .partner__role {
+    color: var(--c-muted);
+    font-size: 13px;
+  }
+  @media (max-width: 720px) {
+    .partners__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .partner {
+      min-height: 150px;
+      padding: 24px 12px;
+    }
+    .partner :global(.partner__logo) {
+      width: 110px;
+      height: 44px;
+    }
+  }
+</style>

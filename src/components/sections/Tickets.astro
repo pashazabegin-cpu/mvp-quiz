@@ -1,0 +1,133 @@
+---
+/**
+ * 07 · Купить билет — по смыслу как на форуме.
+ * Билет с вырезами наклоняется за курсором, по нему бежит блик; позади — тот же живой WebGL-фон.
+ */
+import Anno from '../ui/Anno.astro';
+import Button from '../ui/Button.astro';
+import { event, ticket } from '../../data/content';
+---
+
+<section class="section tickets" id="tickets">
+  <canvas class="tickets__bg" data-shader data-shader-intensity="0.7" aria-hidden="true"></canvas>
+  <Anno kind="screen">07 · Купить билет</Anno>
+  <div class="container">
+    <article class="ticket" data-tilt="5" data-spotlight data-reveal>
+      <span class="ticket__glare" aria-hidden="true"></span>
+      <div class="ticket__main">
+        <p class="eyebrow">{event.date} · {event.venue}</p>
+        <h2 class="ticket__title" data-split>Купить<br />билет</h2>
+        <p class="ticket__text fish">{ticket.text}</p>
+      </div>
+      <div class="ticket__side">
+        <ul class="ticket__perks">
+          {ticket.perks.map((p) => <li>{p}</li>)}
+        </ul>
+        <Button href={event.ticketUrl}>{ticket.cta}</Button>
+      </div>
+    </article>
+    <Anno kind="motion">билет: 3D-наклон, блик бежит за курсором · фон: живой шейдер</Anno>
+  </div>
+</section>
+
+<style>
+  .tickets {
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .tickets__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+  }
+  .ticket {
+    --side: 380px;
+    --notch: 18px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--side);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-l);
+    background: color-mix(in srgb, var(--c-surface) 75%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    /* полукруглые вырезы сверху и снизу на линии отрыва */
+    mask:
+      radial-gradient(circle at calc(100% - var(--side)) 0, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) top / 100% 51% no-repeat,
+      radial-gradient(circle at calc(100% - var(--side)) 100%, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) bottom / 100% 51% no-repeat;
+  }
+  .ticket__glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      115deg,
+      transparent 35%,
+      rgb(255 255 255 / 0.1) 48%,
+      rgb(255 255 255 / 0.18) 50%,
+      transparent 62%
+    );
+    background-size: 300% 100%;
+    background-position: calc(100% - var(--gx, 50%)) 0;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+  .ticket:hover .ticket__glare {
+    opacity: 1;
+  }
+  .ticket__main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-height: 380px;
+    padding: clamp(28px, 4vw, 56px);
+  }
+  .ticket__title {
+    font-size: clamp(56px, 8vw, 116px);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+  }
+  .ticket__text {
+    max-width: 44ch;
+    margin-top: auto;
+    color: var(--c-muted);
+  }
+  .ticket__side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 32px;
+    padding: clamp(28px, 4vw, 48px);
+    border-left: 2px dashed var(--c-line-strong);
+  }
+  .ticket__perks li {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .ticket__perks li::before {
+    content: '';
+    flex: none;
+    width: 6px;
+    height: 6px;
+    margin-top: 9px;
+    border-radius: 50%;
+    background: var(--c-text);
+  }
+  @media (max-width: 860px) {
+    .ticket {
+      grid-template-columns: 1fr;
+      mask: none;
+    }
+    .ticket__main {
+      min-height: 0;
+    }
+    .ticket__side {
+      border-left: 0;
+      border-top: 2px dashed var(--c-line-strong);
+    }
+  }
+</style>

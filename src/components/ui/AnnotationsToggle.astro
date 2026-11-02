@@ -1,0 +1,79 @@
+---
+/** Переключатель слоя разметки прототипа. Не рендерится, если site.annotations = false. */
+---
+
+<div class="anno-panel" data-anno-panel>
+  <button class="anno-toggle" type="button" data-anno-toggle aria-pressed="true" title="Показать/скрыть слой разметки">Разметка</button>
+  <ul class="anno-legend">
+    <li><i class="l-ph"></i>картинка-заглушка</li>
+    <li><i class="l-fish"></i>текст-заглушка («рыба»)</li>
+    <li><i class="l-motion"></i>какая анимация в блоке</li>
+  </ul>
+</div>
+
+<style>
+  .anno-panel {
+    position: fixed;
+    right: 16px;
+    bottom: 96px;
+    z-index: 60;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .anno-toggle {
+    padding: 8px 12px;
+    border-radius: var(--radius-pill);
+    background: rgb(255 255 255 / 0.1);
+    color: var(--c-text);
+    backdrop-filter: blur(10px);
+  }
+  :global(.annotations) .anno-toggle {
+    background: #ffd84d;
+    color: #111;
+  }
+  .anno-legend {
+    display: none;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgb(0 0 0 / 0.75);
+    color: #ddd;
+  }
+  :global(.annotations) .anno-panel:hover .anno-legend {
+    display: grid;
+  }
+  .anno-panel {
+    flex-direction: column-reverse;
+  }
+  .anno-legend li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .anno-legend i {
+    width: 14px;
+    height: 10px;
+    border-radius: 3px;
+  }
+  .l-ph {
+    border: 1px dashed rgb(255 255 255 / 0.5);
+    background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.25) 0 1px, transparent 1px 4px);
+  }
+  .l-fish {
+    border: 1px dashed #ffd84d;
+  }
+  .l-motion {
+    background: #7df9ff;
+  }
+  @media (max-width: 720px) {
+    .anno-panel {
+      bottom: 84px;
+    }
+    .anno-legend {
+      display: none !important;
+    }
+  }
+</style>

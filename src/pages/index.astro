@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/sections/Hero.astro';
+import Story from '../components/sections/Story.astro';
+import Intro from '../components/sections/Intro.astro';
+import Program from '../components/sections/Program.astro';
+import Schedule from '../components/sections/Schedule.astro';
+---
+
+<!--
+  Страница собирается по макету сверху вниз. Блоки ниже расписания (Talks, Quiz, Speakers, Jury,
+  Tickets, Partners, Location, Faq, Footer — прототипы в components/sections) пока сняты со страницы.
+-->
+<Base>
+  <main>
+    <Hero />          <!-- 01 Первый экран — по макету -->
+    <Story>           <!-- общий фон-градиент для трёх экранов ниже -->
+      <Intro />       <!-- 02 Что мы придумали? — по макету -->
+      <Program />     <!-- 03 Программа: три пункта дня — по макету -->
+      <Schedule />    <!-- 04 Как всё пройдёт? — по макету -->
+    </Story>
+  </main>
+</Base>

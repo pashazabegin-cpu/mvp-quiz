@@ -1,0 +1,47 @@
+---
+/**
+ * Место под новогодний декоративный элемент (ёлочная игрушка, звезда, снежинка…).
+ * Внешний слой двигается при скролле (data-parallax), внутренний — за курсором (data-depth).
+ * Без src это пунктирная заглушка, видимая только в режиме разметки.
+ */
+interface Props {
+  /** Позиция и размер, например 'top: 10%; left: 4%; width: 90px' */
+  style: string;
+  src?: string;
+  speed?: number;
+  depth?: number;
+}
+const { style, src, speed = 0.3, depth = 1 } = Astro.props;
+---
+
+<div class="ny" style={style} data-parallax={speed} aria-hidden="true">
+  <div class="ny__inner" data-depth={depth}>
+    {src ? <img src={src} alt="" /> : <span class="ny__ph">НГ-элемент</span>}
+  </div>
+</div>
+
+<style>
+  .ny {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .ny img {
+    width: 100%;
+  }
+  .ny__ph {
+    display: none;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px dashed rgb(255 216 77 / 0.7);
+    border-radius: 50%;
+    background: rgb(255 216 77 / 0.06);
+    color: #ffd84d;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-align: center;
+  }
+  :global(.annotations) .ny__ph {
+    display: grid;
+  }
+</style>

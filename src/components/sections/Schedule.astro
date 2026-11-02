@@ -1,0 +1,172 @@
+---
+/**
+ * 04 · «Как всё пройдёт?» (Figma: кадр «main» с расписанием).
+ * Экран закреплён: заголовок слева стоит, программа дня справа прокручивается.
+ * Логика — scripts/sections/schedule.ts
+ */
+import Anno from '../ui/Anno.astro';
+import { event, schedule } from '../../data/content';
+const lines = (text: string) => text.split('\n');
+---
+
+<section class="schedule stage" id="schedule" data-schedule>
+  <div class="stage__ui">
+    <p class="schedule__date label" data-split="dark">{event.date} · {event.venue}</p>
+    <h2 class="schedule__title" data-split>{schedule.title} <span class="accent">{schedule.accent}</span></h2>
+
+    <ol class="schedule__list" data-schedule-list>
+      {
+        schedule.items.map((it) => (
+          <li class:list={['sch', it.key && 'sch--key', it.list && 'sch--wide']}>
+            <span class="time-pill">{it.time}</span>
+            {it.tag && <p class="sch__tag">{it.tag}</p>}
+            <h3 class="sch__title">{it.title}</h3>
+            {it.text && (
+              <p class="sch__text">
+                {lines(it.text).map((line, i) => (
+                  <>
+                    {i > 0 && <br />}
+                    {line}
+                  </>
+                ))}
+              </p>
+            )}
+            {it.list && (
+              <ul class="sch__chips">
+                {it.list.map((x) => (
+                  <li class="pill">{x}</li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+  <Anno kind="screen">04 · Как всё пройдёт?</Anno>
+</section>
+
+<style>
+  .schedule {
+    color: var(--c-text);
+  }
+  .schedule__date {
+    left: calc(60px + var(--col));
+    top: calc(50% - 450px + 158px);
+    width: 527px;
+    line-height: 33px;
+  }
+  .schedule__title {
+    left: calc(60px + var(--col));
+    top: calc(50% - 450px + 228px);
+    width: 520px;
+    font-size: 45px;
+    font-weight: 300;
+    line-height: 45px;
+    letter-spacing: -2.25px;
+  }
+  .accent {
+    color: var(--c-accent);
+  }
+  /* список — от 9-й колонки (816 при 1440) */
+  .schedule__list {
+    left: calc(60px + var(--col) * 8 - 4px);
+    top: calc(50% - 450px + 219px);
+    width: 525px;
+    will-change: transform;
+  }
+  .sch {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    width: 393px;
+    font-weight: 300;
+  }
+  .sch + .sch {
+    margin-top: 60px;
+  }
+  .sch--key {
+    gap: 30px;
+    width: 472px;
+  }
+  .sch--wide {
+    width: 525px;
+  }
+  .sch__tag {
+    font-size: 20px;
+    line-height: 20px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .sch__title {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 32px;
+  }
+  .sch--key .sch__title {
+    font-size: 45px;
+    line-height: 45px;
+    letter-spacing: -2.25px;
+  }
+  .sch__text {
+    font-size: 22px;
+    line-height: 32px;
+  }
+  .sch__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10.4px 10px;
+    max-width: 500px;
+    margin-top: 4px;
+  }
+
+  @media (max-aspect-ratio: 4/5) {
+    .schedule__date {
+      left: 16px;
+      top: 56px;
+      width: 343px;
+      font-size: 13px;
+      letter-spacing: 2px;
+      line-height: 20px;
+    }
+    .schedule__title {
+      left: 16px;
+      top: 88px;
+      width: 343px;
+      font-size: 34px;
+      line-height: 36px;
+    }
+    .schedule__list {
+      left: 16px;
+      top: 168px;
+      width: 343px;
+    }
+    .sch,
+    .sch--key,
+    .sch--wide {
+      width: 343px;
+      gap: 16px;
+    }
+    .sch + .sch {
+      margin-top: 40px;
+    }
+    .sch__title,
+    .sch__text {
+      font-size: 18px;
+      line-height: 26px;
+    }
+    .sch--key .sch__title {
+      font-size: 30px;
+      line-height: 32px;
+    }
+    .sch__text :global(br) {
+      display: none;
+    }
+    .sch__chips :global(.pill) {
+      height: 32px;
+      padding: 7px 16px 2px;
+      font-size: 14px;
+    }
+  }
+</style>

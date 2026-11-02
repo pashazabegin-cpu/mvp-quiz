@@ -1,0 +1,38 @@
+---
+/**
+ * Обёртка экранов «Что мы придумали?» → «Программа» → «Как всё пройдёт?».
+ * Общий фон из макета (кадр «2»): градиент высотой 3622 px — чёрный → синий → чёрный.
+ * Он «прилипает» к экрану и едет вверх вместе с экранами (scripts/sections/story-bg.ts).
+ */
+---
+
+<div class="story" data-story>
+  <div class="story__bg" aria-hidden="true">
+    <div class="story__grad" data-story-grad></div>
+  </div>
+  <slot />
+</div>
+
+<style>
+  .story {
+    position: relative;
+    background: var(--c-bg);
+  }
+  .story__bg {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    margin-bottom: -100vh;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .story__grad {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: calc(3622px * var(--ui-s));
+    background: linear-gradient(to top, var(--c-bg) 0%, var(--c-navy) 30.1%, var(--c-navy) 50.751%, var(--c-bg) 78.388%);
+    will-change: transform;
+  }
+</style>

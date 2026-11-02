@@ -1,0 +1,94 @@
+---
+/**
+ * 04 · Программа MVP Talks & Entertainment — один поток, компактно:
+ * время — название сессии — пояснение. Строки появляются по очереди, на ховере — подсветка.
+ */
+import Anno from '../ui/Anno.astro';
+import { talks } from '../../data/content';
+---
+
+<section class="section talks" id="talks">
+  <Anno kind="screen">04 · Программа MVP Talks</Anno>
+  <div class="container">
+    <div class="section-head">
+      <h2 class="h2" data-split>{talks.title}</h2>
+      <span class="chip chip--mono" data-reveal>{talks.badge}</span>
+    </div>
+    <ol class="talks__list" data-stagger>
+      {
+        talks.sessions.map((s) => (
+          <li class="talk" data-spotlight>
+            <time class="talk__time">{s.time}</time>
+            <div class="talk__main">
+              <span class="talk__format">{s.format}</span>
+              <h3 class:list={['talk__title', { fish: s.draft }]}>{s.title}</h3>
+            </div>
+            <p class:list={['talk__text', { fish: s.draft }]}>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <Anno>ТЗ: один поток, компактнее чем на форуме · время — сессия — пояснение</Anno>
+    <Anno kind="motion">строки появляются лесенкой · ховер: полоска слева, сдвиг заголовка, пятно света</Anno>
+  </div>
+</section>
+
+<style>
+  .talks__list {
+    border-top: 1px solid var(--c-line);
+  }
+  .talk {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 8px 32px;
+    align-items: baseline;
+    padding: 22px 16px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .talk::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    background: var(--c-accent);
+    transform: scaleY(0);
+    transition: transform 0.5s var(--ease-out);
+  }
+  .talk:hover::before {
+    transform: scaleY(1);
+  }
+  .talk__time {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--c-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .talk__format {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .talk__title {
+    margin-top: 6px;
+    font-size: 21px;
+    line-height: 1.2;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .talk:hover .talk__title {
+    transform: translateX(8px);
+  }
+  .talk__text {
+    color: var(--c-muted);
+    font-size: 15px;
+  }
+  @media (max-width: 860px) {
+    .talk {
+      grid-template-columns: 1fr;
+      padding-inline: 4px;
+    }
+  }
+</style>

@@ -1,0 +1,14 @@
+---
+/**
+ * Метка слоя разметки (номер экрана или заметка из ТЗ). Видна только
+ * при включённой «Разметке», в проде не рендерится вовсе (site.annotations = false).
+ */
+import { site } from '../../data/content';
+interface Props {
+  /** screen — номер экрана, note — заметка из ТЗ, motion — какая анимация в блоке */
+  kind?: 'screen' | 'note' | 'motion';
+}
+const { kind = 'note' } = Astro.props;
+---
+
+{site.annotations && <span class:list={['anno', `anno--${kind}`]}><slot /></span>}

@@ -1,0 +1,129 @@
+---
+/**
+ * 06 · Кто будет? — горизонтальная лента спикеров (по ТЗ, чтобы не уходить вниз).
+ * Листается тачпадом/свайпом, перетаскиванием мышью и стрелками (scripts/ui/rail.ts).
+ */
+import Anno from '../ui/Anno.astro';
+import Placeholder from '../ui/Placeholder.astro';
+import { speakers } from '../../data/content';
+---
+
+<section class="section speakers" id="speakers">
+  <Anno kind="screen">06 · Кто будет?</Anno>
+  <div class="container section-head">
+    <h2 class="h2" data-split>{speakers.title}</h2>
+    <div class="rail-ctrl" data-reveal>
+      <button type="button" class="rail-btn" data-rail-prev aria-label="Предыдущие спикеры">←</button>
+      <button type="button" class="rail-btn" data-rail-next aria-label="Следующие спикеры">→</button>
+    </div>
+  </div>
+
+  <div class="rail" data-rail>
+    <ul class="rail__track" data-stagger>
+      {
+        speakers.items.map((s) => (
+          <li class="speaker">
+            <div class="speaker__photo">
+              <Placeholder label="Фото спикера" src={s.photo} ratio="3/4" />
+            </div>
+            <h3 class:list={['speaker__name', { fish: s.draft }]}>{s.name}</h3>
+            <p class:list={['speaker__role', { fish: s.draft }]}>{s.role}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="container">
+    <div class="rail__progress" aria-hidden="true"><span data-rail-progress></span></div>
+    <Anno>ТЗ: горизонтальная прокрутка · фото, ФИ, должность</Anno>
+    <Anno kind="motion">лента тянется мышью с инерцией · прогресс-бар · фото приближается на ховере</Anno>
+  </div>
+</section>
+
+<style>
+  .rail-ctrl {
+    display: flex;
+    gap: 8px;
+  }
+  .rail-btn {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--c-line-strong);
+    border-radius: 50%;
+    font-size: 18px;
+    transition: background 0.3s, color 0.3s;
+  }
+  .rail-btn:hover {
+    background: var(--c-text);
+    color: var(--c-bg);
+  }
+  .rail-btn:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .rail {
+    --rail-pad: max(var(--gutter), calc((100vw - var(--container)) / 2));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--rail-pad);
+    padding-inline: var(--rail-pad);
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  :global(.rail.is-dragging) {
+    scroll-snap-type: none;
+    cursor: grabbing;
+    user-select: none;
+  }
+  .rail__track {
+    display: flex;
+    gap: 16px;
+    width: max-content;
+  }
+  .speaker {
+    width: clamp(220px, 22vw, 290px);
+    scroll-snap-align: start;
+  }
+  .speaker__photo {
+    overflow: hidden;
+    border-radius: var(--radius-m);
+  }
+  .speaker__photo > :global(*) {
+    transition: transform 0.8s var(--ease-out);
+  }
+  .speaker:hover .speaker__photo > :global(*) {
+    transform: scale(1.05);
+  }
+  .speaker__name {
+    margin-top: 16px;
+    font-size: 19px;
+    line-height: 1.2;
+  }
+  .speaker__role {
+    margin-top: 4px;
+    color: var(--c-muted);
+    font-size: 14px;
+  }
+
+  .rail__progress {
+    position: relative;
+    height: 2px;
+    margin-top: 32px;
+    background: var(--c-line);
+  }
+  .rail__progress span {
+    position: absolute;
+    inset: 0;
+    background: var(--c-text);
+    transform: scaleX(var(--p, 0.1));
+    transform-origin: left;
+  }
+</style>

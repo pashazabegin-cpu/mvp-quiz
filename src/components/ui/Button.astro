@@ -1,0 +1,32 @@
+---
+/**
+ * Кнопка MVP (как на mvpa.ru): золотая, блик при наведении, средний ряд точек сдвигается.
+ * По умолчанию «магнитная» (тянется за курсором, scripts/interactions/magnetic.ts).
+ */
+interface Props {
+  href: string;
+  variant?: 'gold' | 'ghost';
+  magnetic?: boolean;
+  class?: string;
+  /** атрибут появления для анимаций первого экрана (data-anim="btn") */
+  anim?: string;
+}
+const { href, variant = 'gold', magnetic = true, class: className, anim } = Astro.props;
+const external = /^https?:/.test(href);
+---
+
+<a
+  href={href}
+  class:list={['btn', variant === 'ghost' && 'btn--ghost', className]}
+  data-magnetic={magnetic ? '' : undefined}
+  data-anim={anim}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener' : undefined}
+>
+  <span class="btn__label"><slot /></span>
+  <svg class="btn__icon" width="13.51" height="11.82" viewBox="0 0 13.5065 11.8182" aria-hidden="true">
+    <circle cx="5.065" cy="1.688" r="1.688"></circle><circle cx="11.818" cy="1.688" r="1.688"></circle>
+    <g class="btn__dots-mid"><circle cx="1.688" cy="5.909" r="1.688"></circle><circle cx="8.442" cy="5.909" r="1.688"></circle></g>
+    <circle cx="5.065" cy="10.13" r="1.688"></circle><circle cx="11.818" cy="10.13" r="1.688"></circle>
+  </svg>
+</a>

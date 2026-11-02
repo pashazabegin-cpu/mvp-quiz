@@ -1,0 +1,117 @@
+---
+/**
+ * 09 · Локация — как на форуме + фото площадки на фоне (едет медленнее страницы).
+ */
+import Anno from '../ui/Anno.astro';
+import Placeholder from '../ui/Placeholder.astro';
+import { event, location } from '../../data/content';
+---
+
+<section class="section location" id="location">
+  <div class="location__bg" data-parallax="0.15" aria-hidden="true">
+    <Placeholder label="Фото площадки — фон (2 варианта в ТЗ)" src={location.photo} />
+  </div>
+  <Anno kind="screen">09 · Локация</Anno>
+  <div class="container">
+    <h2 class="h2 location__title" data-split>{location.title}</h2>
+    <div class="location__grid">
+      <div class="location__info" data-reveal>
+        <h3 class="location__venue">{event.venue}</h3>
+        <p class="location__address">{event.address}</p>
+        <a class="link-arrow" href={event.mapUrl} target="_blank" rel="noopener">
+          {location.mapLabel} <span class="arr">↗</span>
+        </a>
+      </div>
+      <div class="map" data-reveal>
+        <Placeholder label="Яндекс Карта (тёмная тема)" />
+        <span class="map__pin" aria-hidden="true"></span>
+      </div>
+    </div>
+    <Anno>ТЗ: фото площадки где-то на фоне</Anno>
+    <Anno kind="motion">фото фона — параллакс · пин на карте пульсирует</Anno>
+  </div>
+</section>
+
+<style>
+  .location {
+    overflow: hidden;
+    isolation: isolate;
+    padding-bottom: calc(var(--section-y) + 80px);
+  }
+  .location__bg {
+    position: absolute;
+    inset: -12% 0;
+    z-index: -1;
+  }
+  .location__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(var(--c-bg) 0%, color-mix(in srgb, var(--c-bg) 55%, transparent) 50%, var(--c-bg) 100%);
+  }
+  .location__bg :global(.ph) {
+    border: 0;
+    border-radius: 0;
+    place-items: end center;
+    padding-bottom: 18%;
+  }
+  .location__title {
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+  .location__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 48px;
+    align-items: center;
+  }
+  .location__venue {
+    font-size: clamp(28px, 3.2vw, 42px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .location__address {
+    margin: 16px 0 28px;
+    color: var(--c-muted);
+    font-size: 17px;
+  }
+  .map {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius-l);
+    background: var(--c-surface);
+  }
+  .map__pin {
+    position: absolute;
+    top: 38%;
+    left: 64%;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border-radius: 50%;
+    background: var(--c-text);
+  }
+  .map__pin::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--c-text);
+    animation: pin-ping 2s var(--ease-out) infinite;
+  }
+  @keyframes pin-ping {
+    from {
+      transform: scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+  @media (max-width: 860px) {
+    .location__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

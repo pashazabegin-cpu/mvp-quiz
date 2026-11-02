@@ -1,0 +1,66 @@
+---
+import '../styles/tokens.css';
+import '../styles/global.css';
+import Nav from '../components/ui/Nav.astro';
+import AnnotationsToggle from '../components/ui/AnnotationsToggle.astro';
+import { site } from '../data/content';
+import { withBase } from '../lib/paths';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title = site.metaTitle, description = site.metaDescription } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ru" class={site.annotations ? 'annotations' : undefined} data-anno={site.annotations ? 'on' : 'off'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" href={withBase('fonts/SpaceGrotesk-Light.woff2')} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={withBase('fonts/SpaceGrotesk-Regular.woff2')} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={withBase('media/hero/poster.jpg')} as="image" />
+    <script is:inline>
+      // До первой отрисовки: включаем начальные состояния анимаций и восстанавливаем режим разметки.
+      (function () {
+        var d = document.documentElement;
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          d.classList.add('js-motion');
+          // Страховка: если скрипты не загрузились, показываем контент без анимаций.
+          setTimeout(function () {
+            if (!d.classList.contains('motion-ready')) d.classList.remove('js-motion');
+          }, 3500);
+        }
+        if (d.dataset.anno === 'on') {
+          try {
+            if (localStorage.getItem('quizmas:annotations') === '0') d.classList.remove('annotations');
+          } catch (e) {}
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- прелоадер как на MVP (Lottie), уходит наклонными полосами: scripts/ui/preloader.ts, scripts/sections/hero.ts -->
+    <div class="preloader" data-preloader aria-hidden="true">
+      <div class="preloader__anim" data-lottie></div>
+    </div>
+    <slot />
+    <Nav />
+    {site.annotations && <AnnotationsToggle />}
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>

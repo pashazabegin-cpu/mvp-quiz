@@ -1,0 +1,25 @@
+---
+/**
+ * Картинка или заглушка на её месте. Как только в content.ts появится путь
+ * к файлу (src), вместо штриховки выведется <img>.
+ */
+interface Props {
+  label: string;
+  src?: string;
+  alt?: string;
+  ratio?: string;
+  class?: string;
+}
+const { label, src, alt, ratio, class: className } = Astro.props;
+const style = ratio ? `aspect-ratio: ${ratio}` : undefined;
+---
+
+{
+  src ? (
+    <img class:list={['ph-img', className]} src={src} alt={alt ?? label} style={style} loading="lazy" decoding="async" />
+  ) : (
+    <div class:list={['ph', className]} style={style} role="img" aria-label={label}>
+      <span>{label}</span>
+    </div>
+  )
+}

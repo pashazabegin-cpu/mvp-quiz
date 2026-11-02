@@ -1,0 +1,329 @@
+---
+/**
+ * 01 · Первый экран — по слайду «Квизмас» с mvpa.ru (Figma: кадр «main» 1440×900).
+ * Прелоадер → видео приближается с 1.22 → тексты появляются как на MVP (data-anim: tag | lines | parts | btn).
+ * Логика — scripts/sections/hero.ts, scripts/animations/mvp-reveal.ts, scripts/ui/preloader.ts
+ */
+import Anno from '../ui/Anno.astro';
+import Button from '../ui/Button.astro';
+import { contacts, event, hero } from '../../data/content';
+import { withBase } from '../../lib/paths';
+const tg = contacts.socials.find((s) => s.id === 'tg');
+const vk = contacts.socials.find((s) => s.id === 'vk');
+---
+
+<section class="hero stage" id="top" data-hero>
+  <div class="hero__zoom" data-hero-zoom>
+    <div class="hero__canvas">
+      <!-- видео 1600×900 от левого края кадра 1440, как в макете (слой «studio-light-shift») -->
+      <div class="hero__video" data-depth="0.25">
+        <video
+          src={withBase(hero.video)}
+          poster={withBase(hero.poster)}
+          muted
+          loop
+          autoplay
+          playsinline
+          preload="auto"
+          data-hero-video
+          aria-hidden="true"></video>
+      </div>
+    </div>
+  </div>
+  <i class="hero__shade-mob" aria-hidden="true"></i>
+  <!-- переход в чёрный следующего экрана: проявляется по мере скролла (scripts/sections/hero.ts) -->
+  <i class="hero__fade" data-hero-fade aria-hidden="true"></i>
+
+  <div class="stage__ui hero__ui" data-hero-ui>
+    <a class="hc-partner" href={hero.partner.url} target="_blank" rel="noopener" data-intro>
+      <img src={withBase(hero.partner.logo)} width="136" height="23.8" alt={hero.partner.name} />
+      <span>{hero.partner.caption}</span>
+    </a>
+    <a class="hc-contact" href={contacts.contactUrl} target="_blank" rel="noopener" data-intro>
+      <span>Связаться с нами</span>
+      <img class="hc-contact__arrow" src={withBase('/media/hero/arrow.svg')} width="14.84" height="13.55" alt="" />
+    </a>
+    <a class="hc-social hc-social--tg" href={tg?.url} target="_blank" rel="noopener" aria-label="Telegram" data-intro>
+      <img src={withBase('/media/hero/telegram.svg')} width="20" height="20" alt="" />
+    </a>
+    <a class="hc-social hc-social--vk" href={vk?.url} target="_blank" rel="noopener" aria-label="ВКонтакте" data-intro>
+      <img src={withBase('/media/hero/vk.svg')} width="20" height="20" alt="" />
+    </a>
+
+    <p class="hero-tag" data-anim="tag"><span>{hero.date}</span></p>
+    <p class="hero-address" data-anim="lines">{hero.address}</p>
+    <h1 class="hero-logo" data-anim="parts">
+      <img src={withBase(hero.logo)} width="534" height="75.37" alt="MVP Квизмас" />
+    </h1>
+    <p class="hero-lead" data-anim="lines">{hero.lead}</p>
+    <Button href={event.ticketUrl} anim="btn" class="hero-btn">{hero.cta}</Button>
+  </div>
+
+  <Anno kind="screen">01 · Первый экран</Anno>
+</section>
+
+<style>
+  .hero {
+    background: #00010b;
+    color: #fff;
+    isolation: isolate;
+  }
+  .hero__zoom {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 50%;
+    will-change: transform;
+  }
+  /* фон — холст 1600×900 (кадр 1440 + по 80 запаса), «cover» */
+  .hero__canvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1600px;
+    height: 900px;
+    transform: translate(-50%, -50%) scale(var(--hero-cover));
+  }
+  .hero__video {
+    position: absolute;
+    left: 80px;
+    top: 0;
+    width: 1600px;
+    height: 900px;
+    will-change: transform;
+  }
+  .hero__video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.02);
+  }
+  .hero__shade-mob {
+    display: none;
+  }
+  .hero__fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 60%;
+    background: linear-gradient(to bottom, rgb(0 0 2 / 0), rgb(0 0 2 / 0.75) 55%, var(--c-bg));
+    pointer-events: none;
+  }
+  /* на открытом первом экране видео целиком, переход появляется при скролле */
+  :global(.js-motion) .hero__fade {
+    opacity: 0;
+  }
+
+  .hero__ui {
+    z-index: 2;
+    pointer-events: none;
+  }
+  /* :global — кнопка отдельный компонент, scoped-селектор её не видит */
+  .hero__ui :global(a) {
+    pointer-events: auto;
+  }
+
+  /* ── шапка (как на MVP) ── */
+  .hc-partner {
+    left: 60px;
+    top: 76.1px;
+  }
+  .hc-partner img {
+    width: 136px;
+    height: 23.8px;
+  }
+  .hc-partner span {
+    display: block;
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .hc-contact {
+    left: calc(60px + var(--col) * 11);
+    top: 78.03px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 18.45px;
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .hc-contact span {
+    position: relative;
+    top: 1.2px;
+  }
+  .hc-contact span::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .hc-contact:hover span::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .hc-contact__arrow {
+    width: 14.84px;
+    height: 13.55px;
+    transform: rotate(-45deg);
+    transition: transform 0.5s var(--ease-out);
+  }
+  .hc-contact:hover .hc-contact__arrow {
+    transform: rotate(-45deg) translateX(4px);
+  }
+  .hc-social {
+    top: 77px;
+    width: 20px;
+    height: 20px;
+  }
+  .hc-social img {
+    transition: transform 0.4s var(--ease-out);
+  }
+  .hc-social:hover img {
+    transform: translateY(-3px);
+  }
+  .hc-social--tg {
+    right: 102px;
+  }
+  .hc-social--vk {
+    right: 60px;
+  }
+
+  /* ── контент: x — от 2-й колонки сетки (155 при 1440), y — из макета, от центра экрана ── */
+  .hero-tag,
+  .hero-address {
+    left: calc(60px + var(--col) - 13px);
+    font-size: 20px;
+    line-height: 26px;
+    white-space: nowrap;
+  }
+  .hero-tag {
+    top: calc(50% - 450px + 283px);
+  }
+  .hero-tag span {
+    display: block;
+    width: max-content;
+    padding: 6px 9px 2px;
+    background: var(--c-accent);
+  }
+  .hero-address {
+    top: calc(50% - 450px + 330px);
+  }
+  .hero-logo {
+    left: calc(60px + var(--col) - 2px);
+    top: calc(50% - 450px + 423px);
+    width: 534px;
+    height: 75.37px;
+  }
+  .hero-logo img {
+    width: 534px;
+    height: 75.37px;
+  }
+  .hero-lead {
+    left: calc(60px + var(--col) - 2px);
+    top: calc(50% - 450px + 529px);
+    width: 433px;
+    font-size: 20px;
+    line-height: 30px;
+  }
+  .hero__ui :global(.hero-btn) {
+    left: calc(60px + var(--col));
+    top: calc(50% - 450px + 663px);
+  }
+
+  /* ── мобильный (вертикальный экран): кадр 375 по ширине, KV сверху, текст от низа ── */
+  @media (max-aspect-ratio: 4/5) {
+    .hero__canvas {
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 64%;
+      transform: none;
+    }
+    .hero__video {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .hero__video video {
+      object-position: 74% 50%;
+      transform: none;
+    }
+    .hero__shade-mob {
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 30%;
+      height: 34.5%;
+      background: linear-gradient(to bottom, rgb(0 1 11 / 0), #00010b);
+      pointer-events: none;
+    }
+    .hc-partner {
+      left: 16px;
+      top: 24px;
+    }
+    .hc-partner img {
+      width: 102px;
+      height: 17.85px;
+    }
+    .hc-partner span {
+      margin-top: 8px;
+      font-size: 10px;
+    }
+    .hc-contact {
+      display: none;
+    }
+    .hc-social {
+      top: 26px;
+    }
+    .hc-social--tg {
+      right: 52px;
+    }
+    .hc-social--vk {
+      right: 16px;
+    }
+    .hero-tag,
+    .hero-address {
+      left: 16px;
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .hero-tag {
+      top: calc(100% - 352px);
+    }
+    .hero-address {
+      top: calc(100% - 316px);
+      white-space: normal;
+      width: 300px;
+    }
+    .hero-logo,
+    .hero-logo img {
+      left: 16px;
+      width: 300px;
+      height: 42.34px;
+    }
+    .hero-logo {
+      top: calc(100% - 252px);
+    }
+    .hero-lead {
+      left: 16px;
+      top: calc(100% - 188px);
+      width: 320px;
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .hero__ui :global(.hero-btn) {
+      left: 16px;
+      top: calc(100% - 98px);
+    }
+  }
+</style>

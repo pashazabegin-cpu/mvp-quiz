@@ -1,0 +1,148 @@
+---
+/**
+ * 05 · Спортивный квиз — «интерактивный» экран.
+ * Живой WebGL-фон, реагирующий на курсор (scripts/effects/shader-background.ts),
+ * карточки правил с наклоном, темы-чипы разбегаются от курсора (scripts/interactions/repel.ts).
+ */
+import Anno from '../ui/Anno.astro';
+import Button from '../ui/Button.astro';
+import { event, quiz } from '../../data/content';
+---
+
+<section class="section quiz" id="quiz">
+  <canvas class="quiz__bg" data-shader aria-hidden="true"></canvas>
+  <Anno kind="screen">05 · Спортивный квиз</Anno>
+  <div class="container">
+    <div class="section-head">
+      <h2 class="h2" data-split>{quiz.title}</h2>
+      <span class="chip chip--mono chip--live" data-reveal>{quiz.time}</span>
+    </div>
+
+    <p class="eyebrow quiz__label" data-reveal>{quiz.rulesTitle}:</p>
+    <ol class="rules" data-stagger>
+      {
+        quiz.rules.map((r, i) => (
+          <li class="card rule" data-tilt data-spotlight>
+            <span class="rule__n">0{i + 1}</span>
+            <h3 class="rule__title">{r.title}</h3>
+            <p class:list={['rule__text', { fish: r.draft }]}>{r.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="quiz__bottom">
+      <div class="quiz__details" data-stagger>
+        {
+          quiz.details.map((d) => (
+            <div>
+              <h4 class="eyebrow">{d.title}</h4>
+              <p class:list={['quiz__detail', { fish: d.draft }]}>{d.text}</p>
+            </div>
+          ))
+        }
+      </div>
+      <div data-reveal>
+        <h4 class="eyebrow">{quiz.topicsTitle}</h4>
+        <ul class="topics" data-repel>
+          {quiz.topics.map((t) => <li class="chip topic">{t}</li>)}
+        </ul>
+      </div>
+    </div>
+
+    <div data-reveal>
+      <Button href={event.quizRegisterUrl}>{quiz.cta}</Button>
+    </div>
+    <Anno>ТЗ: как пройдёт квиз, темы, как формируются команды + кнопка регистрации</Anno>
+    <Anno kind="motion">живой WebGL-фон тянется к курсору · карточки с наклоном · чипы тем разбегаются от курсора</Anno>
+  </div>
+</section>
+
+<style>
+  .quiz {
+    overflow: hidden;
+    isolation: isolate;
+    background: radial-gradient(80% 60% at 70% 30%, var(--c-surface-2), var(--c-bg));
+  }
+  .quiz__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+  }
+  .quiz__label {
+    margin-bottom: 16px;
+  }
+  .rules {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    perspective: 1200px;
+  }
+  .rule {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 240px;
+    padding: 28px;
+    background: color-mix(in srgb, var(--c-surface) 65%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .rule__n {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--c-muted);
+  }
+  .rule__title {
+    margin-top: auto;
+    font-size: clamp(30px, 3.4vw, 48px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .rule__text {
+    color: var(--c-muted);
+  }
+
+  .quiz__bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 48px;
+    margin: 56px 0 40px;
+  }
+  .quiz__details {
+    display: grid;
+    gap: 28px;
+  }
+  .quiz__detail {
+    margin-top: 10px;
+    font-size: 17px;
+  }
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .topic {
+    padding: 11px 18px;
+    font-size: 16px;
+    background: color-mix(in srgb, var(--c-bg) 60%, transparent);
+    transition: background 0.3s, color 0.3s;
+  }
+  .topic:hover {
+    background: var(--c-text);
+    color: var(--c-bg);
+  }
+
+  @media (max-width: 900px) {
+    .rules,
+    .quiz__bottom {
+      grid-template-columns: 1fr;
+    }
+    .rule {
+      min-height: 0;
+    }
+  }
+</style>

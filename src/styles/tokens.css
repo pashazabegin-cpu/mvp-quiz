@@ -1,0 +1,60 @@
+/*
+ * Дизайн-токены. Цвета и шрифты — из макета (Figma, страница «Квизмас web»)
+ * и общего стиля MVP (кнопка, прелоадер, появление текста — как на mvpa.ru).
+ * WebGL-фоны (src/scripts/effects/shader-background.ts) читают эти переменные.
+ */
+:root {
+  /* Цвета макета */
+  --c-bg: #000002;
+  --c-navy: #003f97; /* градиент фона экранов «Что мы придумали» → «Как всё пройдёт» */
+  --c-surface: #07142b;
+  --c-surface-2: #0b1d3d;
+  --c-line: rgb(255 255 255 / 0.12);
+  --c-line-strong: rgb(255 255 255 / 0.24);
+  --c-text: #f2f2f3;
+  --c-muted: rgb(242 242 243 / 0.6);
+  --c-accent: #31a8f3; /* «akcent» в макете */
+  --c-accent-2: #0e4697; /* «Dark blue» в макете */
+  --c-label: #297bf2; /* подписи «ПРОГРАММА», дата над заголовком (с opacity .6) */
+  --c-gold: #bca35e; /* кнопка MVP */
+  --c-on-accent: #ffffff;
+
+  /* Шрифты: Space Grotesk лежит локально (public/fonts), те же файлы, что на MVP */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Типографика (для блоков, которые ещё не отрисованы в макете) */
+  --fs-hero: clamp(64px, 13vw, 200px);
+  --fs-h2: clamp(32px, 3.2vw, 45px);
+  --fs-h3: clamp(22px, 2.2vw, 30px);
+  --fs-lead: clamp(18px, 1.6vw, 22px);
+  --fs-body: 16px;
+  --fs-small: 13px;
+
+  /* Сетка и отступы */
+  --container: 1240px;
+  --gutter: clamp(16px, 4vw, 48px);
+  --section-y: clamp(64px, 9vw, 120px);
+
+  /* Скругления */
+  --radius-s: 12px;
+  --radius-m: 20px;
+  --radius-l: 32px;
+  --radius-pill: 999px;
+
+  /* Движение — те же кривые, что на MVP */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /*
+   * Кадр макета 1440×900 (как на MVP): JS (scripts/core/stage.ts) выставляет
+   * --ui-s — масштаб, --ui-w/--ui-h — размер экрана в px макета. Сетка — 14 колонок,
+   * поля 60, межколонник 10: --col = 95 при ширине 1440.
+   */
+  --ui-s: 1;
+  --ui-w: 1440px;
+  --ui-h: 900px;
+  --hero-cover: 1;
+  --col: calc((var(--ui-w) - 110px) / 14);
+}

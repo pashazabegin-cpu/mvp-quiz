@@ -1,0 +1,158 @@
+---
+/**
+ * Жюри — по принципу «Как всё пройдёт?»: заголовок закреплён, карточки прокручиваются.
+ * Счётчик, полоса прогресса и фокус на текущей карточке — scripts/animations/sticky-list.ts
+ */
+import Anno from '../ui/Anno.astro';
+import Placeholder from '../ui/Placeholder.astro';
+import { jury } from '../../data/content';
+
+interface Props {
+  /** С какой стороны закреплённый заголовок */
+  side?: 'left' | 'right';
+}
+const { side = 'left' } = Astro.props;
+const total = String(jury.items.length).padStart(2, '0');
+---
+
+<section class:list={['section jury', `jury--${side}`]} id="jury" data-sticky-list>
+  <Anno kind="screen">Новый блок · Жюри</Anno>
+  <div class="container jury__grid">
+    <div class="jury__head">
+      <h2 class="h2" data-split>{jury.title}</h2>
+      <p class="jury__lead fish" data-reveal>{jury.lead}</p>
+      <div class="jury__meter" data-reveal>
+        <span class="jury__counter" data-sticky-counter>01 / {total}</span>
+        <span class="jury__progress" aria-hidden="true"><span data-sticky-progress></span></span>
+      </div>
+      <Anno kind="motion">заголовок закреплён · счётчик и полоса прогресса · текущая карточка в фокусе, остальные приглушены</Anno>
+    </div>
+
+    <ol class="jury__list" data-stagger>
+      {
+        jury.items.map((m) => (
+          <li class="jury__item" data-sticky-item>
+            <article class="card jury-card" data-spotlight>
+              <div class="jury-card__photo">
+                <Placeholder label="Фото" src={m.photo} ratio="3/4" />
+              </div>
+              <div class="jury-card__body">
+                <h3 class:list={['jury-card__name', { fish: m.draft }]}>{m.name}</h3>
+                <p class:list={['jury-card__role', { fish: m.draft }]}>{m.role}</p>
+                <p class:list={['jury-card__text', { fish: m.draft }]}>{m.text}</p>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .jury__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr);
+    gap: clamp(32px, 6vw, 96px);
+  }
+  .jury--right .jury__grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr);
+  }
+  .jury--right .jury__head {
+    order: 2;
+  }
+  .jury__head {
+    position: sticky;
+    top: 12vh;
+    align-self: start;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .jury__lead {
+    max-width: 36ch;
+    color: var(--c-muted);
+  }
+  .jury__meter {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .jury__counter {
+    font-family: var(--font-mono);
+    font-size: clamp(28px, 3vw, 40px);
+    font-variant-numeric: tabular-nums;
+  }
+  .jury__progress {
+    position: relative;
+    height: 2px;
+    background: var(--c-line);
+  }
+  .jury__progress span {
+    position: absolute;
+    inset: 0;
+    background: var(--c-text);
+    transform-origin: left;
+  }
+
+  .jury__list {
+    display: grid;
+    gap: 16px;
+  }
+  .jury-card {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 28px;
+    padding: 16px;
+    transition: opacity 0.5s var(--ease-out), transform 0.6s var(--ease-out), border-color 0.4s;
+  }
+  /* фокус: текущая карточка яркая, остальные приглушены (только с анимациями) */
+  :global(.js-motion) .jury__item:not(.is-current) .jury-card {
+    opacity: 0.4;
+    transform: scale(0.97);
+  }
+  .jury__item.is-current .jury-card {
+    border-color: var(--c-line-strong);
+  }
+  .jury-card__photo {
+    overflow: hidden;
+    border-radius: var(--radius-s);
+  }
+  .jury-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 8px 8px 0;
+  }
+  .jury-card__name {
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .jury-card__role {
+    color: var(--c-muted);
+    font-size: 15px;
+  }
+  .jury-card__text {
+    max-width: 48ch;
+    margin-top: auto;
+    color: var(--c-muted);
+    font-size: 15px;
+  }
+
+  @media (max-width: 900px) {
+    .jury__grid,
+    .jury--right .jury__grid {
+      grid-template-columns: 1fr;
+    }
+    .jury__head {
+      position: static;
+      order: 0;
+    }
+    .jury-card {
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 16px;
+      padding: 12px;
+    }
+  }
+</style>

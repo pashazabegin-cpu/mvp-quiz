@@ -1,0 +1,97 @@
+---
+/** Подвал — как на форуме: меню, «Связаться», соцсети, документы. */
+import Anno from '../ui/Anno.astro';
+import Socials from '../ui/Socials.astro';
+import { contacts, event, nav } from '../../data/content';
+---
+
+<footer class="footer">
+  <canvas class="footer__snow" data-snow data-snow-density="0.5" aria-hidden="true"></canvas>
+  <Anno kind="screen">11 · Подвал</Anno>
+  <div class="container">
+    <p class="footer__mark" data-split>{event.title}</p>
+    <div class="footer__row">
+      <ul class="footer__nav">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={`#${item.id}`}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="footer__contacts">
+        <a class="link-arrow" href={contacts.contactUrl} target="_blank" rel="noopener">
+          Связаться с нами <span class="arr">↗</span>
+        </a>
+        <Socials />
+      </div>
+      <ul class="footer__docs">
+        <li><a href={contacts.policyUrl}>Политика обработки персональных данных</a></li>
+        <li><a href={contacts.consentUrl} target="_blank" rel="noopener">Согласие на обработку персональных данных</a></li>
+      </ul>
+    </div>
+    <Anno kind="motion">название проявляется построчно · снег на фоне</Anno>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    padding: 72px 0 140px;
+    overflow: hidden;
+    isolation: isolate;
+    border-top: 1px solid var(--c-line);
+  }
+  .footer__snow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .footer__mark {
+    font-size: clamp(48px, 13vw, 190px);
+    font-weight: 700;
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+  }
+  .footer__row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    margin-top: 56px;
+    font-size: 14px;
+  }
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 10px 32px;
+  }
+  .footer__nav a,
+  .footer__docs a {
+    color: var(--c-muted);
+    transition: color 0.3s;
+  }
+  .footer__nav a:hover,
+  .footer__docs a:hover {
+    color: var(--c-text);
+  }
+  .footer__contacts {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+  }
+  .footer__docs {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+  }
+  @media (max-width: 860px) {
+    .footer__row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

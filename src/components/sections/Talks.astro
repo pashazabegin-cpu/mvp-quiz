@@ -24,12 +24,12 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
       {
         talks.sessions.map((s) => (
           <article class="talk">
-            <span class="time-pill talk__time">{s.time}</span>
+            <span class="time-pill talk__time" data-rise>{s.time}</span>
             <div class="talk__main">
-              <h3 class="talk__title">{glue(s.title)}</h3>
-              <p class="talk__speaker">{s.speaker}</p>
+              <h3 class="talk__title" data-lines>{glue(s.title)}</h3>
+              <p class="talk__speaker" data-lines>{s.speaker}</p>
             </div>
-            <p class="talk__text">{glue(s.text)}</p>
+            <p class="talk__text" data-lines>{glue(s.text)}</p>
           </article>
         ))
       }

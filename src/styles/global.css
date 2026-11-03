@@ -414,8 +414,24 @@ button {
   opacity: 0;
   transform: translateY(24px);
 }
-.js-motion [data-split] {
+.js-motion [data-split],
+.js-motion [data-lines],
+.js-motion [data-rise] {
   visibility: hidden;
+}
+/* маска строки (scripts/animations/text-reveal.ts): запас сверху и снизу под кратку «й» и хвосты
+   «р», «у», «д»; отрицательные отступы его компенсируют — высота и шаг строк не меняются */
+.tl-mask {
+  padding-block: 0.15em;
+}
+.tl-mask:first-child {
+  margin-top: -0.15em;
+}
+.tl-mask + .tl-mask {
+  margin-top: -0.3em;
+}
+.tl-mask:last-child {
+  margin-bottom: -0.15em;
 }
 /* строка заголовка и голубая плашка, которая по ней пробегает (scripts/animations/reveal.ts) */
 .wipe {

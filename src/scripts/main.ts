@@ -22,6 +22,7 @@ import { initLogoSpin } from './sections/logo-spin';
 import { initTalks } from './sections/talks';
 import { initStoryBg } from './sections/story-bg';
 import { initReveals } from './animations/reveal';
+import { initTextReveal } from './animations/text-reveal';
 import { initParallax } from './animations/parallax';
 import { initTimeline } from './animations/timeline';
 import { initStickyList } from './animations/sticky-list';
@@ -81,6 +82,7 @@ fontsReady.then(() => {
   initTalks();
   if (motion) {
     initReveals();
+    initTextReveal();
     initParallax();
     initTimeline();
     initStickyList();

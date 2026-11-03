@@ -10,6 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { IconMorph } from '../effects/icon-morph';
 import { onStageFit } from '../core/stage';
+import { TEXT_REVEAL } from '../animations/text-reveal';
 
 export function initProgram(motion: boolean): ScrollTrigger | undefined {
   const section = document.querySelector<HTMLElement>('[data-program]');
@@ -34,7 +35,7 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
   // номер и описание: строки из-под маски, как на MVP. Переносы, скрытые в этой раскладке
   // (br-d на мобильном), убираем до разбивки — SplitText считает любой <br> концом строки
   infos.forEach((el) => el.querySelectorAll('br').forEach((br) => getComputedStyle(br).display === 'none' && br.remove()));
-  const splits = infos.map((el) => SplitText.create(el.querySelectorAll('[data-lines]'), { type: 'lines', mask: 'lines' }));
+  const splits = infos.map((el) => SplitText.create(el.querySelectorAll('[data-step-lines]'), { type: 'lines', mask: 'lines', linesClass: 'tl' }));
   splits.forEach((sp, i) => gsap.set(sp.lines, { yPercent: i === 0 ? 0 : 105 }));
   section.classList.add('is-ready');
   let active = 0;
@@ -42,7 +43,7 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
     if (i === active) return;
     const dir = i > active ? 1 : -1;
     gsap.to(splits[active].lines, { yPercent: -105 * dir, duration: 0.45, ease: 'power2.in', stagger: 0.04, overwrite: true });
-    gsap.fromTo(splits[i].lines, { yPercent: 105 * dir }, { yPercent: 0, duration: 0.85, ease: 'power3.out', stagger: 0.08, delay: 0.2, overwrite: true });
+    gsap.fromTo(splits[i].lines, { yPercent: 105 * dir }, { yPercent: 0, duration: TEXT_REVEAL.duration, ease: TEXT_REVEAL.ease, stagger: TEXT_REVEAL.lineStagger, delay: 0.2, overwrite: true });
     active = i;
   };
 

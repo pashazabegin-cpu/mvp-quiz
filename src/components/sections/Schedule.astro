@@ -18,11 +18,11 @@ const lines = (text: string) => text.split('\n');
       {
         schedule.items.map((it) => (
           <li class:list={['sch', it.key && 'sch--key', it.list && 'sch--wide']}>
-            <span class="time-pill">{it.time}</span>
-            {it.tag && <p class="sch__tag">{it.tag}</p>}
-            <h3 class="sch__title">{it.title}</h3>
+            <span class="time-pill" data-rise>{it.time}</span>
+            {it.tag && <p class="sch__tag" data-lines>{it.tag}</p>}
+            <h3 class="sch__title" data-lines>{it.title}</h3>
             {it.text && (
-              <p class="sch__text">
+              <p class="sch__text" data-lines>
                 {lines(it.text).map((line, i) => (
                   <>
                     {i > 0 && <>{' '}<br class="br-d" /></>}
@@ -34,7 +34,7 @@ const lines = (text: string) => text.split('\n');
             {it.list && (
               <ul class="sch__chips">
                 {it.list.map((x) => (
-                  <li class="pill">{x}</li>
+                  <li class="pill" data-rise>{x}</li>
                 ))}
               </ul>
             )}

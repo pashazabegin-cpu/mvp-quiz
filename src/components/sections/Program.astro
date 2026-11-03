@@ -41,8 +41,8 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
     {
       program.items.map((it, i) => (
         <div class="program__info" data-program-info>
-          <p class="program__num" data-lines>{pad(i)}</p>
-          <p class="program__lead" data-lines>
+          <p class="program__num" data-step-lines>{pad(i)}</p>
+          <p class="program__lead" data-step-lines>
             {it.lead.split('\n').map((line, j) => (
               <>
                 {j > 0 && <>{' '}<br class="br-d" /></>}

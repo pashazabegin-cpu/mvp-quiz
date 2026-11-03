@@ -8,6 +8,7 @@
  */
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
+import { TEXT_REVEAL } from './text-reveal';
 
 const splits = new WeakMap<HTMLElement, SplitText>();
 
@@ -16,7 +17,7 @@ const items = (root: ParentNode) => Array.from(root.querySelectorAll<HTMLElement
 /** Разбить абзацы на строки один раз (после загрузки шрифтов). */
 export function prepareLines(root: ParentNode) {
   root.querySelectorAll<HTMLElement>('[data-anim="lines"]').forEach((el) => {
-    if (!splits.has(el)) splits.set(el, new SplitText(el, { type: 'lines', mask: 'lines', linesClass: 'line' }));
+    if (!splits.has(el)) splits.set(el, new SplitText(el, { type: 'lines', mask: 'lines', linesClass: 'tl' }));
   });
 }
 
@@ -57,7 +58,7 @@ export function revealUI(root: ParentNode): gsap.core.Timeline {
         break;
       case 'lines': {
         const split = splits.get(el);
-        if (split) tl.to(split.lines, { yPercent: 0, duration: 0.85, ease: 'power3.out', stagger: 0.08 }, at);
+        if (split) tl.to(split.lines, { yPercent: 0, duration: TEXT_REVEAL.duration, ease: TEXT_REVEAL.ease, stagger: TEXT_REVEAL.lineStagger }, at);
         break;
       }
       case 'btn':

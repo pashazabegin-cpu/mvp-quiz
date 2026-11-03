@@ -161,18 +161,11 @@ import Button from './Button.astro';
     height: 46px;
     padding: 2px 22px 0;
   }
-  @media (max-width: 720px) {
+  /* мобильная раскладка (тот же запрос, что MOBILE_QUERY в scripts/core/stage.ts): нижнего меню нет —
+     навигация будет бургером на первом экране */
+  @media (max-aspect-ratio: 1/1) {
     .nav {
-      bottom: 12px;
-      width: auto;
-      margin-inline: 16px;
-    }
-    .nav__links {
-      flex: 1;
-    }
-    .nav__link {
-      padding: 10px 12px;
-      font-size: 13px;
+      display: none;
     }
   }
 </style>

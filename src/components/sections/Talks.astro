@@ -135,9 +135,11 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
     line-height: 32px;
   }
 
-  @media (max-aspect-ratio: 4/5) {
+  /* мобильный (Figma: «2 · mobile» → «06 · Программа MVP Talks»): заголовок у верха экрана,
+     сессии друг под другом, между ними 24 px — линия — 24 px */
+  @media (max-aspect-ratio: 1/1) {
     .talks__list {
-      top: 56px;
+      top: 40px;
     }
     .talks__head {
       height: auto;
@@ -148,27 +150,37 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
       font-size: 34px;
       line-height: 36px;
       letter-spacing: -1.5px;
+      white-space: normal;
     }
     .talks__line--accent {
       margin-left: 0;
     }
     .talks__badge {
       position: static;
-      margin-top: 16px;
+      margin-top: 17px;
       font-size: 13px;
-      letter-spacing: 2px;
+      line-height: 18px;
+      letter-spacing: 1.95px;
     }
     .talk {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      padding: 32px 16px;
+      padding: 56px 16px 32px;
+    }
+    .talk + .talk {
+      margin-top: 24px;
     }
     .talk:first-of-type {
-      margin-top: 40px;
+      margin-top: 39px;
+      padding-top: 32px;
     }
     .talk__time {
       margin-top: 0;
+    }
+    .talk__main,
+    .talk__text {
+      max-width: 480px;
     }
     .talk__title {
       font-size: 26px;

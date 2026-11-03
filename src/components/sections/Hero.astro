@@ -239,8 +239,8 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     top: calc(50% - 450px + 663px);
   }
 
-  /* ── мобильный (вертикальный экран): кадр 375 по ширине, KV сверху, текст от низа ── */
-  @media (max-aspect-ratio: 4/5) {
+  /* ── мобильный (Figma: «main · mobile»): кадр 375 по ширине, KV сверху, текст от низа ── */
+  @media (max-aspect-ratio: 1/1) {
     .hero__canvas {
       left: 0;
       top: 0;
@@ -298,10 +298,10 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       line-height: 22px;
     }
     .hero-tag {
-      top: calc(100% - 352px);
+      top: calc(100% - 387px);
     }
     .hero-address {
-      top: calc(100% - 316px);
+      top: calc(100% - 351px);
       white-space: normal;
       width: 300px;
     }
@@ -312,11 +312,11 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       height: 42.34px;
     }
     .hero-logo {
-      top: calc(100% - 252px);
+      top: calc(100% - 287px);
     }
     .hero-lead {
       left: 16px;
-      top: calc(100% - 188px);
+      top: calc(100% - 223px);
       width: 320px;
       font-size: 16px;
       line-height: 22px;

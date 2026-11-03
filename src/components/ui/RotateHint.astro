@@ -1,0 +1,67 @@
+---
+/**
+ * Телефон в горизонтальном положении: экран ниже 500 px, и ни мобильный (375×640),
+ * ни десктопный (1440×900) кадр в него не влезают читаемо — просим повернуть.
+ * Только для сенсорных экранов: низкое окно на компьютере остаётся десктопной раскладкой.
+ */
+import { hero } from '../../data/content';
+import { withBase } from '../../lib/paths';
+---
+
+<div class="rotate" role="alert">
+  <img class="rotate__logo" src={withBase(hero.logo)} width="534" height="75" alt="MVP Квизмас" />
+  <svg class="rotate__icon" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
+    <rect x="15" y="6" width="18" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
+    <path d="M10 30a14 14 0 0 0 10 12M38 18A14 14 0 0 0 28 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+  </svg>
+  <p class="rotate__text">Поверните телефон вертикально</p>
+</div>
+
+<style>
+  .rotate {
+    display: none;
+  }
+  @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+    .rotate {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 24px;
+      background: var(--c-bg);
+      color: var(--c-text);
+      text-align: center;
+    }
+    .rotate__logo {
+      width: 240px;
+      height: auto;
+    }
+    .rotate__icon {
+      color: var(--c-accent);
+      animation: rotate-hint 2.4s var(--ease-in-out) infinite;
+    }
+    .rotate__text {
+      font-size: 16px;
+      font-weight: 300;
+    }
+  }
+  @keyframes rotate-hint {
+    0%,
+    30% {
+      transform: rotate(-90deg);
+    }
+    60%,
+    100% {
+      transform: rotate(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rotate__icon {
+      animation: none;
+    }
+  }
+</style>

@@ -25,7 +25,7 @@ const lines = (text: string) => text.split('\n');
               <p class="sch__text">
                 {lines(it.text).map((line, i) => (
                   <>
-                    {i > 0 && <br />}
+                    {i > 0 && <>{' '}<br class="br-d" /></>}
                     {line}
                   </>
                 ))}
@@ -124,35 +124,38 @@ const lines = (text: string) => text.split('\n');
     margin-top: 4px;
   }
 
-  @media (max-aspect-ratio: 4/5) {
+  /* мобильный (Figma: «2 · mobile» → «04 · Как всё пройдёт?»): шапка у верха экрана, пункты через 63 px */
+  @media (max-aspect-ratio: 1/1) {
     .schedule__date {
       left: 16px;
-      top: 56px;
-      width: 343px;
+      top: 40px;
+      width: calc(var(--ui-w) - 32px);
       font-size: 13px;
-      letter-spacing: 2px;
+      letter-spacing: 1.95px;
       line-height: 20px;
     }
     .schedule__title {
       left: 16px;
-      top: 88px;
-      width: 343px;
+      top: 66px;
+      width: calc(var(--ui-w) - 32px);
       font-size: 34px;
       line-height: 36px;
+      letter-spacing: -1.7px;
     }
     .schedule__list {
       left: 16px;
-      top: 168px;
-      width: 343px;
+      top: 146px;
+      width: calc(var(--ui-w) - 32px);
+      max-width: 480px;
     }
     .sch,
     .sch--key,
     .sch--wide {
-      width: 343px;
+      width: 100%;
       gap: 16px;
     }
     .sch + .sch {
-      margin-top: 40px;
+      margin-top: 63px;
     }
     .sch__title,
     .sch__text {
@@ -162,14 +165,16 @@ const lines = (text: string) => text.split('\n');
     .sch--key .sch__title {
       font-size: 30px;
       line-height: 32px;
+      letter-spacing: -1.5px;
     }
-    .sch__text :global(br) {
-      display: none;
+    .sch__chips {
+      gap: 10px;
     }
     .sch__chips :global(.pill) {
       height: 32px;
-      padding: 7px 16px 2px;
+      padding: 7px 16px 3px;
       font-size: 14px;
+      line-height: 22px;
     }
   }
 </style>

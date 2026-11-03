@@ -45,7 +45,7 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
           <p class="program__lead" data-lines>
             {it.lead.split('\n').map((line, j) => (
               <>
-                {j > 0 && <br />}
+                {j > 0 && <>{' '}<br class="br-d" /></>}
                 {line}
               </>
             ))}
@@ -81,7 +81,11 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
     letter-spacing: -2.25px;
     white-space: nowrap;
   }
-  .program__item:nth-child(n + 2) {
+  /* до запуска скрипта — как в макете: следующий пункт 20%, дальше 5% */
+  .program__item:nth-child(2) {
+    opacity: 0.2;
+  }
+  .program__item:nth-child(n + 3) {
     opacity: 0.05;
   }
   /* иконка 441×351: центр — 6-я колонка (535 при 1440) */
@@ -132,18 +136,20 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
     line-height: 32px;
   }
 
-  @media (max-aspect-ratio: 4/5) {
+  /* мобильный (Figma: «2 · mobile» → «03 · Программа»): блок от подписи до описания (585 px) — по центру экрана */
+  @media (max-aspect-ratio: 1/1) {
     .program__label {
       left: 16px;
-      top: 64px;
+      top: calc(50% - 292.5px);
       font-size: 14px;
-      letter-spacing: 2px;
+      line-height: 20px;
+      letter-spacing: 2.1px;
     }
     .program__list {
       --step: 44px;
       left: 16px;
-      top: 104px;
-      width: 343px;
+      top: calc(50% - 292.5px + 36px);
+      width: calc(var(--ui-w) - 32px);
     }
     .program__item {
       height: 32px;
@@ -153,23 +159,25 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
     }
     .program__icon {
       left: 50%;
-      top: 230px;
-      width: 300px;
-      height: 239px;
-      margin-left: -150px;
+      top: calc(50% - 292.5px + 202px);
+      width: 263px;
+      height: 210px;
+      margin-left: -131.5px;
     }
     .program__info {
       left: 16px;
-      top: 500px;
-      width: 343px;
+      top: calc(50% - 292.5px + 439px);
+      width: calc(var(--ui-w) - 32px);
+      max-width: 480px;
+    }
+    .program__num {
+      font-size: 30px;
+      line-height: 30px;
     }
     .program__lead {
-      margin-top: 16px;
-      font-size: 18px;
-      line-height: 26px;
-    }
-    .program__lead :global(br) {
-      display: none;
+      margin-top: 20px;
+      font-size: 22px;
+      line-height: 32px;
     }
   }
 </style>

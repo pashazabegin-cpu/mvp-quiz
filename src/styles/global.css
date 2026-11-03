@@ -266,6 +266,14 @@ button {
 }
 .stage__ui > * { position: absolute; }
 
+/* ручные переносы строк из макетов: br-d — только в десктопном, br-m — только в мобильном
+   (запрос тот же, что MOBILE_QUERY в scripts/core/stage.ts) */
+.br-m { display: none; }
+@media (max-aspect-ratio: 1/1) {
+  .br-d { display: none; }
+  .br-m { display: inline; }
+}
+
 .link-arrow {
   display: inline-flex;
   align-items: center;

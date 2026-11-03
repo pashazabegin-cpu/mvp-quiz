@@ -44,11 +44,17 @@ import { withBase } from '../../lib/paths';
     height: 38%;
     pointer-events: none;
   }
-  /* вертикальный экран: кадр выше, по бокам обрезан — логотип остаётся крупным */
-  @media (max-aspect-ratio: 4/5) {
+  /* мобильный (Figma: «2 · mobile» → «05 · Логотип в снегу»): кадр 375×431, по бокам обрезан —
+     логотип остаётся крупным. Чёрный верх заходит на расписание на 72 px, белый низ уходит
+     под программу MVP Talks на 56 px (её заголовок стоит на снегу) */
+  @media (max-aspect-ratio: 1/1) {
+    .spin {
+      margin-top: calc(-72px * var(--ui-s));
+      margin-bottom: calc(-56px * var(--ui-s));
+    }
     .spin__video {
       aspect-ratio: auto;
-      height: 115vw;
+      height: calc(431px * var(--ui-s));
     }
   }
 </style>

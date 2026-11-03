@@ -31,7 +31,9 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
   // иконка «дышит» на месте
   if (motion && float) gsap.to(float, { y: -12, rotation: 1.5, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
 
-  // номер и описание: строки из-под маски, как на MVP
+  // номер и описание: строки из-под маски, как на MVP. Переносы, скрытые в этой раскладке
+  // (br-d на мобильном), убираем до разбивки — SplitText считает любой <br> концом строки
+  infos.forEach((el) => el.querySelectorAll('br').forEach((br) => getComputedStyle(br).display === 'none' && br.remove()));
   const splits = infos.map((el) => SplitText.create(el.querySelectorAll('[data-lines]'), { type: 'lines', mask: 'lines' }));
   splits.forEach((sp, i) => gsap.set(sp.lines, { yPercent: i === 0 ? 0 : 105 }));
   section.classList.add('is-ready');
@@ -56,7 +58,9 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
     gsap.set(list, { y: -s * step() });
     items.forEach((el, j) => {
       const d = j - s;
-      el.style.opacity = String(d < 0 ? gsap.utils.clamp(0, 1, 1 + d * 2.2) : gsap.utils.interpolate(1, 0.05, Math.min(1, d)));
+      // как в макете: следующий пункт — 20%, дальше — 5%
+      const after = d < 1 ? gsap.utils.interpolate(1, 0.2, d) : gsap.utils.interpolate(0.2, 0.05, Math.min(1, d - 1));
+      el.style.opacity = String(d < 0 ? gsap.utils.clamp(0, 1, 1 + d * 2.2) : after);
     });
     if (morph) morph.set(seg, k);
     else imgs.forEach((img, j) => (img.style.opacity = String(gsap.utils.clamp(0, 1, 1 - Math.abs(j - s) * 1.6))));

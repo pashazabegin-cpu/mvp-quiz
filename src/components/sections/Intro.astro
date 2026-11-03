@@ -1,6 +1,6 @@
 ---
 /**
- * 02 · «Что мы придумали?» (Figma: кадр «main»/«START» 1440×900).
+ * 02 · «Что мы придумали?» (Figma: кадр «main»/«START» 1440×900, мобильный — «2 · mobile»).
  * Экран закреплён: текст закрашивается по словам, теги/снежинки/фото проезжают снизу вверх
  * на разной глубине — в середине пути стоят ровно как в макете (кадр «2»).
  * Логика — scripts/sections/intro.ts
@@ -8,7 +8,31 @@
 import Anno from '../ui/Anno.astro';
 import { intro } from '../../data/content';
 import { withBase } from '../../lib/paths';
-const lines = (text: string) => text.split('\n');
+
+// абзац с переносами обоих макетов: слова совпадают, \n отмечает перенос после слова
+// (d — в десктопном, m — в мобильном), поэтому идём по словам двух версий параллельно
+const tokens = (text: string) => {
+  const out: { word: string; br: boolean }[] = [];
+  for (const part of text.split(/(\s+)/)) {
+    if (!part) continue;
+    if (!/^\s+$/.test(part)) out.push({ word: part, br: false });
+    else if (part.includes('\n') && out.length) out[out.length - 1].br = true;
+  }
+  return out;
+};
+const paragraph = (desktop: string, mobile: string) => {
+  const m = tokens(mobile);
+  return tokens(desktop).map((t, i) => ({ word: t.word, d: t.br, m: m[i]?.br ?? false }));
+};
+// позиция на сцене: десктоп — доля ширины кадра 1440 и px кадра 900, мобильный — доля 375 и px кадра 688
+const floatStyle = (f: (typeof intro.floats)[number]) =>
+  [
+    `--x:${((f.x / 1440) * 100).toFixed(3)}%;--y:${f.y}px`,
+    'w' in f && f.w ? `--w:${f.w}px;--h:${f.h}px` : '',
+    'm' in f && f.m ? `--mx:${((f.m.x / 375) * 100).toFixed(3)}%;--my:${f.m.y}px;--mw:${f.m.w}px` : '',
+  ]
+    .filter(Boolean)
+    .join(';');
 ---
 
 <section class="intro stage" id="about" data-intro-section>
@@ -18,12 +42,14 @@ const lines = (text: string) => text.split('\n');
     </h2>
     <div class="intro__lead" data-intro-lead>
       {
-        intro.paragraphs.map((p) => (
+        intro.paragraphs.map((p, i) => (
           <p>
-            {lines(p).map((line, i) => (
+            {paragraph(p, intro.paragraphsMobile[i]).map((t, j, all) => (
               <>
-                {i > 0 && <br />}
-                {line}
+                {t.word}
+                {j < all.length - 1 && ' '}
+                {t.d && <br class="br-d" />}
+                {t.m && <br class="br-m" />}
               </>
             ))}
           </p>
@@ -34,10 +60,16 @@ const lines = (text: string) => text.split('\n');
       {
         intro.floats.map((f) => (
           <div
-            class:list={['intro__float', `intro__float--${f.kind}`, 'back' in f && f.back && 'intro__float--back']}
+            class:list={[
+              'intro__float',
+              `intro__float--${f.kind}`,
+              'back' in f && f.back && 'intro__float--back',
+              !('m' in f) && 'intro__float--no-m',
+              'mobileOnly' in f && f.mobileOnly && 'intro__float--m-only',
+            ]}
             data-float
             data-z={f.z}
-            style={`left:${((f.x / 1440) * 100).toFixed(3)}%;top:${f.y}px;${'w' in f && f.w ? `width:${f.w}px;height:${f.h}px;` : ''}`}
+            style={floatStyle(f)}
           >
             {f.kind === 'tag' ? (
               <span class="pill" style={`--pill:var(${f.color === 'accent' ? '--c-accent' : '--c-accent-2'})`}>
@@ -95,6 +127,10 @@ const lines = (text: string) => text.split('\n');
   }
   .intro__float {
     position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w, auto);
+    height: var(--h, auto);
     will-change: transform;
   }
   /* дальний план — за текстом */
@@ -109,30 +145,49 @@ const lines = (text: string) => text.split('\n');
     object-fit: contain;
   }
 
-  @media (max-aspect-ratio: 4/5) {
+  /* элемент только для мобильного кадра */
+  .intro__float--m-only {
+    display: none;
+  }
+
+  /* мобильный кадр 375×688 по центру экрана (Figma: «2 · mobile» → «02 · Что мы придумали?»):
+     теги и фото убраны, снежинки на своих местах, x — доля ширины кадра */
+  @media (max-aspect-ratio: 1/1) {
     .intro__title {
-      top: 72px;
+      top: calc(50% - 344px + 95px);
       width: 300px;
       margin-left: -150px;
       font-size: 34px;
       line-height: 36px;
+      letter-spacing: -1.7px;
     }
     .intro__lead {
-      top: 170px;
+      top: calc(50% - 344px + 229px);
       width: 343px;
       margin-left: -171.5px;
       font-size: 18px;
     }
-    .intro__lead :global(br) {
-      display: none;
+    .intro__lead p + p {
+      margin-top: 26px;
     }
     .intro__floats {
-      left: 50%;
-      top: calc(100% - 210px);
-      width: 1440px;
-      margin-left: -720px;
-      transform: scale(0.36);
-      transform-origin: 50% 0;
+      top: calc(50% - 344px);
+      height: 688px;
+    }
+    .intro__float {
+      left: var(--mx);
+      top: var(--my);
+      width: var(--mw);
+      height: auto;
+    }
+    .intro__float img {
+      height: auto;
+    }
+    .intro__float--no-m {
+      display: none;
+    }
+    .intro__float--m-only {
+      display: block;
     }
   }
 </style>

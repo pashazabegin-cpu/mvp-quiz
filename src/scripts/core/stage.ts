@@ -3,9 +3,16 @@
  * целиком влез в экран, а по ширине тянется сетка 14 колонок (--col в tokens.css).
  * Выставляет на <html>: --ui-s (масштаб), --ui-w/--ui-h (размер экрана в px макета),
  * --hero-cover (масштаб фона 1600×900 «по cover»).
- * На вертикальных экранах (тот же запрос, что на MVP) — кадр 375 по ширине.
+ *
+ * Экран не шире своей высоты (телефоны, планшеты вертикально, узкие окна) — мобильный макет
+ * (Figma: секция «Квизмас · Mobile 375»): кадр 375 по ширине, но не меньше MOBILE_MIN_H по высоте
+ * и не крупнее MOBILE_MAX_S — на планшете колонка шире, а шрифт не раздувается.
+ * Этот же запрос — в @media всех экранов.
  */
-export const MOBILE_QUERY = '(max-aspect-ratio: 4/5)';
+export const MOBILE_QUERY = '(max-aspect-ratio: 1/1)';
+/** высота мобильной композиции, которая обязана влезть в экран (самый высокий экран — «Программа») */
+const MOBILE_MIN_H = 640;
+const MOBILE_MAX_S = 1.5;
 
 const listeners: Array<() => void> = [];
 
@@ -19,7 +26,7 @@ export function initStage() {
   const fit = () => {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const s = mobile.matches ? w / 375 : Math.min(w / 1440, h / 900);
+    const s = mobile.matches ? Math.min(w / 375, h / MOBILE_MIN_H, MOBILE_MAX_S) : Math.min(w / 1440, h / 900);
     const cover = Math.max(w / 1600, h / 900);
     root.style.setProperty('--ui-s', s.toFixed(4));
     root.style.setProperty('--ui-w', `${(w / s).toFixed(2)}px`);

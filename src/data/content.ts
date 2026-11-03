@@ -80,28 +80,36 @@ export const intro = {
     'Мы объединили три индустрии — спорт, беттинг\nи киберспорт, чтобы подвести итоги года\nв расслабленной атмосфере. Подготовили полезный контент в новом формате и возможность\nобменяться опытом.',
     'А ещё соберём MVP-комьюнити, чтобы вместе\nсыграть в Квиз, проверить эрудицию и укрепить профессиональные связи.',
   ],
+  /** те же абзацы с переносами мобильного макета (слова совпадают, отличаются только \n) */
+  paragraphsMobile: [
+    'Мы объединили три индустрии — спорт, беттинг и киберспорт,\nчтобы подвести итоги года\nв расслабленной атмосфере. Подготовили полезный контент\nв новом формате и возможность обменяться опытом.',
+    'А ещё соберём MVP-комьюнити, чтобы вместе сыграть в Квиз, проверить эрудицию и укрепить профессиональные связи.',
+  ],
   /**
    * Сцена с глубиной вокруг текста. x, y — позиция в кадре 1440×900 в момент, когда сцена
    * совпадает с макетом (кадр «2»); до него элементы ниже, после — уходят вверх.
    * z — удалённость от камеры: 1 — плоскость текста, меньше — дальше (медленнее, за текстом),
    * больше — ближе (быстрее и сильнее растут). back — слой за текстом.
+   * m — позиция и размер в мобильном кадре 375×688 (Figma: «2 · mobile»); без m элемент на мобильном скрыт,
+   * mobileOnly — только на мобильном. Теги и фото в мобильном макете убраны.
    */
   floats: [
-    { kind: 'snow', src: '/media/intro/snow-2.svg', x: -31, y: 223, w: 91, h: 96, z: 0.45, back: true },
-    { kind: 'snow', src: '/media/intro/snow-4.svg', x: 1339, y: 381, w: 159, h: 168, z: 0.6, back: true },
-    { kind: 'snow', src: '/media/intro/snow-6.svg', x: 737, y: 669, w: 73, h: 76, z: 0.35, back: true },
-    { kind: 'snow', src: '/media/intro/snow-1.svg', x: 252, y: 190, w: 21, h: 22, z: 1.3 },
+    { kind: 'snow', src: '/media/intro/snow-2.svg', x: -31, y: 223, w: 91, h: 96, z: 0.45, back: true, m: { x: -34, y: 104, w: 81.9 } },
+    { kind: 'snow', src: '/media/intro/snow-4.svg', x: 1339, y: 381, w: 159, h: 168, z: 0.6, back: true, m: { x: 268, y: 196, w: 111.3 } },
+    { kind: 'snow', src: '/media/intro/snow-6.svg', x: 737, y: 669, w: 73, h: 76, z: 0.35, back: true, m: { x: 140, y: 342, w: 58.4 } },
+    { kind: 'snow', src: '/media/intro/snow-1.svg', x: 252, y: 190, w: 21, h: 22, z: 1.3, m: { x: 150, y: 622, w: 21 } },
     { kind: 'snow', src: '/media/intro/snow-3.svg', x: 1035, y: 223, w: 39, h: 42, z: 1.9 },
     { kind: 'tag', text: 'sport', color: 'accent', x: 386, y: 258, z: 1.15 },
     { kind: 'tag', text: 'mvp', color: 'dark', x: 756, y: 325, z: 1.15 },
     { kind: 'tag', text: 'cybersport', color: 'accent', x: 1126, y: 335, z: 1 },
     { kind: 'photo', src: '/media/intro/photo-2.png', x: 1000, y: 412, w: 179, h: 201, z: 1.45 },
     { kind: 'tag', text: 'betting', color: 'dark', x: 179, y: 431, z: 0.9 },
-    { kind: 'snow', src: '/media/intro/snow-5.svg', x: 102, y: 542, w: 43, h: 46, z: 1.7 },
+    { kind: 'snow', src: '/media/intro/snow-5.svg', x: 102, y: 542, w: 43, h: 46, z: 1.7, m: { x: 358, y: 506, w: 34.4 } },
     { kind: 'photo', src: '/media/intro/photo-1.png', x: 255, y: 567, w: 179, h: 201, z: 1.35 },
     { kind: 'snow', src: '/media/intro/snow-7.svg', x: 1257, y: 678, w: 62, h: 67, z: 2.1 },
     { kind: 'tag', text: 'quiz', color: 'dark', x: 925, y: 745, z: 0.95 },
-    { kind: 'snow', src: '/media/intro/snow-8.svg', x: 502, y: 768, w: 28, h: 30, z: 1.5 },
+    { kind: 'snow', src: '/media/intro/snow-8.svg', x: 502, y: 768, w: 28, h: 30, z: 1.5, m: { x: 300, y: 59, w: 28 } },
+    { kind: 'snow', src: '/media/intro/snow-8.svg', x: 0, y: 0, w: 28, h: 30, z: 1.2, mobileOnly: true, m: { x: 13, y: 556, w: 19.6 } },
     { kind: 'tag', text: 'community', color: 'accent', x: 604, y: 812, z: 1.05 },
   ],
 };

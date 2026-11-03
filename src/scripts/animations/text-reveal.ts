@@ -27,14 +27,31 @@ export const TEXT_REVEAL = {
   itemStagger: 0.1,
   /** элемент появляется, когда его верх поднялся выше этой доли высоты экрана */
   enterAt: 0.88,
+  /** где строка ждёт появления, % своей высоты: ниже запаса маски (.tl-mask), чтобы ничего не выглядывало */
+  hidden: 120,
   /** мобильная раскладка: чуть быстрее, лесенки короче */
   mobile: { duration: 0.7, lineStagger: 0.06, itemStagger: 0.07 },
 };
 
 /** класс строки; обёртки-маски получают «tl-mask» (запас под кратку и хвосты букв — в global.css) */
-const LINE_CLASS = 'tl';
-/** где строка ждёт появления, % своей высоты: ниже запаса маски, чтобы ничего не выглядывало */
-const HIDDEN = 120;
+export const LINE_CLASS = 'tl';
+
+/** IntersectionObserver, который срабатывает на линии TEXT_REVEAL.enterAt (общий для всех эффектов текста) */
+export const enterObserver = (onEnter: (els: HTMLElement[]) => void) => {
+  const top = (el: Element) => el.getBoundingClientRect().top;
+  const io = new IntersectionObserver(
+    (entries) => {
+      const els = entries
+        .filter((e) => e.isIntersecting)
+        .map((e) => e.target as HTMLElement)
+        .sort((a, b) => top(a) - top(b));
+      els.forEach((el) => io.unobserve(el));
+      if (els.length) onEnter(els);
+    },
+    { rootMargin: `0px 0px ${Math.round(-(1 - TEXT_REVEAL.enterAt) * 100)}% 0px` },
+  );
+  return io;
+};
 
 export function initTextReveal() {
   const texts = Array.from(document.querySelectorAll<HTMLElement>('[data-lines]'));
@@ -55,7 +72,7 @@ export function initTextReveal() {
       // при пересборке строк (ресайз, поворот) уже показанный текст остаётся на месте
       onSplit(self) {
         lines.set(el, self.lines as HTMLElement[]);
-        gsap.set(self.lines, { yPercent: shown.has(el) ? 0 : HIDDEN });
+        gsap.set(self.lines, { yPercent: shown.has(el) ? 0 : TEXT_REVEAL.hidden });
         gsap.set(el, { visibility: 'visible' });
       },
     });
@@ -73,20 +90,9 @@ export function initTextReveal() {
     }
   };
 
-  const top = (el: Element) => el.getBoundingClientRect().top;
-  const io = new IntersectionObserver(
-    (entries) => {
-      const { itemStagger } = config();
-      entries
-        .filter((e) => e.isIntersecting)
-        .map((e) => e.target as HTMLElement)
-        .sort((a, b) => top(a) - top(b))
-        .forEach((el, i) => {
-          io.unobserve(el);
-          reveal(el, i * itemStagger);
-        });
-    },
-    { rootMargin: `0px 0px ${-(1 - TEXT_REVEAL.enterAt) * 100}% 0px` },
-  );
+  const io = enterObserver((els) => {
+    const { itemStagger } = config();
+    els.forEach((el, i) => reveal(el, i * itemStagger));
+  });
   [...texts, ...blocks].forEach((el) => io.observe(el));
 }

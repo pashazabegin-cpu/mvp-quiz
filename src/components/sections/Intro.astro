@@ -24,12 +24,12 @@ const paragraph = (desktop: string, mobile: string) => {
   const m = tokens(mobile);
   return tokens(desktop).map((t, i) => ({ word: t.word, d: t.br, m: m[i]?.br ?? false }));
 };
-// позиция на сцене: десктоп — доля ширины кадра 1440 и px кадра 900, мобильный — доля 375 и px кадра 688
+// позиция на сцене: десктоп — доля ширины кадра 1440 и px кадра 900, мобильный — доля 375 и px кадра 743
 const floatStyle = (f: (typeof intro.floats)[number]) =>
   [
     `--x:${((f.x / 1440) * 100).toFixed(3)}%;--y:${f.y}px`,
     'w' in f && f.w ? `--w:${f.w}px;--h:${f.h}px` : '',
-    'm' in f && f.m ? `--mx:${((f.m.x / 375) * 100).toFixed(3)}%;--my:${f.m.y}px;--mw:${f.m.w}px` : '',
+    'm' in f && f.m ? `--mx:${((f.m.x / 375) * 100).toFixed(3)}%;--my:${f.m.y}px;--mw:${f.m.w}px${'h' in f.m ? `;--mh:${f.m.h}px` : ''}` : '',
   ]
     .filter(Boolean)
     .join(';');
@@ -150,11 +150,11 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
     display: none;
   }
 
-  /* мобильный кадр 375×688 по центру экрана (Figma: «2 · mobile» → «02 · Что мы придумали?»):
-     теги и фото убраны, снежинки на своих местах, x — доля ширины кадра */
+  /* мобильный кадр 375×743 по центру экрана (Figma: «2 · mobile» → «02 · Что мы придумали?»):
+     теги убраны, головы внизу под текстом, снежинки на своих местах, x — доля ширины кадра */
   @media (max-aspect-ratio: 1/1) {
     .intro__title {
-      top: calc(50% - 344px + 95px);
+      top: calc(50% - 371.5px + 68px);
       width: 300px;
       margin-left: -150px;
       font-size: 34px;
@@ -162,7 +162,7 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
       letter-spacing: -1.7px;
     }
     .intro__lead {
-      top: calc(50% - 344px + 229px);
+      top: calc(50% - 371.5px + 202px);
       width: 343px;
       margin-left: -171.5px;
       font-size: 18px;
@@ -171,17 +171,21 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
       margin-top: 26px;
     }
     .intro__floats {
-      top: calc(50% - 344px);
-      height: 688px;
+      top: calc(50% - 371.5px);
+      height: 743px;
     }
     .intro__float {
       left: var(--mx);
       top: var(--my);
       width: var(--mw);
+      height: var(--mh, auto);
+    }
+    .intro__float--snow img {
       height: auto;
     }
-    .intro__float img {
-      height: auto;
+    /* узкий экран: дальше по скроллу головы улетают вверх через текст — пусть пролетают под ним */
+    .intro__float--photo {
+      z-index: -1;
     }
     .intro__float--no-m {
       display: none;

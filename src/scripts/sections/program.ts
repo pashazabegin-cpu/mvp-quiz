@@ -36,14 +36,14 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
   // (br-d на мобильном), убираем до разбивки — SplitText считает любой <br> концом строки
   infos.forEach((el) => el.querySelectorAll('br').forEach((br) => getComputedStyle(br).display === 'none' && br.remove()));
   const splits = infos.map((el) => SplitText.create(el.querySelectorAll('[data-step-lines]'), { type: 'lines', mask: 'lines', linesClass: 'tl' }));
-  splits.forEach((sp, i) => gsap.set(sp.lines, { yPercent: i === 0 ? 0 : 105 }));
+  splits.forEach((sp, i) => gsap.set(sp.lines, { yPercent: i === 0 ? 0 : TEXT_REVEAL.hidden }));
   section.classList.add('is-ready');
   let active = 0;
   const show = (i: number) => {
     if (i === active) return;
     const dir = i > active ? 1 : -1;
-    gsap.to(splits[active].lines, { yPercent: -105 * dir, duration: 0.45, ease: 'power2.in', stagger: 0.04, overwrite: true });
-    gsap.fromTo(splits[i].lines, { yPercent: 105 * dir }, { yPercent: 0, duration: TEXT_REVEAL.duration, ease: TEXT_REVEAL.ease, stagger: TEXT_REVEAL.lineStagger, delay: 0.2, overwrite: true });
+    gsap.to(splits[active].lines, { yPercent: -TEXT_REVEAL.hidden * dir, duration: 0.45, ease: 'power2.in', stagger: 0.04, overwrite: true });
+    gsap.fromTo(splits[i].lines, { yPercent: TEXT_REVEAL.hidden * dir }, { yPercent: 0, duration: TEXT_REVEAL.duration, ease: TEXT_REVEAL.ease, stagger: TEXT_REVEAL.lineStagger, delay: 0.2, overwrite: true });
     active = i;
   };
 

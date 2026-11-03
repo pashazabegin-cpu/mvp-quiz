@@ -90,26 +90,26 @@ export const intro = {
    * совпадает с макетом (кадр «2»); до него элементы ниже, после — уходят вверх.
    * z — удалённость от камеры: 1 — плоскость текста, меньше — дальше (медленнее, за текстом),
    * больше — ближе (быстрее и сильнее растут). back — слой за текстом.
-   * m — позиция и размер в мобильном кадре 375×688 (Figma: «2 · mobile»); без m элемент на мобильном скрыт,
-   * mobileOnly — только на мобильном. Теги и фото в мобильном макете убраны.
+   * m — позиция и размер в мобильном кадре 375×743 (Figma: «2 · mobile»); без m элемент на мобильном скрыт,
+   * mobileOnly — только на мобильном. Теги в мобильном макете убраны, головы — внизу под текстом.
    */
   floats: [
-    { kind: 'snow', src: '/media/intro/snow-2.svg', x: -31, y: 223, w: 91, h: 96, z: 0.45, back: true, m: { x: -34, y: 104, w: 81.9 } },
-    { kind: 'snow', src: '/media/intro/snow-4.svg', x: 1339, y: 381, w: 159, h: 168, z: 0.6, back: true, m: { x: 268, y: 196, w: 111.3 } },
-    { kind: 'snow', src: '/media/intro/snow-6.svg', x: 737, y: 669, w: 73, h: 76, z: 0.35, back: true, m: { x: 140, y: 342, w: 58.4 } },
-    { kind: 'snow', src: '/media/intro/snow-1.svg', x: 252, y: 190, w: 21, h: 22, z: 1.3, m: { x: 150, y: 622, w: 21 } },
+    { kind: 'snow', src: '/media/intro/snow-2.svg', x: -31, y: 223, w: 91, h: 96, z: 0.45, back: true, m: { x: -34, y: 89, w: 81.9 } },
+    { kind: 'snow', src: '/media/intro/snow-4.svg', x: 1339, y: 381, w: 159, h: 168, z: 0.6, back: true, m: { x: 268, y: 188, w: 111.3 } },
+    { kind: 'snow', src: '/media/intro/snow-6.svg', x: 737, y: 669, w: 73, h: 76, z: 0.35, back: true, m: { x: 140, y: 346, w: 58.4 } },
+    { kind: 'snow', src: '/media/intro/snow-1.svg', x: 252, y: 190, w: 21, h: 22, z: 1.3, m: { x: 308, y: 656, w: 21 } },
     { kind: 'snow', src: '/media/intro/snow-3.svg', x: 1035, y: 223, w: 39, h: 42, z: 1.9 },
     { kind: 'tag', text: 'sport', color: 'accent', x: 386, y: 258, z: 1.15 },
     { kind: 'tag', text: 'mvp', color: 'dark', x: 756, y: 325, z: 1.15 },
     { kind: 'tag', text: 'cybersport', color: 'accent', x: 1126, y: 335, z: 1 },
-    { kind: 'photo', src: '/media/intro/photo-2.png', x: 1000, y: 412, w: 179, h: 201, z: 1.45 },
+    { kind: 'photo', src: '/media/intro/photo-2.png', x: 1000, y: 412, w: 179, h: 201, z: 1.45, m: { x: 191, y: 532, w: 100, h: 112 } },
     { kind: 'tag', text: 'betting', color: 'dark', x: 179, y: 431, z: 0.9 },
-    { kind: 'snow', src: '/media/intro/snow-5.svg', x: 102, y: 542, w: 43, h: 46, z: 1.7, m: { x: 358, y: 506, w: 34.4 } },
-    { kind: 'photo', src: '/media/intro/photo-1.png', x: 255, y: 567, w: 179, h: 201, z: 1.35 },
+    { kind: 'snow', src: '/media/intro/snow-5.svg', x: 102, y: 542, w: 43, h: 46, z: 1.7, m: { x: 358, y: 523, w: 34.4 } },
+    { kind: 'photo', src: '/media/intro/photo-1.png', x: 255, y: 567, w: 179, h: 201, z: 1.35, m: { x: 100, y: 588, w: 100, h: 112 } },
     { kind: 'snow', src: '/media/intro/snow-7.svg', x: 1257, y: 678, w: 62, h: 67, z: 2.1 },
     { kind: 'tag', text: 'quiz', color: 'dark', x: 925, y: 745, z: 0.95 },
-    { kind: 'snow', src: '/media/intro/snow-8.svg', x: 502, y: 768, w: 28, h: 30, z: 1.5, m: { x: 300, y: 59, w: 28 } },
-    { kind: 'snow', src: '/media/intro/snow-8.svg', x: 0, y: 0, w: 28, h: 30, z: 1.2, mobileOnly: true, m: { x: 13, y: 556, w: 19.6 } },
+    { kind: 'snow', src: '/media/intro/snow-8.svg', x: 502, y: 768, w: 28, h: 30, z: 1.5, m: { x: 300, y: 40, w: 28 } },
+    { kind: 'snow', src: '/media/intro/snow-8.svg', x: 0, y: 0, w: 28, h: 30, z: 1.2, mobileOnly: true, m: { x: 13, y: 577, w: 19.6 } },
     { kind: 'tag', text: 'community', color: 'accent', x: 604, y: 812, z: 1.05 },
   ],
 };

@@ -64,14 +64,23 @@ function initDepth(section: HTMLElement, pin: ScrollTrigger) {
   const floats = Array.from(section.querySelectorAll<HTMLElement>('[data-float]'));
   if (!layer || !floats.length) return;
 
-  const items = floats.map((el) => ({
-    el,
-    z: Number(el.dataset.z) || 1,
-    cx: 0,
-    setX: gsap.quickSetter(el, 'x', 'px'),
-    setY: gsap.quickSetter(el, 'y', 'px'),
-    setScale: gsap.quickSetter(el, 'scale'),
-  }));
+  const items = floats.map((el) => {
+    // scale — сокращение (scaleX + scaleY): quickSetter его не раскрывает, а Safari падает
+    // на setAttribute('scaleX,scaleY'), поэтому две оси отдельно
+    const setScaleX = gsap.quickSetter(el, 'scaleX');
+    const setScaleY = gsap.quickSetter(el, 'scaleY');
+    return {
+      el,
+      z: Number(el.dataset.z) || 1,
+      cx: 0,
+      setX: gsap.quickSetter(el, 'x', 'px'),
+      setY: gsap.quickSetter(el, 'y', 'px'),
+      setScale: (v: number) => {
+        setScaleX(v);
+        setScaleY(v);
+      },
+    };
+  });
   let screen = 900; // высота экрана в px слоя (учитывает масштаб кадра и мобильную раскладку)
   let center = 720;
 

@@ -50,48 +50,70 @@ window.scrollTo(0, 0);
 
 initStage();
 
-// Базовое поведение — работает всегда
-initAnnotations();
-initNav();
-initRail();
-initAccordion(motion);
-initShaderBackgrounds(motion);
-initLiquidGlass();
+/**
+ * Запуск модуля: если он упадёт (баг, особенность браузера), остальные всё равно стартуют,
+ * а ошибка видна в консоли с именем модуля. fallback — что сделать вместо него (например, показать текст).
+ */
+function run<T>(name: string, init: () => T, fallback?: () => void): T | undefined {
+  try {
+    return init();
+  } catch (error) {
+    console.error(`[${name}]`, error);
+    fallback?.();
+    return undefined;
+  }
+}
+/** если модуль появления не запустился, текст не должен остаться скрытым (.js-motion в global.css) */
+const showText = (selector: string) => () => gsap.set(selector, { visibility: 'visible', opacity: 1 });
 
-const lenis = motion ? initSmoothScroll() : null;
+// Базовое поведение — работает всегда
+run('annotations', initAnnotations);
+run('nav', initNav);
+run('rail', initRail);
+run('accordion', () => initAccordion(motion));
+run('shader', () => initShaderBackgrounds(motion));
+run('glass', initLiquidGlass);
+
+const lenis = motion ? run('smooth-scroll', initSmoothScroll) : null;
 lenis?.stop(); // скролл открывается, когда уходит прелоадер
 
-if (motion) initSnow();
+if (motion) run('snow', initSnow);
 
 // Эффекты под курсор — только для мыши/тачпада
 if (motion && finePointer) {
-  initTilt();
-  initSpotlight();
-  initMagnetic();
-  initRepel();
-  initMouseDepth();
+  run('tilt', initTilt);
+  run('spotlight', initSpotlight);
+  run('magnetic', initMagnetic);
+  run('repel', initRepel);
+  run('mouse-depth', initMouseDepth);
 }
 
 // Текст режем на строки и слова только после загрузки шрифтов, иначе переносы посчитаются неверно
 const fontsReady = Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]);
 fontsReady.then(() => {
   // закреплённые экраны — строго сверху вниз
-  const pins = [initIntro(), initProgram(motion), initSchedule()];
-  initStoryBg(pins);
-  initLogoSpin();
-  initTalks();
+  const pins = [run('intro', initIntro), run('program', () => initProgram(motion)), run('schedule', initSchedule)];
+  run('story-bg', () => initStoryBg(pins));
+  run('logo-spin', initLogoSpin);
+  run('talks', initTalks);
   if (motion) {
-    initReveals();
-    initTextReveal();
-    initParallax();
-    initTimeline();
-    initStickyList();
-    initScramble();
+    run('reveals', initReveals, showText('[data-split], [data-reveal], [data-stagger] > *'));
+    run('text-reveal', initTextReveal, showText('[data-lines], [data-rise]'));
+    run('parallax', initParallax);
+    run('timeline', initTimeline);
+    run('sticky-list', initStickyList);
+    run('scramble', initScramble);
   }
   ScrollTrigger.sort();
   ScrollTrigger.refresh();
 });
 
-initHero({ motion, onReady: () => lenis?.start() });
+// первый экран: если интро сломается, прелоадер уходит и скролл открывается — страница не «зависает»
+initHero({ motion, onReady: () => lenis?.start() }).catch((error) => {
+  console.error('[hero]', error);
+  document.querySelector('[data-preloader]')?.remove();
+  showText('[data-anim], [data-anim] *')();
+  lenis?.start();
+});
 
 document.documentElement.classList.add('motion-ready');

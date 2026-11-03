@@ -5,13 +5,13 @@
  *
  * Десктоп (кадр «2», Rectangle 5879: 3622 px от y 43): кадр 1440×900 стоит по центру экрана;
  *   у его верха интро — 60, программа — 868 (+100 за закрепление), расписание — 1611 и дальше со списком.
- * Мобильный («2 · mobile»: градиент 3246 px от y −72): кадр интро 688 и блок программы — по центру
- *   экрана, шапка расписания — у верха (дата 1419 на 40 px от верха).
+ * Мобильный («2 · mobile»: градиент 3246 px от y −99): кадр интро 743 и блок программы — по центру
+ *   экрана, шапка расписания — у верха (дата 1447 на 40 px от верха).
  * Высота градиента для каждой раскладки — в Story.astro.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MOBILE_QUERY, stageScale } from '../core/stage';
+import { MOBILE_QUERY, stageHeight, stageScale } from '../core/stage';
 
 /** строка макета у верха экрана для каждого закрепления; h — высота экрана в px макета */
 const LAYOUTS = {
@@ -23,11 +23,11 @@ const LAYOUTS = {
     schedule: (h: number) => 1611 - (h - 900) / 2,
   },
   mobile: {
-    gradTop: -72,
-    intro: (h: number) => 344 - h / 2,
-    program: (h: number) => 1020.5 - h / 2,
+    gradTop: -99,
+    intro: (h: number) => 371.5 - h / 2,
+    program: (h: number) => 1048.5 - h / 2,
     drift: 60,
-    schedule: () => 1379,
+    schedule: () => 1407,
   },
 };
 
@@ -45,7 +45,7 @@ export function initStoryBg([intro, program, schedule]: Pin[]) {
   const build = () => {
     layout = mobile.matches ? LAYOUTS.mobile : LAYOUTS.desktop;
     const s = stageScale();
-    const h = window.innerHeight / s;
+    const h = stageHeight();
     keys = [];
     if (intro) keys.push([intro.start, layout.intro(h)], [intro.end, layout.intro(h)]);
     if (program) keys.push([program.start, layout.program(h)], [program.end, layout.program(h) + layout.drift]);

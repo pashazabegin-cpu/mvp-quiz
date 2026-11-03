@@ -34,7 +34,7 @@ export function resetUI(root: ParentNode) {
         break;
       case 'lines': {
         const split = splits.get(el);
-        if (split) gsap.set(split.lines, { yPercent: 105 });
+        if (split) gsap.set(split.lines, { yPercent: TEXT_REVEAL.hidden });
         break;
       }
       case 'btn':

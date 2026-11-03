@@ -45,11 +45,11 @@ import { withBase } from '../../lib/paths';
     pointer-events: none;
   }
   /* мобильный (Figma: «2 · mobile» → «05 · Логотип в снегу»): кадр 375×431, по бокам обрезан —
-     логотип остаётся крупным. Чёрный верх заходит на расписание на 72 px, белый низ уходит
+     логотип остаётся крупным. Чёрный верх заходит на расписание на 99 px, белый низ уходит
      под программу MVP Talks на 56 px (её заголовок стоит на снегу) */
   @media (max-aspect-ratio: 1/1) {
     .spin {
-      margin-top: calc(-72px * var(--ui-s));
+      margin-top: calc(-99px * var(--ui-s));
       margin-bottom: calc(-56px * var(--ui-s));
     }
     .spin__video {

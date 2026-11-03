@@ -1,5 +1,6 @@
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
+import { enterObserver } from './text-reveal';
 
 /** плашка на строке заголовка: время каждой половины, сдвиг между строками */
 const WIPE = { duration: 0.85, stagger: 0.1, ease: 'power4.inOut' };
@@ -14,7 +15,20 @@ const WIPE = { duration: 0.85, stagger: 0.1, ease: 'power4.inOut' };
  * Начальные (скрытые) состояния заданы в global.css под классом .js-motion.
  */
 export function initReveals() {
+  // запуск — когда заголовок появился на экране (как у обычного текста, text-reveal.ts):
+  // работает и на закреплённых экранах; после показа пересборка строк (ресайз, панель Safari)
+  // оставляет заголовок видимым, а не прячет его заново
+  const shown = new WeakSet<HTMLElement>();
+  const wipes = new WeakMap<HTMLElement, gsap.core.Timeline>();
+  const io = enterObserver((els) =>
+    els.forEach((el, i) => {
+      shown.add(el);
+      wipes.get(el)?.delay(i * WIPE.stagger).play();
+    }),
+  );
+
   document.querySelectorAll<HTMLElement>('[data-split]').forEach((el) => {
+    io.observe(el);
     SplitText.create(el, {
       type: 'lines',
       autoSplit: true, // пересобирает строки при ресайзе; разметку ниже SplitText откатывает сам
@@ -35,8 +49,13 @@ export function initReveals() {
           return block;
         });
 
+        wipes.get(el)?.kill();
+        if (shown.has(el)) {
+          gsap.set(blocks, { scaleX: 0 });
+          return;
+        }
         gsap.set(lines, { opacity: 0 });
-        const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+        const tl = gsap.timeline({ paused: true });
         lines.forEach((line, i) => {
           const at = i * WIPE.stagger;
           tl.fromTo(blocks[i], { scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: WIPE.duration, ease: WIPE.ease }, at)
@@ -44,7 +63,7 @@ export function initReveals() {
             .set(blocks[i], { transformOrigin: 'right center' }, at + WIPE.duration)
             .to(blocks[i], { scaleX: 0, duration: WIPE.duration, ease: WIPE.ease }, at + WIPE.duration);
         });
-        return tl; // при пересборке строк SplitText перенесёт сюда прогресс прошлой анимации
+        wipes.set(el, tl);
       },
     });
   });

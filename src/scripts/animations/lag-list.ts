@@ -6,27 +6,31 @@
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { stageScale } from '../core/stage';
+import { MOBILE_QUERY, stageHeight, stageScale } from '../core/stage';
 
 type Options = {
   /** где встаёт низ списка в конце (px макета от низа экрана) */
   bottom?: number;
   /** сколько экран ещё стоит после того, как список доехал (доля высоты экрана) */
   hold?: number;
+  /** шапка над списком: в мобильной раскладке уезжает вместе со списком (как первый пункт),
+      иначе пункты проезжали бы по ней; на десктопе шапка сбоку и стоит */
+  head?: HTMLElement[];
 };
 
 /** нижняя полоса экрана (px макета), в которой пункты доезжают вверх */
 const EDGE = 300;
 const RISE = 40;
 
-export function pinLagList(section: HTMLElement, list: HTMLElement, { bottom = 140, hold = 0.35 }: Options = {}) {
+export function pinLagList(section: HTMLElement, list: HTMLElement, { bottom = 140, hold = 0.35, head = [] }: Options = {}) {
   const items = Array.from(list.children) as HTMLElement[];
+  const mobile = window.matchMedia(MOBILE_QUERY);
+  const headMovers = head.map((el) => gsap.quickTo(el, 'y', { duration: 1, ease: 'power3.out' }));
 
   // сколько списку уехать (px макета), чтобы его низ встал на `bottom` выше низа экрана
   let travel = 0;
   const measure = () => {
-    const uiH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-h')) || 900;
-    travel = Math.max(0, list.offsetTop + list.offsetHeight - (uiH - bottom));
+    travel = Math.max(0, list.offsetTop + list.offsetHeight - (stageHeight() - bottom));
     return travel;
   };
 
@@ -42,6 +46,7 @@ export function pinLagList(section: HTMLElement, list: HTMLElement, { bottom = 1
       const top = el.getBoundingClientRect().top + (y - Number(gsap.getProperty(el, 'y'))) * s;
       movers[i](y + (1 - edge(top)) * RISE);
     });
+    headMovers.forEach((move) => move(mobile.matches ? y : 0));
   };
 
   return ScrollTrigger.create({

@@ -40,6 +40,9 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
 <style>
   .talks {
     background: #fff;
+    /* на телефоне экран высотой с «малый» экран (100svh): когда панель браузера прячется,
+       под закреплённым экраном открывается полоса — она тоже белая, а не чёрный фон страницы */
+    box-shadow: 0 30vh 0 #fff;
     color: var(--c-accent-2);
     color-scheme: light;
   }

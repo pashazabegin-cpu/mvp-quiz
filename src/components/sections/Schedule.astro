@@ -11,8 +11,8 @@ const lines = (text: string) => text.split('\n');
 
 <section class="schedule stage" id="schedule" data-schedule>
   <div class="stage__ui">
-    <p class="schedule__date label" data-split="dark">{event.date} · {event.venue}</p>
-    <h2 class="schedule__title" data-split>{schedule.title} <span class="accent">{schedule.accent}</span></h2>
+    <p class="schedule__date label" data-split="dark" data-schedule-head>{event.date} · {event.venue}</p>
+    <h2 class="schedule__title" data-split data-schedule-head>{schedule.title} <span class="accent">{schedule.accent}</span></h2>
 
     <ol class="schedule__list" data-schedule-list>
       {

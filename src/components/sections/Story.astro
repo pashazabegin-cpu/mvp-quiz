@@ -25,6 +25,8 @@
     margin-bottom: -100vh;
     overflow: hidden;
     pointer-events: none;
+    /* подложка: шум ниже края градиента смешивается с чёрным, а не с пустотой (иначе серая полоса) */
+    background: var(--c-bg);
   }
   .story__grad {
     position: absolute;

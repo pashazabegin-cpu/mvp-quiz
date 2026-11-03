@@ -76,6 +76,9 @@ public/media/hero.mp4      ← видео первого экрана
 | `data-parallax="0.3"` | параллакс от скролла (число — скорость, минус — навстречу) | `animations/parallax.ts` |
 | `data-timeline` / `data-tl-item` | линия расписания заполняется, точки загораются | `animations/timeline.ts` |
 | `data-sticky-list` / `data-sticky-item` | закреплённый заголовок: счётчик, прогресс, фокус на текущей карточке | `animations/sticky-list.ts` |
+| `data-schedule-list`, `data-talks-list` | экран закреплён, пункты едут вверх «гармошкой» (каждый отстаёт от предыдущего) | `animations/lag-list.ts` |
+| `data-spin` | кадр видео с логотипом задаёт скролл (видео перекодировано: каждый кадр ключевой) | `sections/logo-spin.ts` |
+| `data-nav-light` | над этим участком меню переключается на тёмный текст | `ui/nav.ts` |
 | `data-scramble` | цифры/буквы перебираются как на табло | `animations/scramble.ts` |
 | `data-tilt="8"` | 3D-наклон за курсором (число — макс. угол) | `interactions/tilt.ts` |
 | `data-spotlight` | пятно света под курсором (+ CSS-переменные `--mx`, `--my`, `--gx`) | `interactions/spotlight.ts` |

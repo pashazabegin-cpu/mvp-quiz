@@ -5,10 +5,12 @@ import Story from '../components/sections/Story.astro';
 import Intro from '../components/sections/Intro.astro';
 import Program from '../components/sections/Program.astro';
 import Schedule from '../components/sections/Schedule.astro';
+import LogoSpin from '../components/sections/LogoSpin.astro';
+import Talks from '../components/sections/Talks.astro';
 ---
 
 <!--
-  Страница собирается по макету сверху вниз. Блоки ниже расписания (Talks, Quiz, Speakers, Jury,
+  Страница собирается по макету сверху вниз. Блоки ниже программы MVP Talks (Quiz, Speakers, Jury,
   Tickets, Partners, Location, Faq, Footer — прототипы в components/sections) пока сняты со страницы.
 -->
 <Base>
@@ -19,5 +21,7 @@ import Schedule from '../components/sections/Schedule.astro';
       <Program />     <!-- 03 Программа: три пункта дня — по макету -->
       <Schedule />    <!-- 04 Как всё пройдёт? — по макету -->
     </Story>
+    <LogoSpin />      <!-- 05 Логотип в снегу: видео перематывается скроллом -->
+    <Talks />         <!-- 06 Программа MVP Talks — белый экран -->
   </main>
 </Base>

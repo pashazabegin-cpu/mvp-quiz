@@ -47,4 +47,21 @@ export function initNav() {
     link.addEventListener('pointerenter', () => place(link));
   });
   wrap.addEventListener('pointerleave', () => place(active));
+
+  // над белыми участками (data-nav-light) — тёмный текст на светлом стекле. Проверка по положению на экране,
+  // а не по триггерам: так верно и для закреплённых экранов (их триггер не знает про собственное закрепление)
+  const zones = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-light]'));
+  if (zones.length) {
+    const check = () => {
+      const y = window.innerHeight - 50; // середина меню над низом экрана
+      const light = zones.some((zone) => {
+        const r = zone.getBoundingClientRect();
+        return r.top <= y && r.bottom >= y;
+      });
+      nav.classList.toggle('nav--light', light);
+    };
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    check();
+  }
 }

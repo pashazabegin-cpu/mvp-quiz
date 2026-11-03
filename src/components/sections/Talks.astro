@@ -1,94 +1,189 @@
 ---
 /**
- * 04 · Программа MVP Talks & Entertainment — один поток, компактно:
- * время — название сессии — пояснение. Строки появляются по очереди, на ховере — подсветка.
+ * 06 · Программа MVP Talks & Entertainment — белый экран (Figma: кадр «2», низ).
+ * Один поток: время — название сессии и спикер — пояснение, между сессиями тонкие линии.
+ * Экран закреплён, сессии едут вверх «гармошкой», как в «Как всё пройдёт?».
+ * Логика — scripts/sections/talks.ts, scripts/animations/lag-list.ts
  */
-import Anno from '../ui/Anno.astro';
 import { talks } from '../../data/content';
+
+// короткие слова («в», «и», «на») не оставляем в конце строки — как в макете
+const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$1$2 ');
 ---
 
-<section class="section talks" id="talks">
-  <Anno kind="screen">04 · Программа MVP Talks</Anno>
-  <div class="container">
-    <div class="section-head">
-      <h2 class="h2" data-split>{talks.title}</h2>
-      <span class="chip chip--mono" data-reveal>{talks.badge}</span>
-    </div>
-    <ol class="talks__list" data-stagger>
+<section class="talks stage" id="talks" data-talks data-nav-light>
+  <div class="stage__ui talks__ui">
+    <div class="talks__list" data-talks-list>
+      <header class="talks__head">
+        <h2 class="talks__title">
+          <span class="talks__line" data-split>{talks.title}</span>
+          <span class="talks__line talks__line--accent" data-split>{talks.accent}</span>
+        </h2>
+        <p class="talks__badge" data-split="dark">{talks.badge}</p>
+      </header>
       {
         talks.sessions.map((s) => (
-          <li class="talk" data-spotlight>
-            <time class="talk__time">{s.time}</time>
+          <article class="talk">
+            <span class="time-pill talk__time">{s.time}</span>
             <div class="talk__main">
-              <span class="talk__format">{s.format}</span>
-              <h3 class:list={['talk__title', { fish: s.draft }]}>{s.title}</h3>
+              <h3 class="talk__title">{glue(s.title)}</h3>
+              <p class="talk__speaker">{s.speaker}</p>
             </div>
-            <p class:list={['talk__text', { fish: s.draft }]}>{s.text}</p>
-          </li>
+            <p class="talk__text">{glue(s.text)}</p>
+          </article>
         ))
       }
-    </ol>
-    <Anno>ТЗ: один поток, компактнее чем на форуме · время — сессия — пояснение</Anno>
-    <Anno kind="motion">строки появляются лесенкой · ховер: полоска слева, сдвиг заголовка, пятно света</Anno>
+    </div>
   </div>
 </section>
 
 <style>
-  .talks__list {
-    border-top: 1px solid var(--c-line);
+  .talks {
+    background: #fff;
+    color: var(--c-accent-2);
+    color-scheme: light;
   }
+  /* нижние 300 px макета: сессии проявляются из белого (фон экрана маска не трогает) */
+  .talks__ui {
+    -webkit-mask-image: linear-gradient(to top, transparent 0, #000 300px);
+    mask-image: linear-gradient(to top, transparent 0, #000 300px);
+  }
+  /* верх заголовка — 189 px от начала белого фона */
+  .talks__list {
+    left: 0;
+    top: calc(50% - 450px + 189px);
+    width: 100%;
+  }
+  .talks__list > * {
+    will-change: transform;
+  }
+
+  .talks__head {
+    position: relative;
+    height: 90px;
+  }
+  .talks__title {
+    position: absolute;
+    left: calc(60px + var(--col) + 16px);
+    top: 0;
+    font-size: 45px;
+    font-weight: 300;
+    line-height: 45px;
+    letter-spacing: -2.25px;
+    white-space: nowrap;
+  }
+  .talks__line {
+    display: block;
+  }
+  /* вторая строка начинается с колонки названий сессий (345 при 1440) */
+  .talks__line--accent {
+    margin-left: calc(var(--col) * 2 - 16px);
+    color: var(--c-accent);
+  }
+  .talks__badge {
+    position: absolute;
+    left: calc(60px + var(--col) * 8);
+    top: 58px;
+    color: rgb(14 70 151 / 0.8);
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* сессия: время (155) — название и спикер (345) — пояснение (820); линии между сессиями во всю ширину */
   .talk {
     display: grid;
-    grid-template-columns: 140px minmax(0, 1fr) minmax(0, 1.1fr);
-    gap: 8px 32px;
-    align-items: baseline;
-    padding: 22px 16px;
-    border-bottom: 1px solid var(--c-line);
+    grid-template-columns: calc(60px + var(--col)) calc(var(--col) * 2) calc(var(--col) * 5) 465px;
+    align-items: start;
+    padding: 60px 0;
+    border-top: 1px solid rgb(124 135 153 / 0.3);
+    font-weight: 300;
   }
-  .talk::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 2px;
-    background: var(--c-accent);
-    transform: scaleY(0);
-    transition: transform 0.5s var(--ease-out);
-  }
-  .talk:hover::before {
-    transform: scaleY(1);
+  .talk:first-of-type {
+    margin-top: 100px;
+    padding-top: 0;
+    border-top: 0;
   }
   .talk__time {
-    font-family: var(--font-mono);
-    font-size: 14px;
-    color: var(--c-muted);
-    font-variant-numeric: tabular-nums;
+    grid-column: 2;
+    margin-top: 7px;
   }
-  .talk__format {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--c-muted);
+  .talk__main {
+    grid-column: 3;
+    max-width: 421px;
   }
   .talk__title {
-    margin-top: 6px;
-    font-size: 21px;
-    line-height: 1.2;
-    transition: transform 0.5s var(--ease-out);
+    color: var(--c-accent);
+    font-size: 35px;
+    font-weight: 300;
+    line-height: 45px;
+    letter-spacing: -1.75px;
   }
-  .talk:hover .talk__title {
-    transform: translateX(8px);
+  .talk__speaker {
+    margin-top: 15px;
+    font-size: 22px;
+    line-height: 45px;
+    letter-spacing: -1.1px;
   }
   .talk__text {
-    color: var(--c-muted);
-    font-size: 15px;
+    grid-column: 4;
+    color: #7c8799;
+    font-size: 22px;
+    line-height: 32px;
   }
-  @media (max-width: 860px) {
+
+  @media (max-aspect-ratio: 4/5) {
+    .talks__list {
+      top: 56px;
+    }
+    .talks__head {
+      height: auto;
+      padding-inline: 16px;
+    }
+    .talks__title {
+      position: static;
+      font-size: 34px;
+      line-height: 36px;
+      letter-spacing: -1.5px;
+    }
+    .talks__line--accent {
+      margin-left: 0;
+    }
+    .talks__badge {
+      position: static;
+      margin-top: 16px;
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
     .talk {
-      grid-template-columns: 1fr;
-      padding-inline: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 32px 16px;
+    }
+    .talk:first-of-type {
+      margin-top: 40px;
+    }
+    .talk__time {
+      margin-top: 0;
+    }
+    .talk__title {
+      font-size: 26px;
+      line-height: 30px;
+      letter-spacing: -1px;
+    }
+    .talk__speaker {
+      margin-top: 8px;
+      font-size: 18px;
+      line-height: 26px;
+      letter-spacing: -0.5px;
+    }
+    .talk__text {
+      font-size: 18px;
+      line-height: 26px;
     }
   }
 </style>

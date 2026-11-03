@@ -18,6 +18,8 @@ import { initHero } from './sections/hero';
 import { initIntro } from './sections/intro';
 import { initProgram } from './sections/program';
 import { initSchedule } from './sections/schedule';
+import { initLogoSpin } from './sections/logo-spin';
+import { initTalks } from './sections/talks';
 import { initStoryBg } from './sections/story-bg';
 import { initReveals } from './animations/reveal';
 import { initParallax } from './animations/parallax';
@@ -75,6 +77,8 @@ fontsReady.then(() => {
   // закреплённые экраны — строго сверху вниз
   const pins = [initIntro(), initProgram(motion), initSchedule()];
   initStoryBg(pins);
+  initLogoSpin();
+  initTalks();
   if (motion) {
     initReveals();
     initParallax();

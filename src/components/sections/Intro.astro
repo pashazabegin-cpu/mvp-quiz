@@ -101,10 +101,12 @@ const lines = (text: string) => text.split('\n');
   .intro__float--back {
     z-index: -1;
   }
+  /* фото вписаны в рамку 179×201 целиком, как в макете (пропорции у снимков разные) */
   .intro__float img {
     display: block;
     width: 100%;
     height: 100%;
+    object-fit: contain;
   }
 
   @media (max-aspect-ratio: 4/5) {

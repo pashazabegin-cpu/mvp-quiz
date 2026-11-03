@@ -130,6 +130,31 @@ import Button from './Button.astro';
     background: rgb(255 255 255 / 0.1);
     opacity: 0;
   }
+  /* над белым экраном (scripts/ui/nav.ts): стекло светлее, текст тёмно-синий */
+  .nav__glass,
+  .nav__link,
+  .nav__indicator {
+    transition:
+      background-color 0.4s,
+      box-shadow 0.4s,
+      color 0.4s;
+  }
+  .nav--light .nav__glass {
+    background-color: rgb(255 255 255 / 0.45);
+    box-shadow:
+      inset 0 0 0 1px rgb(14 70 151 / 0.12),
+      inset 0 1px 0 rgb(255 255 255 / 0.9);
+  }
+  .nav--light .nav__link {
+    color: rgb(14 70 151 / 0.6);
+  }
+  .nav--light .nav__link:hover,
+  .nav--light .nav__link.is-active {
+    color: var(--c-accent-2);
+  }
+  .nav--light .nav__indicator {
+    background-color: rgb(14 70 151 / 0.08);
+  }
   .nav :global(.nav__cta) {
     flex: none;
     min-width: 0;

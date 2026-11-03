@@ -1,0 +1,54 @@
+---
+/**
+ * 05 · Логотип в снегу (Figma: кадр «2», слой «festive-glass-logo»).
+ * Видео не играет само: пока блок поднимается через экран, скролл перематывает его,
+ * и логотип поворачивается вокруг своей оси (вниз — вперёд, вверх — назад).
+ * Верх кадра чёрный — стык с расписанием, низ белый — стык с программой MVP Talks.
+ * Логика — scripts/sections/logo-spin.ts
+ */
+import { logoSpin } from '../../data/content';
+import { withBase } from '../../lib/paths';
+---
+
+<section class="spin" data-spin aria-hidden="true">
+  <video
+    class="spin__video"
+    src={withBase(logoSpin.video)}
+    poster={withBase(logoSpin.poster)}
+    width="1920"
+    height="1168"
+    muted
+    playsinline
+    preload="none"
+    data-spin-video></video>
+  <!-- снег и белый низ кадра: меню над ними переключается на тёмный текст (scripts/ui/nav.ts) -->
+  <i class="spin__light" data-nav-light></i>
+</section>
+
+<style>
+  .spin {
+    position: relative;
+    background: var(--c-bg);
+  }
+  .spin__video {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1920 / 1168;
+    object-fit: cover;
+  }
+  .spin__light {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 38%;
+    pointer-events: none;
+  }
+  /* вертикальный экран: кадр выше, по бокам обрезан — логотип остаётся крупным */
+  @media (max-aspect-ratio: 4/5) {
+    .spin__video {
+      aspect-ratio: auto;
+      height: 115vw;
+    }
+  }
+</style>

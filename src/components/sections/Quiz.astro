@@ -2,7 +2,8 @@
 /**
  * 07 · Спортивный квиз (Figma: кадр «2» — низ, мобильный — «2 · mobile» → «06», плашка под программой).
  * Тёмная плашка-«сквиркл» на градиенте (белый → синий → почти чёрный). Вокруг плашки по орбите идут иконки:
- * спереди — поверх текста, сзади — за плашкой; размер задаёт перспектива, скролл прокручивает орбиту.
+ * спереди — поверх текста, сзади — за плашкой; размер задаёт перспектива. Скролл прокручивает орбиту
+ * по горизонтали и поднимает её с начала текста на место пунктов, когда доходишь до текста.
  * Пункты загораются по очереди, текст закрашивается по словам. Логика — scripts/sections/quiz.ts, quiz-orbit.ts
  * Блок не закреплён: высота задана в px макета (1931 на десктопе, 1137 на мобильном) и масштабируется.
  */
@@ -12,7 +13,7 @@ import { event, quiz } from '../../data/content';
 import { withBase } from '../../lib/paths';
 import { paragraph } from '../../lib/text';
 
-// на орбите 26 мест: каждая иконка дважды, копии — напротив друг друга (одна спереди, другая за плашкой)
+// на орбите 24 места: каждая иконка дважды, копии — напротив друг друга (одна спереди, другая за плашкой)
 const ring = [...quiz.icons, ...quiz.icons];
 ---
 
@@ -22,7 +23,7 @@ const ring = [...quiz.icons, ...quiz.icons];
 
     <h2 class="quiz__title" data-split>{quiz.title[0]}<br /><span class="accent">{quiz.title[1]}</span></h2>
 
-    <ol class="quiz__steps">
+    <ol class="quiz__steps" data-quiz-steps>
       {quiz.steps.map((step) => <li class="quiz__step" data-quiz-step>{step}</li>)}
     </ol>
 
@@ -166,8 +167,8 @@ const ring = [...quiz.icons, ...quiz.icons];
     position: absolute;
     left: 0;
     top: 0;
-    width: 300px;
-    height: 300px;
+    width: 280px;
+    height: 280px;
     /* показывает скрипт, когда поставит иконку на орбиту */
     visibility: hidden;
     will-change: transform;
@@ -221,8 +222,8 @@ const ring = [...quiz.icons, ...quiz.icons];
       top: 888px;
     }
     .orbit__item {
-      width: 132px;
-      height: 132px;
+      width: 120px;
+      height: 120px;
     }
   }
 </style>

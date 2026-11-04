@@ -125,6 +125,35 @@ const ring = [...quiz.icons, ...quiz.icons];
     height: 1352px;
     border-radius: 260px;
     background: #030f1c;
+    /* свечение не выходит за форму плашки (в макете — маска по сквирклу) */
+    overflow: hidden;
+  }
+  /* свечение у низа плашки (Figma: Mask group 4205:4648): два размытых круга, центры ниже края плашки.
+     Большой — голубой akcent, размытие 193; малый — светлее, в режиме overlay, размытие 77 */
+  .quiz__plate::before,
+  .quiz__plate::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .quiz__plate::before {
+    bottom: -392px;
+    width: 556px;
+    height: 556px;
+    margin-left: -278px;
+    background: var(--c-accent);
+    filter: blur(193px);
+  }
+  .quiz__plate::after {
+    bottom: -209px;
+    width: 281px;
+    height: 281px;
+    margin-left: -140.5px;
+    background: #61c2ff;
+    filter: blur(77px);
+    mix-blend-mode: overlay;
   }
   @supports (corner-shape: squircle) {
     .quiz__plate {
@@ -260,6 +289,21 @@ const ring = [...quiz.icons, ...quiz.icons];
       width: var(--ui-w);
       height: auto;
       border-radius: 74px;
+    }
+    /* свечение мельче — плашка уже в 3.5 раза */
+    .quiz__plate::before {
+      bottom: -235px;
+      width: 334px;
+      height: 334px;
+      margin-left: -167px;
+      filter: blur(116px);
+    }
+    .quiz__plate::after {
+      bottom: -125px;
+      width: 169px;
+      height: 169px;
+      margin-left: -84.5px;
+      filter: blur(46px);
     }
     .quiz__title,
     .quiz__steps,

@@ -6,12 +6,15 @@
  *   на мобильном список стоит, меняется только яркость;
  *   иконка посередине перетекает в следующую (WebGL, effects/icon-morph.ts), на мобильном — простая смена картинок;
  *   номер и описание справа сменяются как тексты на MVP — строки из-под маски.
+ * Заголовки пунктов — кнопки: клик докручивает экран до своего пункта (например, из «Спортивного квиза»
+ * сразу к «Кибермейджору»), по пути проигрываются те же переходы.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { IconMorph } from '../effects/icon-morph';
 import { MOBILE_QUERY, onStageFit } from '../core/stage';
+import { scrollToY } from '../core/smooth-scroll';
 import { TEXT_REVEAL, dropHiddenBreaks } from '../animations/text-reveal';
 
 export function initProgram(motion: boolean): ScrollTrigger | undefined {
@@ -19,6 +22,7 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
   if (!section) return;
   const list = section.querySelector<HTMLElement>('[data-program-list]')!;
   const items = Array.from(section.querySelectorAll<HTMLElement>('[data-program-item]'));
+  const buttons = items.map((el) => el.querySelector<HTMLButtonElement>('button'));
   const infos = Array.from(section.querySelectorAll<HTMLElement>('[data-program-info]'));
   const imgs = Array.from(section.querySelectorAll<HTMLImageElement>('[data-program-img]'));
   const canvas = section.querySelector<HTMLCanvasElement>('[data-icon-morph]');
@@ -65,6 +69,9 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
       // как в макете: активный — 100%, соседний — 20%, дальний — 5%; пройденные не гаснут, а тоже тускнеют
       const d = Math.abs(j - s);
       el.style.opacity = String(d < 1 ? gsap.utils.interpolate(1, 0.2, d) : gsap.utils.interpolate(0.2, 0.05, Math.min(1, d - 1)));
+      const current = j === Math.round(s);
+      el.classList.toggle('is-active', current);
+      buttons[j]?.toggleAttribute('aria-current', current);
     });
     if (morph) morph.set(seg, k);
     else imgs.forEach((img, j) => (img.style.opacity = String(gsap.utils.clamp(0, 1, 1 - Math.abs(j - s) * 1.6))));
@@ -80,5 +87,14 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
     onRefresh: (self) => render(self.progress),
   });
   render(0);
+
+  // клик по пункту: скролл к месту закрепления, где этот пункт стоит (середина его удержания;
+  // крайние — чуть внутрь закрепления, чтобы экран не отпустило)
+  buttons.forEach((btn, i) =>
+    btn?.addEventListener('click', () => {
+      const y = st.start + ((st.end - st.start) * i) / (n - 1);
+      scrollToY(gsap.utils.clamp(st.start + 2, st.end - 2, y));
+    }),
+  );
   return st;
 }

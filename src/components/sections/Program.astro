@@ -18,7 +18,13 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
     <h2 class="program__title" data-split>{program.title[0]} <span class="accent">{program.title[1]}</span></h2>
 
     <ol class="program__list" data-program-list>
-      {program.items.map((it) => <li class="program__item" data-program-item>{it.title}</li>)}
+      {
+        program.items.map((it) => (
+          <li class="program__item" data-program-item>
+            <button class="program__btn" type="button">{it.title}</button>
+          </li>
+        ))
+      }
     </ol>
 
     <div class="program__icon" data-tilt="10">
@@ -95,6 +101,24 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
     line-height: 45px;
     letter-spacing: -2.25px;
     white-space: nowrap;
+  }
+  /* пункт — кнопка: клик докручивает экран до него (program.ts); выглядит как текст */
+  .program__btn {
+    display: block;
+    width: 100%;
+    letter-spacing: inherit;
+    line-height: inherit;
+    text-align: inherit;
+    white-space: nowrap;
+  }
+  .program__item:not(.is-active) .program__btn {
+    cursor: pointer;
+  }
+  /* под курсором неактивный пункт проявляется сильнее (поверх яркости, которую ставит скрипт) */
+  @media (hover: hover) {
+    .program__item:not(.is-active):hover {
+      opacity: 0.6 !important;
+    }
   }
   /* до запуска скрипта — как в макете: следующий пункт 20%, дальше 5% */
   .program__item:nth-child(2) {

@@ -23,7 +23,10 @@ const { title = site.metaTitle, description = site.metaDescription } = Astro.pro
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    <!-- фавиконка — новогодняя шапка из иконок квиза (public/favicon-*.png, apple-touch-icon.png) -->
+    <link rel="icon" href={withBase('favicon-32.png')} type="image/png" sizes="32x32" />
+    <link rel="icon" href={withBase('favicon-64.png')} type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} sizes="180x180" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

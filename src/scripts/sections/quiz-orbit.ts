@@ -6,8 +6,6 @@
  *      (GAP), при любом размере и в любой момент движения. Это важнее всего.
  *   2. Карусель идёт на всю ширину экрана и уходит за оба края; лента замкнута — крутится без конца.
  *   3. Перспектива: по центру самая крупная иконка, к краям плавно меньше (SHRINK); все на одной прямой.
- *   4. По бокам — лёгкая хроматическая аберрация только на иконках карусели: синяя кромка к центру,
- *      бирюзовая — наружу; по центру её нет, к краям чуть сильнее (ABERRATION).
  *
  * Как устроено: лента из 24 мест (12 иконок по два раза), p — текущий сдвиг ленты в «иконках».
  * У каждой иконки o = её место − p (0 — ровно по центру). Размер рамки — BOX·f(o), f = 1/√(1 + SHRINK·o²);
@@ -44,18 +42,11 @@ type Config = {
   pace: number;
   /** горизонтальный параллакс: иконок на 1 px макета скролла */
   scroll: number;
-  /** сдвиг цветных кромок у края экрана, px макета */
-  aberration: number;
 };
 
-// положения — по кадрам 4204:4529 / 4204:4575; перспектива мягче макета (по просьбе заказчика):
-// соседняя ≈ 0.83 от центральной, дальше 0.6, 0.44, 0.35
-const DESKTOP: Config = { gap: 40, shrink: 0.45, arrive: 43, travel: 495, low: 18, high: 16, pace: 3.5, scroll: 0.004, aberration: 7 };
-const MOBILE: Config = { gap: 16, shrink: 0.45, arrive: 20, travel: 340, low: 10, high: 4, pace: 3.5, scroll: 0.009, aberration: 3 };
-/** аберрация: с какого места от центра начинается и где выходит на полную (в иконках) */
-const ABERRATION = { from: 0.8, full: 3.5 };
-/** цвета кромок: к центру — синий, наружу — бирюзовый */
-const FRINGE = { inner: 'rgb(37 99 255 / 0.75)', outer: 'rgb(56 232 222 / 0.7)' };
+// десктоп — по кадрам 4204:4529 / 4204:4575: соседняя ≈ 0.76 от центральной, дальше 0.5, 0.36, 0.28
+const DESKTOP: Config = { gap: 40, shrink: 0.73, arrive: 43, travel: 495, low: 18, high: 16, pace: 3.5, scroll: 0.004 };
+const MOBILE: Config = { gap: 16, shrink: 0.73, arrive: 20, travel: 340, low: 10, high: 4, pace: 3.5, scroll: 0.009 };
 /** до скольких мест от центра раскладываем ленту (дальше — точно за краем экрана) */
 const REACH = 9;
 /** как быстро лента догоняет скролл (1/с) */
@@ -101,7 +92,6 @@ export function initQuizOrbit(motion: boolean) {
   const xs = new Array<number>(n);
   const sizes = new Array<number>(n);
   const order: number[] = [];
-  const fringe = new Array<string>(n).fill('');
   const render = () => {
     for (let i = 0; i < n; i++) {
       // место относительно центра в диапазоне [−n/2, n/2)
@@ -142,16 +132,6 @@ export function initQuizOrbit(motion: boolean) {
       el.style.zIndex = String(40 - Math.round(Math.abs(offs[i]) * 3));
       const s = sizes[i];
       el.style.transform = `translate3d(${(xs[i] - box / 2).toFixed(2)}px, ${(ringY - box / 2).toFixed(2)}px, 0) scale(${s.toFixed(4)})`;
-      // аберрация: цветные копии силуэта (drop-shadow) по бокам; шаг 0.5 px — фильтр перерисовывается редко
-      const k = smoothstep(gsap.utils.clamp(0, 1, (Math.abs(offs[i]) - ABERRATION.from) / (ABERRATION.full - ABERRATION.from)));
-      // сдвиг в px рамки (до масштаба), с шагом 0.5 — строка фильтра меняется только на этих шагах
-      const shift = Math.round(((cfg.aberration * k) / s) * 2) / 2;
-      const dir = xs[i] < cx ? -1 : 1; // наружу
-      const value = shift ? `drop-shadow(${-dir * shift}px 0 0 ${FRINGE.inner}) drop-shadow(${dir * shift}px 0 0 ${FRINGE.outer})` : '';
-      if (value !== fringe[i]) {
-        fringe[i] = value;
-        el.style.filter = value;
-      }
     }
   };
 

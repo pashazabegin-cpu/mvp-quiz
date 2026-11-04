@@ -6,9 +6,6 @@
  *      (GAP), при любом размере и в любой момент движения. Это важнее всего.
  *   2. Карусель идёт на всю ширину экрана и уходит за оба края; лента замкнута — крутится без конца.
  *   3. Перспектива: по центру самая крупная иконка, к краям плавно меньше (SHRINK); все на одной прямой.
- *   4. По краям экрана — полосы EDGE (100 px на десктопе) с прогрессивным размытием и аберрацией:
- *      чем глубже иконка заходит в полосу, тем она мягче и тем заметнее синяя кромка к центру и бирюзовая наружу.
- *      Только на иконках карусели; вне полос иконки чёткие и без цвета.
  *
  * Как устроено: лента из 24 мест (12 иконок по два раза), p — текущий сдвиг ленты в «иконках».
  * У каждой иконки o = её место − p (0 — ровно по центру). Размер рамки — BOX·f(o), f = 1/√(1 + SHRINK·o²);
@@ -45,19 +42,11 @@ type Config = {
   pace: number;
   /** горизонтальный параллакс: иконок на 1 px макета скролла */
   scroll: number;
-  /** ширина полосы у каждого края экрана, px экрана */
-  edge: number;
-  /** размытие у самого края, px экрана */
-  blur: number;
-  /** сдвиг цветных кромок у самого края, px экрана */
-  shift: number;
 };
 
 // десктоп — по кадрам 4204:4529 / 4204:4575: соседняя ≈ 0.76 от центральной, дальше 0.5, 0.36, 0.28
-const DESKTOP: Config = { gap: 40, shrink: 0.73, arrive: 43, travel: 495, low: 18, high: 16, pace: 3.5, scroll: 0.004, edge: 100, blur: 8, shift: 5 };
-const MOBILE: Config = { gap: 16, shrink: 0.73, arrive: 20, travel: 340, low: 10, high: 4, pace: 3.5, scroll: 0.009, edge: 50, blur: 4, shift: 3 };
-/** цвета кромок в полосах у краёв: к центру — синий, наружу — бирюзовый */
-const FRINGE = { inner: 'rgb(37 99 255 / 0.7)', outer: 'rgb(56 232 222 / 0.65)' };
+const DESKTOP: Config = { gap: 40, shrink: 0.73, arrive: 43, travel: 495, low: 18, high: 16, pace: 3.5, scroll: 0.004 };
+const MOBILE: Config = { gap: 16, shrink: 0.73, arrive: 20, travel: 340, low: 10, high: 4, pace: 3.5, scroll: 0.009 };
 /** до скольких мест от центра раскладываем ленту (дальше — точно за краем экрана) */
 const REACH = 9;
 /** как быстро лента догоняет скролл (1/с) */
@@ -86,8 +75,6 @@ export function initQuizOrbit(motion: boolean) {
   let high = 658;
 
   const measure = () => {
-    px = 1 / stageScale();
-    band = cfg.edge * px;
     box = items[0].offsetWidth;
     cx = ui.offsetWidth / 2;
     high = topics.offsetTop + topics.offsetHeight / 2 + cfg.high;
@@ -105,9 +92,6 @@ export function initQuizOrbit(motion: boolean) {
   const xs = new Array<number>(n);
   const sizes = new Array<number>(n);
   const order: number[] = [];
-  const edgeFx = new Array<string>(n).fill('');
-  let band = cfg.edge; // ширина полосы у края, px макета
-  let px = 1; // 1 px экрана в px макета
   const render = () => {
     for (let i = 0; i < n; i++) {
       // место относительно центра в диапазоне [−n/2, n/2)
@@ -148,19 +132,6 @@ export function initQuizOrbit(motion: boolean) {
       el.style.zIndex = String(40 - Math.round(Math.abs(offs[i]) * 3));
       const s = sizes[i];
       el.style.transform = `translate3d(${(xs[i] - box / 2).toFixed(2)}px, ${(ringY - box / 2).toFixed(2)}px, 0) scale(${s.toFixed(4)})`;
-      // полосы у краёв: насколько центр иконки зашёл в полосу (0 — до полосы, 1 — у самого края и за ним)
-      const near = Math.min(xs[i], cx * 2 - xs[i]);
-      const t = smoothstep(gsap.utils.clamp(0, 1, 1 - near / band));
-      // значения — в px рамки до масштаба, с шагом 0.25: строка фильтра меняется только на этих шагах
-      const q = (v: number) => Math.round((v / s) * 4) / 4;
-      const b = q(cfg.blur * t * px);
-      const a = q(cfg.shift * t * px);
-      const dir = xs[i] < cx ? -1 : 1; // наружу
-      const value = b || a ? `blur(${b}px) drop-shadow(${-dir * a}px 0 ${b}px ${FRINGE.inner}) drop-shadow(${dir * a}px 0 ${b}px ${FRINGE.outer})` : '';
-      if (value !== edgeFx[i]) {
-        edgeFx[i] = value;
-        el.style.filter = value;
-      }
     }
   };
 

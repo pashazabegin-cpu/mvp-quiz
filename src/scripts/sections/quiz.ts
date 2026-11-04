@@ -1,16 +1,21 @@
 /**
- * «Спортивный квиз»: орбита иконок (quiz-orbit.ts) и текст.
- *   «Настраиваемся / Играем / Кайфуем» — по скроллу загораются по очереди: каждый пункт поднимается
+ * «Спортивный квиз»: карусель иконок (quiz-orbit.ts) и текст.
+ *   «Настраиваемся • Играем • Кайфуем» — по скроллу загораются по очереди: каждый пункт поднимается
  *   и из 15% становится белым, уже загоревшиеся остаются — как шаги вечера;
- *   текст под иконками закрашивается по словам, как в «Что мы придумали?» (animations/magic-text.ts).
+ *   темы-плашки поднимаются из-под маски (data-rise, animations/text-reveal.ts);
+ *   текст под ними закрашивается по словам, как в «Что мы придумали?» (animations/magic-text.ts).
+ * На мобильном содержимое идёт потоком — высоту блока ставит fitFlow.
  */
 import { gsap } from 'gsap';
 import { initQuizOrbit } from './quiz-orbit';
 import { initMagicText } from '../animations/magic-text';
+import { MOBILE_QUERY, fitFlow } from '../core/stage';
+import { refreshSoon } from '../core/refresh';
 
 export function initQuiz(motion: boolean) {
   const section = document.querySelector<HTMLElement>('[data-quiz]');
   if (!section) return;
+  if (window.matchMedia(MOBILE_QUERY).matches) fitFlow(section, refreshSoon);
   initQuizOrbit(motion);
   if (!motion) return;
 

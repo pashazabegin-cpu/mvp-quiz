@@ -1,11 +1,19 @@
 ---
 /**
- * 07 · Спортивный квиз (Figma: кадр «2» — низ, мобильный — «2 · mobile» → «06», плашка под программой).
- * Тёмная плашка-«сквиркл» на градиенте (белый → синий → почти чёрный). Вокруг плашки по орбите идут иконки:
- * спереди — поверх текста, сзади — за плашкой; размер задаёт перспектива. Скролл прокручивает орбиту
- * по горизонтали и поднимает её с начала текста на место пунктов, когда доходишь до текста.
- * Пункты загораются по очереди, текст закрашивается по словам. Логика — scripts/sections/quiz.ts, quiz-orbit.ts
- * Блок не закреплён: высота задана в px макета (1931 на десктопе, 1137 на мобильном) и масштабируется.
+ * 07 · Спортивный квиз (Figma: кадр «2» — низ; состояния карусели — кадры «Как всё пройдёт? FRAME»
+ * 4204:4529 (вход в блок) и 4204:4575 (дошли до текста)).
+ * Тёмная плашка-«сквиркл» на градиенте (белый → синий → почти чёрный): заголовок, пункты
+ * «Настраиваемся • Играем • Кайфуем», темы вопросов плашками, текст, кнопка.
+ *
+ * Карусель иконок (scripts/sections/quiz-orbit.ts). Главные условия:
+ *   1. расстояния между иконками ОДИНАКОВЫЕ — между краями соседних всегда один и тот же зазор;
+ *   2. карусель идёт на всю ширину экрана и уходит за оба края, по кругу без конца;
+ *   3. перспектива — по центру самая крупная, к краям меньше; все стоят на одной прямой.
+ * При входе в блок карусель стоит под темами, на начале текста; когда доходишь до текста —
+ * поднимается на темы и открывает текст. Скролл ещё и прокручивает её по горизонтали.
+ *
+ * Десктоп: блок 1931 px макета, всё на местах из макета. Мобильный: содержимое идёт потоком
+ * (высоту блока ставит fitFlow), плашка тянется под ним.
  */
 import Anno from '../ui/Anno.astro';
 import Button from '../ui/Button.astro';
@@ -13,19 +21,40 @@ import { event, quiz } from '../../data/content';
 import { withBase } from '../../lib/paths';
 import { paragraph } from '../../lib/text';
 
-// на орбите 24 места: каждая иконка дважды, копии — напротив друг друга (одна спереди, другая за плашкой)
+// 24 места: каждая иконка дважды, чтобы цепочки хватало на любой ширине экрана
 const ring = [...quiz.icons, ...quiz.icons];
 ---
 
 <section class="quiz" id="quiz" data-quiz>
-  <div class="quiz__ui" data-quiz-ui>
+  <div class="quiz__ui" data-quiz-ui data-flow>
     <div class="quiz__plate" aria-hidden="true"></div>
 
     <h2 class="quiz__title" data-split>{quiz.title[0]}<br /><span class="accent">{quiz.title[1]}</span></h2>
 
-    <ol class="quiz__steps" data-quiz-steps>
-      {quiz.steps.map((step) => <li class="quiz__step" data-quiz-step>{step}</li>)}
-    </ol>
+    <p class="quiz__steps" data-quiz-steps>
+      {
+        quiz.steps.map((step, i) => (
+          <>
+            {i > 0 && <span class="quiz__dot" aria-hidden="true">•</span>}
+            <span class="quiz__step" data-quiz-step>{step}</span>
+          </>
+        ))
+      }
+    </p>
+
+    <ul class="quiz__topics" data-quiz-topics>
+      {
+        quiz.topics.map((row) => (
+          <li class="quiz__row">
+            <ul class="quiz__row-list">
+              {row.map((topic) => (
+                <li class="quiz__topic" data-rise>{topic}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
 
     <div class:list={['quiz__lead', { fish: quiz.draft }]} data-quiz-lead>
       {
@@ -50,11 +79,11 @@ const ring = [...quiz.icons, ...quiz.icons];
 
     <div class="orbit" data-orbit aria-hidden="true">
       {
-        ring.map((name) => (
-          <div class="orbit__item" data-orbit-item>
+        ring.map((icon) => (
+          <div class="orbit__item" data-orbit-item data-ratio={icon.ratio}>
             <picture>
-              <source srcset={withBase(`/media/quiz/${name}.avif`)} type="image/avif" />
-              <img src={withBase(`/media/quiz/${name}.png`)} alt="" width="260" height="260" loading="lazy" decoding="async" />
+              <source srcset={withBase(`/media/quiz/${icon.name}.avif`)} type="image/avif" />
+              <img src={withBase(`/media/quiz/${icon.name}.png`)} alt="" width="260" height="260" loading="lazy" decoding="async" />
             </picture>
           </div>
         ))
@@ -103,9 +132,10 @@ const ring = [...quiz.icons, ...quiz.icons];
     }
   }
 
-  /* текст — над плашкой; передние иконки — ещё выше (z-index ставит quiz-orbit.ts) */
+  /* текст — над плашкой; иконки карусели — ещё выше (z-index ставит quiz-orbit.ts) */
   .quiz__title,
   .quiz__steps,
+  .quiz__topics,
   .quiz__lead,
   .quiz__cta {
     z-index: 3;
@@ -123,21 +153,53 @@ const ring = [...quiz.icons, ...quiz.icons];
     line-height: 80px;
     letter-spacing: -3.25px;
   }
-  .quiz__title :global(.wipe) {
-    margin-inline: auto;
-  }
+
+  /* «Настраиваемся • Играем • Кайфуем» — одна строка 35/45, точки акцентные */
   .quiz__steps {
-    top: 450px;
+    top: 444px;
     display: flex;
-    flex-direction: column;
-    gap: 30px;
-  }
-  .quiz__step {
+    justify-content: center;
+    gap: 22px;
     font-size: 35px;
     font-weight: 300;
     line-height: 45px;
     letter-spacing: -1.75px;
+    white-space: nowrap;
   }
+  .quiz__step {
+    display: inline-block;
+  }
+  .quiz__dot {
+    color: var(--c-accent);
+  }
+
+  /* темы: плашки 61 px, три строки по центру, между строками 19.6, между плашками 8 */
+  .quiz__topics {
+    top: 531px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 19.6px;
+  }
+  .quiz__row-list {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .quiz__topic {
+    display: inline-flex;
+    align-items: center;
+    height: 61.08px;
+    padding: 14.54px 34.9px 5.82px 36.36px;
+    border-radius: 145px;
+    background: var(--c-accent-2);
+    color: #fff;
+    font-size: 29.085px;
+    line-height: 40.72px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
   .quiz__lead {
     top: 842px;
     left: 50%;
@@ -158,7 +220,7 @@ const ring = [...quiz.icons, ...quiz.icons];
     min-width: 235px;
   }
 
-  /* орбита: слой во весь кадр, у самого слоя нет z-index — иконки встают между плашкой и текстом */
+  /* карусель: слой во весь кадр, у самого слоя нет z-index — иконки встают над плашкой и текстом */
   .orbit {
     inset: 0;
     pointer-events: none;
@@ -167,9 +229,9 @@ const ring = [...quiz.icons, ...quiz.icons];
     position: absolute;
     left: 0;
     top: 0;
-    width: 280px;
-    height: 280px;
-    /* показывает скрипт, когда поставит иконку на орбиту */
+    width: 260px;
+    height: 260px;
+    /* показывает скрипт, когда поставит иконку на место */
     visibility: hidden;
     will-change: transform;
   }
@@ -179,51 +241,89 @@ const ring = [...quiz.icons, ...quiz.icons];
     object-fit: contain;
   }
 
-  /* мобильный («2 · mobile» → «06»): плашка во всю ширину, скругление 74, иконки мельче */
+  /* мобильный («2 · mobile» → «06»): плашка во всю ширину, скругление 74; содержимое идёт потоком,
+     пункты — столбиком, темы переносятся по ширине */
   @media (max-aspect-ratio: 1/1) {
-    .quiz {
-      height: calc(1137px * var(--ui-s));
-    }
     .quiz__ui {
-      height: 1137px;
+      height: auto;
+      padding: 130px 16px 199px;
     }
-    .quiz__plate {
+    .quiz__ui > * {
+      position: relative;
+    }
+    /* плашка и слой карусели остаются поверх потока (селектор сильнее правила выше) */
+    .quiz__ui > .quiz__plate {
+      position: absolute;
       left: 0;
       top: 63px;
+      bottom: 120px;
       width: var(--ui-w);
-      height: 954px;
+      height: auto;
       border-radius: 74px;
     }
+    .quiz__title,
+    .quiz__steps,
+    .quiz__topics,
+    .quiz__lead,
+    .quiz__cta {
+      top: auto;
+      left: auto;
+      width: auto;
+    }
     .quiz__title {
-      top: 130px;
       font-size: 38px;
       line-height: 36px;
       letter-spacing: -1.9px;
     }
     .quiz__steps {
-      top: 251px;
+      flex-direction: column;
+      align-items: center;
       gap: 4px;
-    }
-    .quiz__step {
+      margin-top: 49px;
       font-size: 26px;
       line-height: 45px;
       letter-spacing: -1.3px;
     }
+    .quiz__dot {
+      display: none;
+    }
+    .quiz__topics {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px 8px;
+      max-width: 360px;
+      margin: 20px auto 0;
+    }
+    .quiz__row,
+    .quiz__row-list {
+      display: contents;
+    }
+    .quiz__topic {
+      height: 32px;
+      padding: 7px 16px 3px;
+      font-size: 14px;
+      line-height: 22px;
+    }
     .quiz__lead {
-      top: 485px;
-      width: 343px;
-      margin-left: -171.5px;
+      left: auto;
+      width: auto;
+      max-width: 343px;
+      margin: 40px auto 0;
       font-size: 18px;
     }
     .quiz__lead p + p {
       margin-top: 26px;
     }
     .quiz__cta {
-      top: 888px;
+      margin-top: 60px;
+    }
+    .quiz__ui > .orbit {
+      position: absolute;
     }
     .orbit__item {
-      width: 120px;
-      height: 120px;
+      width: 110px;
+      height: 110px;
     }
   }
 </style>

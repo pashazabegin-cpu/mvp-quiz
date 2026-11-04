@@ -233,13 +233,32 @@ export const talks = {
 export const quiz = {
   title: ['Спортивный', 'квиз'],
   steps: ['Настраиваемся', 'Играем', 'Кайфуем'],
+  /** темы вопросов — плашки под пунктами, по строкам как в макете */
+  topics: [['Спорт', 'Betting-индустрия', 'Музыка'], ['Кино', 'Lifestyle', 'Киберспорт'], ['Новый год и Рождество']],
   /** пока текст из «Что мы придумали?» — как в макете (с его переносами) */
   paragraphs: intro.paragraphs,
   paragraphsMobile: intro.paragraphsMobile,
   draft: true,
   cta: 'Зарегистрироваться',
-  /** иконки орбиты: public/media/quiz/<name>.avif (+ .png для старых браузеров) */
-  icons: ['tennis', 'shuba', 'ornament', 'mask', 'cup', 'olivier', 'gloves', 'sprats', 'whistle', 'tangerine', 'hat', 'bottle'],
+  /**
+   * Иконки карусели: public/media/quiz/<name>.avif (+ .png для старых браузеров).
+   * ratio — ширина/высота картинки: по нему считается видимая ширина, чтобы промежутки между иконками были равными.
+   * Порядок — как в макете слева направо, по центру кубок.
+   */
+  icons: [
+    { name: 'tennis', ratio: 1 },
+    { name: 'shuba', ratio: 1.012 },
+    { name: 'ornament', ratio: 0.795 },
+    { name: 'mask', ratio: 0.736 },
+    { name: 'cup', ratio: 0.917 },
+    { name: 'olivier', ratio: 1 },
+    { name: 'gloves', ratio: 1.228 },
+    { name: 'sprats', ratio: 0.993 },
+    { name: 'whistle', ratio: 1.714 },
+    { name: 'tangerine', ratio: 0.993 },
+    { name: 'hat', ratio: 1.217 },
+    { name: 'bottle', ratio: 0.286 },
+  ],
 };
 
 /** Спикеры деловой программы. Пока заглушки. */

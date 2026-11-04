@@ -239,7 +239,7 @@ export const quiz = {
   draft: true,
   cta: 'Зарегистрироваться',
   /** иконки орбиты: public/media/quiz/<name>.avif (+ .png для старых браузеров) */
-  icons: ['tennis', 'shuba', 'ornament', 'mask', 'cup', 'olivier', 'gloves', 'sprats', 'whistle', 'tangerine', 'hat', 'bottle', 'caviar', 'sandwich'],
+  icons: ['tennis', 'shuba', 'ornament', 'mask', 'cup', 'olivier', 'gloves', 'sprats', 'whistle', 'tangerine', 'hat', 'bottle', 'caviar'],
 };
 
 /** Спикеры деловой программы. Пока заглушки. */

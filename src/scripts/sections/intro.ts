@@ -11,9 +11,9 @@
  * снежинки слегка отстают/опережают скролл, головы поднимаются снизу и встают поверх конца текста.
  */
 import { gsap } from 'gsap';
-import { SplitText } from 'gsap/SplitText';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MOBILE_QUERY } from '../core/stage';
+import { initMagicText } from '../animations/magic-text';
 
 /** через сколько экранов скролла от начала закрепления сцена совпадает с макетом */
 const MID = 0.9;
@@ -38,32 +38,10 @@ export function initIntro(): ScrollTrigger | undefined {
   tl.set({}, {}, 1);
   const pin = tl.scrollTrigger!;
 
-  initMagicText(lead, pin);
+  // закрашивание заканчивается к 85% закрепления
+  initMagicText(lead, { end: () => pin.start + (pin.end - pin.start) * 0.85 });
   initDepth(section, pin);
   return pin;
-}
-
-/**
- * Закрашивание текста по словам (эффект MagicText из HextaUI): слово видно на 20%
- * и проявляется до 100% строго по очереди, каждое на своём отрезке скролла.
- * Начинается, когда верх текста въезжает на 90% высоты экрана, заканчивается к 85% закрепления.
- */
-function initMagicText(lead: HTMLElement, pin: ScrollTrigger | null) {
-  const { words } = SplitText.create(lead, { type: 'words', wordsClass: 'w' });
-  gsap.set(words, { opacity: 0.2 });
-  gsap
-    .timeline({
-      defaults: { ease: 'none' },
-      scrollTrigger: {
-        trigger: lead,
-        start: 'top 90%',
-        // без закрепления (мобильный) — пока низ текста не поднимется к середине экрана
-        end: pin ? () => pin.start + (pin.end - pin.start) * 0.85 : 'bottom 55%',
-        scrub: true,
-        invalidateOnRefresh: true,
-      },
-    })
-    .to(words, { opacity: 1, duration: 1, stagger: 1 }); // stagger = длительность: отрезки слов не перекрываются
 }
 
 /**
@@ -76,7 +54,8 @@ function initMagicText(lead: HTMLElement, pin: ScrollTrigger | null) {
 const LIFT = 150;
 function initMobile(section: HTMLElement, lead: HTMLElement) {
   const st = ScrollTrigger.create({ trigger: section, start: 'top top', end: 'top top' });
-  initMagicText(lead, null);
+  // без закрепления — пока низ текста не поднимется к середине экрана
+  initMagicText(lead, { end: 'bottom 55%' });
   section.querySelectorAll<HTMLElement>('[data-float]').forEach((el) => {
     if (getComputedStyle(el).display === 'none') return;
     const z = Number(el.dataset.z) || 1;

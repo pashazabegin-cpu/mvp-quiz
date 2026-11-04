@@ -106,7 +106,8 @@ public/media/hero.mp4      ← видео первого экрана
 | `data-sticky-list` / `data-sticky-item` | закреплённый заголовок: счётчик, прогресс, фокус на текущей карточке | `animations/sticky-list.ts` |
 | `data-schedule-list`, `data-talks-list` | экран закреплён, пункты едут вверх «гармошкой» (каждый отстаёт от предыдущего) | `animations/lag-list.ts` |
 | `data-spin` | кадр видео с логотипом задаёт скролл (видео перекодировано: каждый кадр ключевой) | `sections/logo-spin.ts` |
-| `data-orbit` / `data-orbit-item` | иконки квиза по орбите вокруг плашки: равные углы, перспектива, скролл разгоняет вращение | `sections/quiz-orbit.ts` |
+| `data-orbit` / `data-orbit-item` | иконки квиза по орбите вокруг плашки: равные углы, перспектива, скролл прокручивает орбиту (горизонтальный параллакс) | `sections/quiz-orbit.ts` |
+| `data-quiz-step`, `data-quiz-lead` | пункты квиза загораются по очереди, текст закрашивается по словам | `sections/quiz.ts`, `animations/magic-text.ts` |
 | `data-nav-light` | над этим участком меню переключается на тёмный текст | `ui/nav.ts` |
 | `data-scramble` | цифры/буквы перебираются как на табло | `animations/scramble.ts` |
 | `data-tilt="8"` | 3D-наклон за курсором (число — макс. угол) | `interactions/tilt.ts` |

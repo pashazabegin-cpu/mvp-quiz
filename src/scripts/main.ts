@@ -20,7 +20,7 @@ import { initProgram } from './sections/program';
 import { initSchedule } from './sections/schedule';
 import { initLogoSpin } from './sections/logo-spin';
 import { initTalks } from './sections/talks';
-import { initQuizOrbit } from './sections/quiz-orbit';
+import { initQuiz } from './sections/quiz';
 import { initStoryBg } from './sections/story-bg';
 import { initReveals } from './animations/reveal';
 import { initTextReveal } from './animations/text-reveal';
@@ -103,7 +103,7 @@ fontsReady.then(() => {
   run('story-bg', () => initStoryBg(pins));
   run('logo-spin', initLogoSpin);
   run('talks', initTalks);
-  run('quiz-orbit', () => initQuizOrbit(motion));
+  run('quiz', () => initQuiz(motion));
   if (motion) {
     run('reveals', initReveals, showText('[data-split], [data-reveal], [data-stagger] > *'));
     run('text-reveal', initTextReveal, showText('[data-lines], [data-rise]'));

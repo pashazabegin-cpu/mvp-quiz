@@ -6,10 +6,14 @@
  *   разлетается от центра к краям.
  *   Через MID экранов скролла сцена стоит ровно как в макете, до этого — ниже, после — уходит вверх.
  * Сцена доезжает, пока экран уже уходит после закрепления, — без рывка на стыке.
+ *
+ * Мобильный — упрощённо: без закрепления, текст закрашивается, пока блок проходит экран,
+ * снежинки слегка отстают/опережают скролл, головы поднимаются снизу и встают поверх конца текста.
  */
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MOBILE_QUERY } from '../core/stage';
 
 /** через сколько экранов скролла от начала закрепления сцена совпадает с макетом */
 const MID = 0.9;
@@ -24,6 +28,8 @@ export function initIntro(): ScrollTrigger | undefined {
   const section = document.querySelector<HTMLElement>('[data-intro-section]');
   if (!section) return;
   const lead = section.querySelector<HTMLElement>('[data-intro-lead]')!;
+
+  if (window.matchMedia(MOBILE_QUERY).matches) return initMobile(section, lead);
 
   // экран закреплён на 220% высоты; сам таймлайн пустой — на нём держится закрепление
   const tl = gsap.timeline({
@@ -42,7 +48,7 @@ export function initIntro(): ScrollTrigger | undefined {
  * и проявляется до 100% строго по очереди, каждое на своём отрезке скролла.
  * Начинается, когда верх текста въезжает на 90% высоты экрана, заканчивается к 85% закрепления.
  */
-function initMagicText(lead: HTMLElement, pin: ScrollTrigger) {
+function initMagicText(lead: HTMLElement, pin: ScrollTrigger | null) {
   const { words } = SplitText.create(lead, { type: 'words', wordsClass: 'w' });
   gsap.set(words, { opacity: 0.2 });
   gsap
@@ -51,12 +57,37 @@ function initMagicText(lead: HTMLElement, pin: ScrollTrigger) {
       scrollTrigger: {
         trigger: lead,
         start: 'top 90%',
-        end: () => pin.start + (pin.end - pin.start) * 0.85,
+        // без закрепления (мобильный) — пока низ текста не поднимется к середине экрана
+        end: pin ? () => pin.start + (pin.end - pin.start) * 0.85 : 'bottom 55%',
         scrub: true,
         invalidateOnRefresh: true,
       },
     })
     .to(words, { opacity: 1, duration: 1, stagger: 1 }); // stagger = длительность: отрезки слов не перекрываются
+}
+
+/**
+ * Мобильный: блок не закреплён. Каждый элемент сцены сдвигается от скролла по своей глубине (z):
+ * пока верх блока идёт от низа экрана к верху, элемент проходит путь от +LIFT·z до 0 —
+ * в момент, когда блок встал у верха экрана, всё стоит ровно как в макете. Головы (z больше)
+ * поднимаются заметно быстрее текста: появляются у самого низа экрана и заезжают на последние строки.
+ * Возвращает триггер без закрепления — по нему фон-градиент знает, где блок (story-bg.ts).
+ */
+const LIFT = 150;
+function initMobile(section: HTMLElement, lead: HTMLElement) {
+  const st = ScrollTrigger.create({ trigger: section, start: 'top top', end: 'top top' });
+  initMagicText(lead, null);
+  section.querySelectorAll<HTMLElement>('[data-float]').forEach((el) => {
+    if (getComputedStyle(el).display === 'none') return;
+    const z = Number(el.dataset.z) || 1;
+    const photo = el.classList.contains('intro__float--photo');
+    gsap.fromTo(
+      el,
+      { y: LIFT * (photo ? 1.6 : z - 0.6) },
+      { y: 0, ease: 'none', scrollTrigger: { trigger: section, start: 'top bottom', end: 'top top', scrub: true } },
+    );
+  });
+  return st;
 }
 
 function initDepth(section: HTMLElement, pin: ScrollTrigger) {

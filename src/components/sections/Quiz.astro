@@ -1,148 +1,227 @@
 ---
 /**
- * 05 · Спортивный квиз — «интерактивный» экран.
- * Живой WebGL-фон, реагирующий на курсор (scripts/effects/shader-background.ts),
- * карточки правил с наклоном, темы-чипы разбегаются от курсора (scripts/interactions/repel.ts).
+ * 07 · Спортивный квиз (Figma: кадр «2» — низ, мобильный — «2 · mobile» → «06», плашка под программой).
+ * Тёмная плашка-«сквиркл» на градиенте (белый → синий → почти чёрный). Вокруг плашки по орбите идут иконки:
+ * спереди — поверх текста, сзади — за плашкой; размер и яркость задаёт перспектива,
+ * скролл разгоняет вращение. Логика — scripts/sections/quiz-orbit.ts
+ * Блок не закреплён: высота задана в px макета (1931 на десктопе, 1137 на мобильном) и масштабируется.
  */
 import Anno from '../ui/Anno.astro';
 import Button from '../ui/Button.astro';
 import { event, quiz } from '../../data/content';
+import { withBase } from '../../lib/paths';
+import { paragraph } from '../../lib/text';
+
+// на орбите 28 мест: каждая иконка дважды, копии — напротив друг друга (одна спереди, другая за плашкой)
+const ring = [...quiz.icons, ...quiz.icons];
 ---
 
-<section class="section quiz" id="quiz">
-  <canvas class="quiz__bg" data-shader aria-hidden="true"></canvas>
-  <Anno kind="screen">05 · Спортивный квиз</Anno>
-  <div class="container">
-    <div class="section-head">
-      <h2 class="h2" data-split>{quiz.title}</h2>
-      <span class="chip chip--mono chip--live" data-reveal>{quiz.time}</span>
-    </div>
+<section class="quiz" id="quiz" data-quiz>
+  <div class="quiz__ui" data-quiz-ui>
+    <div class="quiz__plate" aria-hidden="true"></div>
 
-    <p class="eyebrow quiz__label" data-reveal>{quiz.rulesTitle}:</p>
-    <ol class="rules" data-stagger>
-      {
-        quiz.rules.map((r, i) => (
-          <li class="card rule" data-tilt data-spotlight>
-            <span class="rule__n">0{i + 1}</span>
-            <h3 class="rule__title">{r.title}</h3>
-            <p class:list={['rule__text', { fish: r.draft }]}>{r.text}</p>
-          </li>
-        ))
-      }
+    <h2 class="quiz__title" data-split>{quiz.title[0]}<br /><span class="accent">{quiz.title[1]}</span></h2>
+
+    <ol class="quiz__steps">
+      {quiz.steps.map((step) => <li class="quiz__step" data-lines>{step}</li>)}
     </ol>
 
-    <div class="quiz__bottom">
-      <div class="quiz__details" data-stagger>
-        {
-          quiz.details.map((d) => (
-            <div>
-              <h4 class="eyebrow">{d.title}</h4>
-              <p class:list={['quiz__detail', { fish: d.draft }]}>{d.text}</p>
-            </div>
-          ))
-        }
-      </div>
-      <div data-reveal>
-        <h4 class="eyebrow">{quiz.topicsTitle}</h4>
-        <ul class="topics" data-repel>
-          {quiz.topics.map((t) => <li class="chip topic">{t}</li>)}
-        </ul>
-      </div>
+    <div class:list={['quiz__lead', { fish: quiz.draft }]}>
+      {
+        quiz.paragraphs.map((p, i) => (
+          <p data-lines>
+            {paragraph(p, quiz.paragraphsMobile[i]).map((t, j, all) => (
+              <>
+                {t.word}
+                {j < all.length - 1 && ' '}
+                {t.d && <br class="br-d" />}
+                {t.m && <br class="br-m" />}
+              </>
+            ))}
+          </p>
+        ))
+      }
     </div>
 
-    <div data-reveal>
+    <div class="quiz__cta">
       <Button href={event.quizRegisterUrl}>{quiz.cta}</Button>
     </div>
-    <Anno>ТЗ: как пройдёт квиз, темы, как формируются команды + кнопка регистрации</Anno>
-    <Anno kind="motion">живой WebGL-фон тянется к курсору · карточки с наклоном · чипы тем разбегаются от курсора</Anno>
+
+    <div class="orbit" data-orbit aria-hidden="true">
+      {
+        ring.map((name) => (
+          <div class="orbit__item" data-orbit-item>
+            <picture>
+              <source srcset={withBase(`/media/quiz/${name}.avif`)} type="image/avif" />
+              <img src={withBase(`/media/quiz/${name}.png`)} alt="" width="260" height="260" loading="lazy" decoding="async" />
+            </picture>
+          </div>
+        ))
+      }
+    </div>
   </div>
+  <Anno kind="screen">07 · Спортивный квиз</Anno>
 </section>
 
 <style>
+  /* фон макета (Rectangle 5881): белый до 11.5% → синий #013a8b к 46.7% → #030f1c к 97% */
   .quiz {
+    position: relative;
+    height: calc(1931px * var(--ui-s));
     overflow: hidden;
-    isolation: isolate;
-    background: radial-gradient(80% 60% at 70% 30%, var(--c-surface-2), var(--c-bg));
+    background-color: #fff;
+    background-image: linear-gradient(to bottom, rgb(1 58 139 / 0) 11.531%, #013a8b 46.68%, #030f1c 96.998%);
+    color: var(--c-text);
   }
-  .quiz__bg {
+  .quiz__ui {
     position: absolute;
-    inset: 0;
-    z-index: -1;
+    left: 0;
+    top: 0;
+    width: var(--ui-w);
+    height: 1931px;
+    transform: scale(var(--ui-s));
+    transform-origin: 0 0;
+  }
+  .quiz__ui > * {
+    position: absolute;
+  }
+
+  /* плашка 1320×1352 при 1440: поля 60, сквиркл r=260 (n=3) */
+  .quiz__plate {
+    z-index: 2;
+    left: 60px;
+    top: 110px;
+    width: calc(var(--ui-w) - 120px);
+    height: 1352px;
+    border-radius: 260px;
+    background: #030f1c;
+  }
+  @supports (corner-shape: squircle) {
+    .quiz__plate {
+      corner-shape: superellipse(1.585);
+    }
+  }
+
+  /* текст — над плашкой; передние иконки — ещё выше (z-index ставит quiz-orbit.ts) */
+  .quiz__title,
+  .quiz__steps,
+  .quiz__lead,
+  .quiz__cta {
+    z-index: 3;
+    left: 0;
     width: 100%;
-    height: 100%;
+    text-align: center;
   }
-  .quiz__label {
-    margin-bottom: 16px;
+  .accent {
+    color: var(--c-accent);
   }
-  .rules {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    perspective: 1200px;
+  .quiz__title {
+    top: 234px;
+    font-size: 65px;
+    font-weight: 300;
+    line-height: 80px;
+    letter-spacing: -3.25px;
   }
-  .rule {
+  .quiz__title :global(.wipe) {
+    margin-inline: auto;
+  }
+  .quiz__steps {
+    top: 450px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    min-height: 240px;
-    padding: 28px;
-    background: color-mix(in srgb, var(--c-surface) 65%, transparent);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    gap: 30px;
   }
-  .rule__n {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--c-muted);
+  .quiz__step {
+    font-size: 35px;
+    font-weight: 300;
+    line-height: 45px;
+    letter-spacing: -1.75px;
   }
-  .rule__title {
-    margin-top: auto;
-    font-size: clamp(30px, 3.4vw, 48px);
-    line-height: 1;
-    letter-spacing: -0.03em;
+  .quiz__lead {
+    top: 842px;
+    left: 50%;
+    width: 694px;
+    margin-left: -347px;
+    font-size: 26px;
+    line-height: 1.45;
   }
-  .rule__text {
-    color: var(--c-muted);
+  .quiz__lead p + p {
+    margin-top: 1.45em;
   }
-
-  .quiz__bottom {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 48px;
-    margin: 56px 0 40px;
-  }
-  .quiz__details {
-    display: grid;
-    gap: 28px;
-  }
-  .quiz__detail {
-    margin-top: 10px;
-    font-size: 17px;
-  }
-  .topics {
+  .quiz__cta {
+    top: 1298px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 14px;
+    justify-content: center;
   }
-  .topic {
-    padding: 11px 18px;
-    font-size: 16px;
-    background: color-mix(in srgb, var(--c-bg) 60%, transparent);
-    transition: background 0.3s, color 0.3s;
-  }
-  .topic:hover {
-    background: var(--c-text);
-    color: var(--c-bg);
+  .quiz__cta :global(.btn) {
+    min-width: 235px;
   }
 
-  @media (max-width: 900px) {
-    .rules,
-    .quiz__bottom {
-      grid-template-columns: 1fr;
+  /* орбита: слой во весь кадр, у самого слоя нет z-index — иконки встают между плашкой и текстом */
+  .orbit {
+    inset: 0;
+    pointer-events: none;
+  }
+  .orbit__item {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 230px;
+    height: 230px;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .orbit__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* мобильный («2 · mobile» → «06»): плашка во всю ширину, скругление 74, иконки мельче */
+  @media (max-aspect-ratio: 1/1) {
+    .quiz {
+      height: calc(1137px * var(--ui-s));
     }
-    .rule {
-      min-height: 0;
+    .quiz__ui {
+      height: 1137px;
+    }
+    .quiz__plate {
+      left: 0;
+      top: 63px;
+      width: var(--ui-w);
+      height: 954px;
+      border-radius: 74px;
+    }
+    .quiz__title {
+      top: 130px;
+      font-size: 38px;
+      line-height: 36px;
+      letter-spacing: -1.9px;
+    }
+    .quiz__steps {
+      top: 251px;
+      gap: 4px;
+    }
+    .quiz__step {
+      font-size: 26px;
+      line-height: 45px;
+      letter-spacing: -1.3px;
+    }
+    .quiz__lead {
+      top: 485px;
+      width: 343px;
+      margin-left: -171.5px;
+      font-size: 18px;
+    }
+    .quiz__lead p + p {
+      margin-top: 26px;
+    }
+    .quiz__cta {
+      top: 888px;
+    }
+    .orbit__item {
+      width: 104px;
+      height: 104px;
     }
   }
 </style>

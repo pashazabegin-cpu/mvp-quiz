@@ -46,7 +46,8 @@ export const nav = [
   { id: 'program', label: 'Программа' },
   { id: 'schedule', label: 'Расписание' },
   { id: 'talks', label: 'MVP Talks' },
-  // вернуть вместе с блоками: quiz «Квиз», speakers «Спикеры», jury «Жюри», location «Локация», faq «FAQ»
+  { id: 'quiz', label: 'Квиз' },
+  // вернуть вместе с блоками: speakers «Спикеры», jury «Жюри», location «Локация», faq «FAQ»
 ];
 
 /** Партнёры на первом экране (по ТЗ — 2–3). */
@@ -91,7 +92,7 @@ export const intro = {
    * z — удалённость от камеры: 1 — плоскость текста, меньше — дальше (медленнее, за текстом),
    * больше — ближе (быстрее и сильнее растут). back — слой за текстом.
    * m — позиция и размер в мобильном кадре 375×743 (Figma: «2 · mobile»); без m элемент на мобильном скрыт,
-   * mobileOnly — только на мобильном. Теги в мобильном макете убраны, головы — внизу под текстом.
+   * mobileOnly — только на мобильном. Теги в мобильном макете убраны, головы — внизу, поверх конца текста.
    */
   floats: [
     { kind: 'snow', src: '/media/intro/snow-2.svg', x: -31, y: 223, w: 91, h: 96, z: 0.45, back: true, m: { x: -34, y: 89, w: 81.9 } },
@@ -102,10 +103,10 @@ export const intro = {
     { kind: 'tag', text: 'sport', color: 'accent', x: 386, y: 258, z: 1.15 },
     { kind: 'tag', text: 'mvp', color: 'dark', x: 756, y: 325, z: 1.15 },
     { kind: 'tag', text: 'cybersport', color: 'accent', x: 1126, y: 335, z: 1 },
-    { kind: 'photo', src: '/media/intro/photo-2.png', x: 1000, y: 412, w: 179, h: 201, z: 1.45, m: { x: 191, y: 532, w: 100, h: 112 } },
+    { kind: 'photo', src: '/media/intro/photo-2.png', x: 1000, y: 412, w: 179, h: 201, z: 1.45, m: { x: 191, y: 493, w: 100, h: 112 } },
     { kind: 'tag', text: 'betting', color: 'dark', x: 179, y: 431, z: 0.9 },
     { kind: 'snow', src: '/media/intro/snow-5.svg', x: 102, y: 542, w: 43, h: 46, z: 1.7, m: { x: 358, y: 523, w: 34.4 } },
-    { kind: 'photo', src: '/media/intro/photo-1.png', x: 255, y: 567, w: 179, h: 201, z: 1.35, m: { x: 100, y: 588, w: 100, h: 112 } },
+    { kind: 'photo', src: '/media/intro/photo-1.png', x: 255, y: 567, w: 179, h: 201, z: 1.35, m: { x: 100, y: 549, w: 100, h: 112 } },
     { kind: 'snow', src: '/media/intro/snow-7.svg', x: 1257, y: 678, w: 62, h: 67, z: 2.1 },
     { kind: 'tag', text: 'quiz', color: 'dark', x: 925, y: 745, z: 0.95 },
     { kind: 'snow', src: '/media/intro/snow-8.svg', x: 502, y: 768, w: 28, h: 30, z: 1.5, m: { x: 300, y: 40, w: 28 } },
@@ -115,11 +116,12 @@ export const intro = {
 };
 
 /**
- * 03 · «Программа» — три пункта дня, экран закреплён: скроллом переключаются пункты,
- * иконка посередине перетекает в следующую (WebGL). Иконки вырезаны из спрайта макета.
+ * 03 · «Что будет?» — три пункта дня, экран закреплён: скроллом переключаются пункты
+ * (все три всегда на экране, активный — белый), иконка посередине перетекает в следующую (WebGL).
+ * Иконки вырезаны из спрайта макета.
  */
 export const program = {
-  label: 'Программа',
+  title: ['Что', 'будет?'],
   items: [
     { title: 'Кибермейджор', lead: 'Совместный просмотр финала CS2 Major\nв Сингапуре на большом экране', icon: '/media/program/icon-cybermajor.png' },
     { title: 'MVP Talks', lead: 'Деловой блок: короткие динамичные форматы вместо классической конференции', icon: '/media/program/icon-talks.png' },
@@ -132,7 +134,6 @@ type ScheduleItem = {
   title: string;
   /** Ключевой пункт — по ТЗ выводится крупнее */
   key?: boolean;
-  tag?: string;
   text?: string;
   list?: string[];
   link?: { href: string; label: string };
@@ -145,7 +146,6 @@ export const schedule: { title: string; accent: string; items: ScheduleItem[] } 
     { time: '09:30 — 10:00', title: 'Сбор гостей, приветственный кофе' },
     {
       time: '10:00 — 12:00',
-      tag: 'Кибермейджор',
       title: 'CS2 Major в Сингапуре',
       text: 'Совместный просмотр финала мажора\nпо CS2 в Сингапуре: большой экран, живая атмосфера и комментарии кастеров непосредственно на площадке',
       key: true,
@@ -153,7 +153,6 @@ export const schedule: { title: string; accent: string; items: ScheduleItem[] } 
     { time: '12:00 — 13:00', title: 'Перерыв, кофе-брейк' },
     {
       time: '13:00 — 17:00',
-      tag: 'Деловой блок',
       title: 'MVP Talks & Entertainment',
       text: 'Серия коротких динамичных форматов\nвместо классической конференции:',
       list: ['дискуссионные панели', 'баттлы', 'прожарка кейсов', 'сольные выступления', 'презентации исследований'],
@@ -162,7 +161,6 @@ export const schedule: { title: string; accent: string; items: ScheduleItem[] } 
     { time: '17:00 — 18:00', title: 'Перерыв, кофе-брейк' },
     {
       time: '18:00 — 20:00',
-      tag: 'Квиз',
       title: 'Спортивный квиз',
       text: 'Командный квиз с вопросами про: спорт, киберспорт, betting индустрию, музыку, кино, lifestyle, Новый год и Рождество',
       key: true,
@@ -226,22 +224,22 @@ export const talks = {
   ],
 };
 
+/**
+ * 07 · Спортивный квиз — тёмная плашка на градиенте после белой программы MVP Talks.
+ * Вокруг плашки по орбите идут иконки (scripts/sections/quiz-orbit.ts): все в одинаковых рамках
+ * и на равных углах, размер и яркость задаёт перспектива. Порядок — как в макете слева направо.
+ * Текст под иконками в макете пока повторяет «Что мы придумали?» — нужен свой.
+ */
 export const quiz = {
-  title: 'Спортивный квиз',
-  time: '18:00 — 20:00',
-  rulesTitle: 'Главные правила',
-  rules: [
-    { title: 'Настраиваемся', text: 'Собираем команду, занимаем стол, знакомимся с ведущим и правилами.', draft: true },
-    { title: 'Играем', text: 'Несколько раундов вопросов — от разминки до финального блица.', draft: true },
-    { title: 'Кайфуем', text: 'Награждаем победителей, общаемся и празднуем Новый год.', draft: true },
-  ],
-  details: [
-    { title: 'Как пройдёт', text: '6 раундов по 7 вопросов. Ответы — на бланках, после каждого раунда результаты выводим на большой экран.', draft: true },
-    { title: 'Команды', text: 'Команды по 4–6 человек. Можно прийти своей командой или зарегистрироваться соло — распределим на месте.', draft: true },
-  ],
-  topicsTitle: 'Темы вопросов',
-  topics: ['Спорт', 'Киберспорт', 'Betting-индустрия', 'Музыка', 'Кино', 'Lifestyle', 'Новый год и Рождество'],
-  cta: 'Зарегистрироваться на квиз',
+  title: ['Спортивный', 'квиз'],
+  steps: ['Настраиваемся', 'Играем', 'Кайфуем'],
+  /** пока текст из «Что мы придумали?» — как в макете (с его переносами) */
+  paragraphs: intro.paragraphs,
+  paragraphsMobile: intro.paragraphsMobile,
+  draft: true,
+  cta: 'Зарегистрироваться',
+  /** иконки орбиты: public/media/quiz/<name>.avif (+ .png для старых браузеров) */
+  icons: ['tennis', 'shuba', 'ornament', 'mask', 'cup', 'olivier', 'gloves', 'sprats', 'whistle', 'tangerine', 'hat', 'bottle', 'caviar', 'sandwich'],
 };
 
 /** Спикеры деловой программы. Пока заглушки. */

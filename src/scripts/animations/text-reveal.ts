@@ -33,6 +33,14 @@ export const TEXT_REVEAL = {
   mobile: { duration: 0.7, lineStagger: 0.06, itemStagger: 0.07 },
 };
 
+/**
+ * Переносы, скрытые в этой раскладке (br-d на мобильном, br-m на десктопе), убираем до разбивки:
+ * SplitText считает концом строки любой <br>, даже невидимый. Раскладка за время жизни страницы
+ * не меняется (при переходе через границу страница перезагружается — main.ts).
+ */
+export const dropHiddenBreaks = (el: HTMLElement) =>
+  el.querySelectorAll('br').forEach((br) => getComputedStyle(br).display === 'none' && br.remove());
+
 /** класс строки; обёртки-маски получают «tl-mask» (запас под кратку и хвосты букв — в global.css) */
 export const LINE_CLASS = 'tl';
 
@@ -64,6 +72,7 @@ export function initTextReveal() {
   const lines = new WeakMap<HTMLElement, HTMLElement[]>();
 
   texts.forEach((el) => {
+    dropHiddenBreaks(el);
     SplitText.create(el, {
       type: 'lines',
       mask: 'lines',

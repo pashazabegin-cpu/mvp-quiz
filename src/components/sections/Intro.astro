@@ -1,29 +1,16 @@
 ---
 /**
- * 02 · «Что мы придумали?» (Figma: кадр «main»/«START» 1440×900, мобильный — «2 · mobile»).
- * Экран закреплён: текст закрашивается по словам, теги/снежинки/фото проезжают снизу вверх
+ * 02 · «Что мы придумали?» (Figma: кадр «2» 1440 и «2 · mobile» 375).
+ * Десктоп: экран закреплён, текст закрашивается по словам, теги/снежинки/фото проезжают снизу вверх
  * на разной глубине — в середине пути стоят ровно как в макете (кадр «2»).
+ * Мобильный: без закрепления — обычный экран 375×743, головы поднимаются снизу поверх текста.
  * Логика — scripts/sections/intro.ts
  */
 import Anno from '../ui/Anno.astro';
 import { intro } from '../../data/content';
 import { withBase } from '../../lib/paths';
+import { paragraph } from '../../lib/text';
 
-// абзац с переносами обоих макетов: слова совпадают, \n отмечает перенос после слова
-// (d — в десктопном, m — в мобильном), поэтому идём по словам двух версий параллельно
-const tokens = (text: string) => {
-  const out: { word: string; br: boolean }[] = [];
-  for (const part of text.split(/(\s+)/)) {
-    if (!part) continue;
-    if (!/^\s+$/.test(part)) out.push({ word: part, br: false });
-    else if (part.includes('\n') && out.length) out[out.length - 1].br = true;
-  }
-  return out;
-};
-const paragraph = (desktop: string, mobile: string) => {
-  const m = tokens(mobile);
-  return tokens(desktop).map((t, i) => ({ word: t.word, d: t.br, m: m[i]?.br ?? false }));
-};
 // позиция на сцене: десктоп — доля ширины кадра 1440 и px кадра 900, мобильный — доля 375 и px кадра 743
 const floatStyle = (f: (typeof intro.floats)[number]) =>
   [
@@ -90,16 +77,18 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
   .intro {
     color: var(--c-text);
   }
+  /* 65/65, верх — 102 в кадре «2» (кадр экрана начинается с 60) */
   .intro__title {
     left: 50%;
-    top: calc(50% - 450px + 110px);
+    top: calc(50% - 450px + 42px);
     width: 380px;
     margin-left: -190px;
-    font-size: 45px;
+    font-size: 65px;
     font-weight: 300;
-    line-height: 45px;
-    letter-spacing: -2.25px;
+    line-height: 65px;
+    letter-spacing: -3.25px;
     text-align: center;
+    white-space: nowrap;
   }
   .accent {
     color: var(--c-accent);
@@ -150,16 +139,23 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
     display: none;
   }
 
-  /* мобильный кадр 375×743 по центру экрана (Figma: «2 · mobile» → «02 · Что мы придумали?»):
-     теги убраны, головы внизу под текстом, снежинки на своих местах, x — доля ширины кадра */
+  /* мобильный (Figma: «2 · mobile» → «02 · Что мы придумали?»): обычный экран 375×743 без закрепления.
+     Теги убраны, головы внизу поверх конца текста, снежинки на своих местах, x — доля ширины кадра */
   @media (max-aspect-ratio: 1/1) {
+    .intro {
+      height: calc(743px * var(--ui-s));
+      min-height: 0;
+    }
+    .intro > .stage__ui {
+      height: 743px;
+    }
     .intro__title {
       top: calc(50% - 371.5px + 68px);
       width: 300px;
       margin-left: -150px;
-      font-size: 34px;
+      font-size: 38px;
       line-height: 36px;
-      letter-spacing: -1.7px;
+      letter-spacing: -1.9px;
     }
     .intro__lead {
       top: calc(50% - 371.5px + 202px);
@@ -183,9 +179,9 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
     .intro__float--snow img {
       height: auto;
     }
-    /* узкий экран: дальше по скроллу головы улетают вверх через текст — пусть пролетают под ним */
+    /* головы — поверх текста (поднимаются снизу и заходят на последние строки) */
     .intro__float--photo {
-      z-index: -1;
+      z-index: 2;
     }
     .intro__float--no-m {
       display: none;

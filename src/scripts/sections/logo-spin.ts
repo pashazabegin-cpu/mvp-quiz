@@ -3,9 +3,13 @@
  * низ у верха), видео проматывается от начала до конца — логотип делает оборот и встаёт лицом.
  * В файле каждый кадр ключевой, поэтому перемотка в обе стороны без рывков.
  * Грузится заранее, когда до блока остаётся пара экранов; до этого виден постер (первый кадр).
+ *
+ * Мобильный — проще: перемотка видео на каждый кадр скролла на телефонах дёргается и греет,
+ * поэтому видео просто проигрывается один раз, когда блок заметно вышел на экран, и останавливается на последнем кадре.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MOBILE_QUERY } from '../core/stage';
 
 const FPS = 24;
 
@@ -45,6 +49,16 @@ export function initLogoSpin() {
     video.addEventListener('loadedmetadata', prime, { once: true });
     video.load();
   };
+
+  if (window.matchMedia(MOBILE_QUERY).matches) {
+    const preload = () => {
+      video.preload = 'auto';
+      video.load();
+    };
+    ScrollTrigger.create({ trigger: section, start: 'top bottom+=150%', once: true, onEnter: preload });
+    ScrollTrigger.create({ trigger: section, start: 'top 70%', once: true, onEnter: () => void video.play().catch(() => {}) });
+    return;
+  }
 
   ScrollTrigger.create({ trigger: section, start: 'top bottom+=200%', end: 'max', once: true, onEnter: load });
   ScrollTrigger.create({

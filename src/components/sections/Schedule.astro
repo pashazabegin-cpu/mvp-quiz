@@ -1,7 +1,8 @@
 ---
 /**
- * 04 · «Как всё пройдёт?» (Figma: кадр «main» с расписанием).
- * Экран закреплён: заголовок слева стоит, программа дня справа прокручивается.
+ * 04 · «Как всё пройдёт?» (Figma: кадр «2», мобильный — «2 · mobile» → «04»).
+ * Десктоп: экран закреплён, заголовок слева стоит, программа дня справа едет «гармошкой».
+ * Мобильный: без закрепления — шапка по центру, пункты идут обычным потоком.
  * Логика — scripts/sections/schedule.ts
  */
 import Anno from '../ui/Anno.astro';
@@ -10,16 +11,18 @@ const lines = (text: string) => text.split('\n');
 ---
 
 <section class="schedule stage" id="schedule" data-schedule>
-  <div class="stage__ui">
-    <p class="schedule__date label" data-split="dark" data-schedule-head>{event.date} · {event.venue}</p>
-    <h2 class="schedule__title" data-split data-schedule-head>{schedule.title} <span class="accent">{schedule.accent}</span></h2>
+  <div class="stage__ui" data-flow>
+    <p class="schedule__date label" data-split="dark">{event.date} · {event.venue}</p>
+    <h2 class="schedule__title">
+      <span class="schedule__line" data-split>{schedule.title}</span>
+      <span class="schedule__line schedule__line--accent accent" data-split>{schedule.accent}</span>
+    </h2>
 
     <ol class="schedule__list" data-schedule-list>
       {
         schedule.items.map((it) => (
           <li class:list={['sch', it.key && 'sch--key', it.list && 'sch--wide']}>
             <span class="time-pill" data-rise>{it.time}</span>
-            {it.tag && <p class="sch__tag" data-lines>{it.tag}</p>}
             <h3 class="sch__title" data-lines>{it.title}</h3>
             {it.text && (
               <p class="sch__text" data-lines>
@@ -59,19 +62,27 @@ const lines = (text: string) => text.split('\n');
     width: 527px;
     line-height: 33px;
   }
+  /* 65/65, вторая строка с отступом 110 (как в макете) */
   .schedule__title {
     left: calc(60px + var(--col));
     top: calc(50% - 450px + 228px);
-    width: 520px;
-    font-size: 45px;
+    width: 527px;
+    font-size: 65px;
     font-weight: 300;
-    line-height: 45px;
-    letter-spacing: -2.25px;
+    line-height: 65px;
+    letter-spacing: -3.25px;
+    white-space: nowrap;
+  }
+  .schedule__line {
+    display: block;
+  }
+  .schedule__line--accent {
+    margin-left: 110px;
   }
   .accent {
     color: var(--c-accent);
   }
-  /* список — от 9-й колонки (816 при 1440) */
+  /* список — от 9-й колонки (816 при 1440), между пунктами 50 */
   .schedule__list {
     left: calc(60px + var(--col) * 8 - 4px);
     top: calc(50% - 450px + 219px);
@@ -87,20 +98,14 @@ const lines = (text: string) => text.split('\n');
     font-weight: 300;
   }
   .sch + .sch {
-    margin-top: 60px;
+    margin-top: 50px;
   }
   .sch--key {
-    gap: 30px;
+    gap: 20px;
     width: 472px;
   }
   .sch--wide {
     width: 525px;
-  }
-  .sch__tag {
-    font-size: 20px;
-    line-height: 20px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
   }
   .sch__title {
     font-size: 22px;
@@ -108,9 +113,9 @@ const lines = (text: string) => text.split('\n');
     line-height: 32px;
   }
   .sch--key .sch__title {
-    font-size: 45px;
+    font-size: 35px;
     line-height: 45px;
-    letter-spacing: -2.25px;
+    letter-spacing: -1.75px;
   }
   .sch__text {
     font-size: 22px;
@@ -121,32 +126,56 @@ const lines = (text: string) => text.split('\n');
     flex-wrap: wrap;
     gap: 10.4px 10px;
     max-width: 500px;
-    margin-top: 4px;
+    margin-top: -16px;
   }
 
-  /* мобильный (Figma: «2 · mobile» → «04 · Как всё пройдёт?»): шапка у верха экрана, пункты через 63 px */
+  /* мобильный (Figma: «2 · mobile» → «04 · Как всё пройдёт?»): обычный поток без закрепления —
+     дата и заголовок по центру, пункты через 29 px (высоту блока по содержимому ставит stage.ts → fitFlow) */
   @media (max-aspect-ratio: 1/1) {
+    .schedule {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .schedule > .stage__ui {
+      height: auto;
+      padding: 40px 16px 96px;
+    }
+    .schedule > .stage__ui > * {
+      position: relative;
+    }
     .schedule__date {
-      left: 16px;
-      top: 40px;
-      width: calc(var(--ui-w) - 32px);
+      left: auto;
+      top: auto;
+      width: auto;
+      color: rgb(41 123 242 / 0.8);
       font-size: 13px;
       letter-spacing: 1.95px;
       line-height: 20px;
+      text-align: center;
     }
     .schedule__title {
-      left: 16px;
-      top: 66px;
-      width: calc(var(--ui-w) - 32px);
-      font-size: 34px;
+      left: auto;
+      top: auto;
+      width: auto;
+      margin-top: 26px;
+      font-size: 38px;
       line-height: 36px;
-      letter-spacing: -1.7px;
+      letter-spacing: -1.9px;
+      text-align: center;
+    }
+    .schedule__line {
+      display: inline-block;
+    }
+    .schedule__line--accent {
+      margin-left: 0.25em;
     }
     .schedule__list {
-      left: 16px;
-      top: 146px;
-      width: calc(var(--ui-w) - 32px);
+      left: auto;
+      top: auto;
+      width: auto;
       max-width: 480px;
+      margin: 60px auto 0;
+      will-change: auto;
     }
     .sch,
     .sch--key,
@@ -155,7 +184,7 @@ const lines = (text: string) => text.split('\n');
       gap: 16px;
     }
     .sch + .sch {
-      margin-top: 63px;
+      margin-top: 29px;
     }
     .sch__title,
     .sch__text {
@@ -169,6 +198,7 @@ const lines = (text: string) => text.split('\n');
     }
     .sch__chips {
       gap: 10px;
+      margin-top: 4px;
     }
     .sch__chips :global(.pill) {
       height: 32px;

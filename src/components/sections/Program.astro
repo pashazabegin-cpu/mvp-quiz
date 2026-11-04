@@ -1,8 +1,10 @@
 ---
 /**
- * 03 · «Программа» — Кибермейджор / MVP Talks / Спортивный квиз (Figma: кадры «main» 01–03).
- * Экран закреплён на три шага скролла. Иконка — WebGL-переход (canvas), картинки ниже —
- * текстуры для него и запасной вариант без WebGL.
+ * 03 · «Что будет?» — Кибермейджор / MVP Talks / Спортивный квиз
+ * (Figma: кадр «2» — первый пункт, кадры «MVP Talks» и «Спортивный квиз» — следующие состояния).
+ * Экран закреплён на три шага скролла. Заголовки пунктов всегда на экране: активный — белый,
+ * соседний — 20%, дальний — 5%; на десктопе список сдвигается на шаг, активный встаёт на одну линию.
+ * Иконка — WebGL-переход (canvas) на десктопе, на мобильном — простая смена картинок.
  * Логика — scripts/sections/program.ts, scripts/effects/icon-morph.ts
  */
 import Anno from '../ui/Anno.astro';
@@ -13,7 +15,7 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
 
 <section class="program stage" id="program" data-program>
   <div class="stage__ui">
-    <p class="program__label label" data-split="dark">{program.label}</p>
+    <h2 class="program__title" data-split>{program.title[0]} <span class="accent">{program.title[1]}</span></h2>
 
     <ol class="program__list" data-program-list>
       {program.items.map((it) => <li class="program__item" data-program-item>{it.title}</li>)}
@@ -54,21 +56,34 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
       ))
     }
   </div>
-  <Anno kind="screen">03 · Программа (новый блок)</Anno>
+  <Anno kind="screen">03 · Что будет?</Anno>
 </section>
 
 <style>
   .program {
     color: var(--c-text);
   }
-  .program__label {
-    left: calc(60px + var(--col));
-    top: calc(50% - 450px + 265px);
+  .accent {
+    color: var(--c-accent);
   }
+  /* «Что будет?» 65/55 по центру, 45 px от верха кадра */
+  .program__title {
+    left: 50%;
+    top: calc(50% - 450px + 45px);
+    width: 380px;
+    margin-left: -190px;
+    font-size: 65px;
+    font-weight: 300;
+    line-height: 55px;
+    letter-spacing: -3.25px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  /* активный пункт стоит на 338 (кадры «MVP Talks», «Спортивный квиз»), шаг — 91 */
   .program__list {
-    --step: 82px;
+    --step: 91px;
     left: calc(60px + var(--col));
-    top: calc(50% - 450px + 399px);
+    top: calc(50% - 450px + 338px);
     width: 380px;
     will-change: transform;
   }
@@ -136,41 +151,48 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
     line-height: 32px;
   }
 
-  /* мобильный (Figma: «2 · mobile» → «03 · Программа»): блок от подписи до описания (585 px) — по центру экрана */
+  /* мобильный (Figma: «2 · mobile» → «03 · Программа»): всё по центру, блок от заголовка
+     до конца описания (613 px) — по центру экрана; список не двигается, меняется только яркость */
   @media (max-aspect-ratio: 1/1) {
-    .program__label {
-      left: 16px;
-      top: calc(50% - 292.5px);
-      font-size: 14px;
-      line-height: 20px;
-      letter-spacing: 2.1px;
+    .program__title {
+      top: calc(50% - 306.6px);
+      width: 300px;
+      margin-left: -150px;
+      font-size: 38px;
+      line-height: 36px;
+      letter-spacing: -1.9px;
     }
     .program__list {
-      --step: 44px;
+      --step: 36px;
       left: 16px;
-      top: calc(50% - 292.5px + 36px);
+      top: calc(50% - 306.6px + 96.2px);
       width: calc(var(--ui-w) - 32px);
+      text-align: center;
+      will-change: auto;
     }
     .program__item {
       height: 32px;
-      font-size: 30px;
+      font-size: 23px;
       line-height: 32px;
-      letter-spacing: -1.5px;
+      letter-spacing: -1.15px;
     }
     .program__icon {
       left: 50%;
-      top: calc(50% - 292.5px + 202px);
-      width: 263px;
-      height: 210px;
-      margin-left: -131.5px;
+      top: calc(50% - 306.6px + 244.2px);
+      width: 233px;
+      height: 186px;
+      margin-left: -116.5px;
     }
     .program__info {
-      left: 16px;
-      top: calc(50% - 292.5px + 439px);
-      width: calc(var(--ui-w) - 32px);
-      max-width: 480px;
+      left: 50%;
+      top: calc(50% - 306.6px + 472.2px);
+      width: 343px;
+      margin-left: -171.5px;
+      text-align: center;
     }
+    /* в макете строка 20 при кегле 30 — маска строки обрезала бы цифры, поэтому строка 30 и сдвиг на 5 вверх */
     .program__num {
+      margin-top: -5px;
       font-size: 30px;
       line-height: 30px;
     }

@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
-import { enterObserver } from './text-reveal';
+import { dropHiddenBreaks, enterObserver } from './text-reveal';
 
 /** плашка на строке заголовка: время каждой половины, сдвиг между строками */
 const WIPE = { duration: 0.85, stagger: 0.1, ease: 'power4.inOut' };
@@ -29,6 +29,7 @@ export function initReveals() {
 
   document.querySelectorAll<HTMLElement>('[data-split]').forEach((el) => {
     io.observe(el);
+    dropHiddenBreaks(el);
     SplitText.create(el, {
       type: 'lines',
       autoSplit: true, // пересобирает строки при ресайзе; разметку ниже SplitText откатывает сам

@@ -12,7 +12,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
 import { finePointer, reducedMotion } from './core/env';
-import { initStage } from './core/stage';
+import { MOBILE_QUERY, initStage } from './core/stage';
 import { initSmoothScroll } from './core/smooth-scroll';
 import { initHero } from './sections/hero';
 import { initIntro } from './sections/intro';
@@ -20,6 +20,7 @@ import { initProgram } from './sections/program';
 import { initSchedule } from './sections/schedule';
 import { initLogoSpin } from './sections/logo-spin';
 import { initTalks } from './sections/talks';
+import { initQuizOrbit } from './sections/quiz-orbit';
 import { initStoryBg } from './sections/story-bg';
 import { initReveals } from './animations/reveal';
 import { initTextReveal } from './animations/text-reveal';
@@ -49,6 +50,12 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 
 initStage();
+
+// мобильная и десктопная раскладки устроены по-разному (закрепления, эффекты) —
+// при переходе через границу (поворот планшета, сужение окна) просто перезапускаем страницу
+window.matchMedia(MOBILE_QUERY).addEventListener('change', () => location.reload());
+// на телефоне панель браузера прячется и появляется при скролле — триггеры от этого не пересчитываем
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 /**
  * Запуск модуля: если он упадёт (баг, особенность браузера), остальные всё равно стартуют,
@@ -96,6 +103,7 @@ fontsReady.then(() => {
   run('story-bg', () => initStoryBg(pins));
   run('logo-spin', initLogoSpin);
   run('talks', initTalks);
+  run('quiz-orbit', () => initQuizOrbit(motion));
   if (motion) {
     run('reveals', initReveals, showText('[data-split], [data-reveal], [data-stagger] > *'));
     run('text-reveal', initTextReveal, showText('[data-lines], [data-rise]'));

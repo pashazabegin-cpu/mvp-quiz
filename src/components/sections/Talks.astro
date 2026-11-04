@@ -1,22 +1,25 @@
 ---
 /**
- * 06 · Программа MVP Talks & Entertainment — белый экран (Figma: кадр «2», низ).
+ * 06 · Программа MVP Talks & Entertainment — белый экран (Figma: кадр «2», мобильный — «2 · mobile» → «06»).
  * Один поток: время — название сессии и спикер — пояснение, между сессиями тонкие линии.
- * Экран закреплён, сессии едут вверх «гармошкой», как в «Как всё пройдёт?».
+ * Десктоп: экран закреплён, сессии едут вверх «гармошкой», как в «Как всё пройдёт?».
+ * Мобильный: без закрепления, обычным потоком.
  * Логика — scripts/sections/talks.ts, scripts/animations/lag-list.ts
  */
 import { talks } from '../../data/content';
 
 // короткие слова («в», «и», «на») не оставляем в конце строки — как в макете
 const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$1$2 ');
+// в мобильном макете заголовок в три строки: «Программа / MVP Talks / & Entertainment»
+const [titleFirst, ...titleRest] = talks.title.split(' ');
 ---
 
 <section class="talks stage" id="talks" data-talks data-nav-light>
-  <div class="stage__ui talks__ui">
+  <div class="stage__ui talks__ui" data-flow>
     <div class="talks__list" data-talks-list>
       <header class="talks__head">
         <h2 class="talks__title">
-          <span class="talks__line" data-split>{talks.title}</span>
+          <span class="talks__line" data-split>{titleFirst}<br class="br-m" /> {titleRest.join(' ')}</span>
           <span class="talks__line talks__line--accent" data-split>{talks.accent}</span>
         </h2>
         <p class="talks__badge" data-split="dark">{talks.badge}</p>
@@ -51,42 +54,42 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
     -webkit-mask-image: linear-gradient(to top, transparent 0, #000 300px);
     mask-image: linear-gradient(to top, transparent 0, #000 300px);
   }
-  /* верх заголовка — 189 px от начала белого фона */
+  /* верх заголовка — 69 px от начала белого фона */
   .talks__list {
     left: 0;
-    top: calc(50% - 450px + 189px);
+    top: calc(50% - 450px + 69px);
     width: 100%;
   }
   .talks__list > * {
     will-change: transform;
   }
 
+  /* заголовок 65/80 в две строки, вторая — с 650 при 1440; подпись — под ним слева, на уровне второй строки */
   .talks__head {
     position: relative;
-    height: 90px;
+    height: 160px;
   }
   .talks__title {
     position: absolute;
-    left: calc(60px + var(--col) + 16px);
+    left: calc(60px + var(--col) - 5px);
     top: 0;
-    font-size: 45px;
+    font-size: 65px;
     font-weight: 300;
-    line-height: 45px;
-    letter-spacing: -2.25px;
+    line-height: 80px;
+    letter-spacing: -3.25px;
     white-space: nowrap;
   }
   .talks__line {
     display: block;
   }
-  /* вторая строка начинается с колонки названий сессий (345 при 1440) */
   .talks__line--accent {
-    margin-left: calc(var(--col) * 2 - 16px);
+    margin-left: 500px;
     color: var(--c-accent);
   }
   .talks__badge {
     position: absolute;
-    left: calc(60px + var(--col) * 8);
-    top: 58px;
+    left: calc(60px + var(--col));
+    top: 121px;
     color: rgb(14 70 151 / 0.8);
     font-size: 20px;
     font-weight: 300;
@@ -105,8 +108,9 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
     border-top: 1px solid rgb(124 135 153 / 0.3);
     font-weight: 300;
   }
+  /* первая сессия — 310 от верха заголовка */
   .talk:first-of-type {
-    margin-top: 100px;
+    margin-top: 150px;
     padding-top: 0;
     border-top: 0;
   }
@@ -138,11 +142,24 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
     line-height: 32px;
   }
 
-  /* мобильный (Figma: «2 · mobile» → «06 · Программа MVP Talks»): заголовок у верха экрана,
-     сессии друг под другом, между ними 24 px — линия — 24 px */
+  /* мобильный (Figma: «2 · mobile» → «06 · Программа MVP Talks»): обычный поток без закрепления.
+     Заголовок 38/42 с 34 px, подпись — 187, сессии — с 259: поля 32/16, между частями 12, линия между сессиями */
   @media (max-aspect-ratio: 1/1) {
+    .talks {
+      box-shadow: none;
+    }
+    .talks__ui {
+      height: auto;
+      padding-top: 34px;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
     .talks__list {
-      top: 40px;
+      position: relative;
+      top: auto;
+    }
+    .talks__list > * {
+      will-change: auto;
     }
     .talks__head {
       height: auto;
@@ -150,8 +167,9 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
     }
     .talks__title {
       position: static;
-      font-size: 34px;
-      line-height: 36px;
+      max-width: 288px;
+      font-size: 38px;
+      line-height: 42px;
       letter-spacing: -1.5px;
       white-space: normal;
     }
@@ -160,7 +178,7 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
     }
     .talks__badge {
       position: static;
-      margin-top: 17px;
+      margin-top: 27px;
       font-size: 13px;
       line-height: 18px;
       letter-spacing: 1.95px;
@@ -169,13 +187,10 @@ const glue = (text: string) => text.replace(/(^|\s)([а-яёa-z]{1,2})\s+/gi, '$
       display: flex;
       flex-direction: column;
       gap: 12px;
-      padding: 56px 16px 32px;
-    }
-    .talk + .talk {
-      margin-top: 24px;
+      padding: 32px 16px;
     }
     .talk:first-of-type {
-      margin-top: 39px;
+      margin-top: 54px;
       padding-top: 32px;
     }
     .talk__time {

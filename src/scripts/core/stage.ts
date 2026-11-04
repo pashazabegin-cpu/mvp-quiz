@@ -58,3 +58,26 @@ export function initStage() {
 export const stageScale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-s')) || 1;
 /** Высота экрана в px макета (малая — без учёта спрятанной панели браузера) */
 export const stageHeight = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-h')) || 900;
+
+/**
+ * Мобильный экран «обычным потоком» (без закрепления): интерфейс внутри .stage__ui в px макета
+ * и масштабируется transform'ом, а transform не влияет на раскладку — поэтому высоту блока
+ * ставим сами: высота содержимого × масштаб. Пересчёт — при любом изменении содержимого (шрифты,
+ * разбивка текста на строки) и при смене масштаба; после него — ScrollTrigger.refresh, чтобы
+ * триггеры ниже узнали новую высоту.
+ */
+export function fitFlow(section: HTMLElement, onChange?: () => void) {
+  const ui = section.querySelector<HTMLElement>('[data-flow]');
+  if (!ui) return;
+  let last = 0;
+  const apply = () => {
+    const h = Math.ceil(ui.offsetHeight * stageScale());
+    if (h === last) return;
+    last = h;
+    section.style.height = `${h}px`;
+    onChange?.();
+  };
+  new ResizeObserver(apply).observe(ui);
+  onStageFit(apply);
+  apply();
+}

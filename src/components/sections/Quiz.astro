@@ -13,7 +13,8 @@
  * поднимается на темы и открывает текст. Скролл ещё и прокручивает её по горизонтали.
  *
  * Десктоп: блок 1931 px макета, всё на местах из макета. Мобильный: содержимое идёт потоком
- * (высоту блока ставит fitFlow), плашка тянется под ним.
+ * (высоту блока ставит fitFlow), плашка тянется под ним; у карусели своя строка между темами и текстом —
+ * она стоит на месте и не закрывает текст, только медленно идёт сама.
  */
 import Anno from '../ui/Anno.astro';
 import Button from '../ui/Button.astro';
@@ -55,6 +56,9 @@ const ring = [...quiz.icons, ...quiz.icons];
         ))
       }
     </ul>
+
+    <!-- мобильный: своя строка карусели между темами и текстом — лента стоит здесь и ничего не закрывает -->
+    <div class="quiz__orbit-slot" data-orbit-slot aria-hidden="true"></div>
 
     <div class:list={['quiz__lead', { fish: quiz.draft }]} data-quiz-lead>
       {
@@ -249,6 +253,11 @@ const ring = [...quiz.icons, ...quiz.icons];
     min-width: 235px;
   }
 
+  /* строка карусели — только в мобильном потоке (ниже); на десктопе карусель ездит по макету */
+  .quiz__orbit-slot {
+    display: none;
+  }
+
   /* карусель: слой во весь кадр, у самого слоя нет z-index — иконки встают над плашкой и текстом */
   .orbit {
     inset: 0;
@@ -349,11 +358,17 @@ const ring = [...quiz.icons, ...quiz.icons];
       font-size: 14px;
       line-height: 22px;
     }
+    /* строка карусели: рамка центральной иконки 110 + воздух сверху и снизу */
+    .quiz__ui > .quiz__orbit-slot {
+      display: block;
+      height: 110px;
+      margin-top: 28px;
+    }
     .quiz__lead {
       left: auto;
       width: auto;
       max-width: 343px;
-      margin: 40px auto 0;
+      margin: 28px auto 0;
       font-size: 18px;
     }
     .quiz__lead p + p {

@@ -19,6 +19,8 @@
  *   по вертикали — два состояния из макета: при входе в блок (верх плашки в ARRIVE от верха экрана) лента стоит
  *   под темами, на начале текста; через TRAVEL px скролла — поднимается на темы и открывает текст.
  * Положение плавно догоняет цель — без рывков от колёсика и пальца. Вне экрана не считается.
+ * Мобильный — спокойнее: у ленты своя строка между темами и текстом ([data-orbit-slot], Quiz.astro),
+ * по вертикали она стоит на месте и ничего не закрывает, скролл её не двигает — она только медленно идёт сама.
  * При «уменьшить движение» лента стоит на месте (в нижнем или верхнем положении — по скроллу при загрузке).
  */
 import { gsap } from 'gsap';
@@ -46,7 +48,7 @@ type Config = {
 
 // десктоп — по кадрам 4204:4529 / 4204:4575: соседняя ≈ 0.76 от центральной, дальше 0.5, 0.36, 0.28
 const DESKTOP: Config = { gap: 40, shrink: 0.73, arrive: 43, travel: 495, low: 18, high: 16, pace: 3.5, scroll: 0.004 };
-// мобильный — спокойнее: лента идёт сама и медленнее, скролл её не подкручивает (только поднимает на темы)
+// мобильный — лента идёт сама и медленнее, скролл её не подкручивает и не поднимает (стоит в своей строке)
 const MOBILE: Config = { gap: 16, shrink: 0.73, arrive: 20, travel: 340, low: 10, high: 4, pace: 5, scroll: 0 };
 /** до скольких мест от центра раскладываем ленту (дальше — точно за краем экрана) */
 const REACH = 9;
@@ -61,6 +63,7 @@ export function initQuizOrbit(motion: boolean) {
   const plate = section?.querySelector<HTMLElement>('.quiz__plate');
   const topics = section?.querySelector<HTMLElement>('[data-quiz-topics]');
   const lead = section?.querySelector<HTMLElement>('[data-quiz-lead]');
+  const slot = section?.querySelector<HTMLElement>('[data-orbit-slot]');
   if (!section || !ui || !plate || !topics || !lead) return;
   const cfg = window.matchMedia(MOBILE_QUERY).matches ? MOBILE : DESKTOP;
 
@@ -80,6 +83,8 @@ export function initQuizOrbit(motion: boolean) {
     cx = ui.offsetWidth / 2;
     high = topics.offsetTop + topics.offsetHeight / 2 + cfg.high;
     low = lead.offsetTop + cfg.low;
+    // своя строка (мобильный): лента стоит по её центру в обоих состояниях
+    if (slot?.offsetHeight) low = high = slot.offsetTop + slot.offsetHeight / 2;
   };
 
   const scaleAt = (o: number) => 1 / Math.sqrt(1 + cfg.shrink * o * o);

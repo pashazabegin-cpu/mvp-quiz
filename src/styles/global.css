@@ -419,6 +419,17 @@ button {
 .js-motion [data-rise] {
   visibility: hidden;
 }
+/* мобильное появление (scripts/animations/soft-reveal.ts): только прозрачность, переход ведёт браузер.
+   Правила ниже перекрывают начальные состояния выше — элемент уже видим для раскладки, но прозрачен */
+.js-motion .soft {
+  visibility: visible;
+  opacity: 0;
+  transform: none;
+  transition: opacity 0.6s ease var(--soft-delay, 0s);
+}
+.js-motion .soft.is-shown {
+  opacity: 1;
+}
 /* маска строки (scripts/animations/text-reveal.ts): запас сверху и снизу под кратку «й» и хвосты
    «р», «у», «д»; отрицательные отступы его компенсируют — высота и шаг строк не меняются */
 .tl-mask {

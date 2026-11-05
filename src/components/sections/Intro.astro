@@ -3,8 +3,8 @@
  * 02 · «Что мы придумали?» (Figma: кадр «2» 1440 и «2 · mobile» 375).
  * Десктоп: экран закреплён, текст закрашивается по словам, теги/снежинки/фото проезжают снизу вверх
  * на разной глубине — в середине пути стоят ровно как в макете (кадр «2»).
- * Мобильный: без закрепления — обычный экран 375×743, всё стоит как в макете (головы поверх конца текста),
- * текст проявляется по абзацам.
+ * Мобильный: без закрепления — обычный экран 375×829 (кадр макета 743 + 86: головы опущены под текст,
+ * отдельно от него), всё стоит на местах, текст проявляется по абзацам.
  * Логика — scripts/sections/intro.ts
  */
 import Anno from '../ui/Anno.astro';
@@ -12,7 +12,7 @@ import { intro } from '../../data/content';
 import { withBase } from '../../lib/paths';
 import { paragraph } from '../../lib/text';
 
-// позиция на сцене: десктоп — доля ширины кадра 1440 и px кадра 900, мобильный — доля 375 и px кадра 743
+// позиция на сцене: десктоп — доля ширины кадра 1440 и px кадра 900, мобильный — доля 375 и px кадра 829
 const floatStyle = (f: (typeof intro.floats)[number]) =>
   [
     `--x:${((f.x / 1440) * 100).toFixed(3)}%;--y:${f.y}px`,
@@ -23,7 +23,7 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
     .join(';');
 ---
 
-<section class="intro stage" id="about" data-intro-section>
+<section class="intro stage" id="about" data-intro-section data-story-row style="--story-row: 0px">
   <div class="stage__ui">
     <h2 class="intro__title" data-split>
       {intro.title[0]}<br /><span class="accent">{intro.title[1]}</span>
@@ -140,18 +140,18 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
     display: none;
   }
 
-  /* мобильный (Figma: «2 · mobile» → «02 · Что мы придумали?»): обычный экран 375×743 без закрепления.
-     Теги убраны, головы внизу поверх конца текста, снежинки на своих местах, x — доля ширины кадра */
+  /* мобильный (Figma: «2 · mobile» → «02 · Что мы придумали?»): обычный экран 375×829 без закрепления.
+     Теги убраны, головы внизу — отдельно, на 64 px ниже текста; снежинки на своих местах, x — доля ширины кадра */
   @media (max-aspect-ratio: 1/1) {
     .intro {
-      height: calc(743px * var(--ui-s));
+      height: calc(829px * var(--ui-s));
       min-height: 0;
     }
     .intro > .stage__ui {
-      height: 743px;
+      height: 829px;
     }
     .intro__title {
-      top: calc(50% - 371.5px + 68px);
+      top: calc(50% - 414.5px + 68px);
       width: 300px;
       margin-left: -150px;
       font-size: 38px;
@@ -159,7 +159,7 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
       letter-spacing: -1.9px;
     }
     .intro__lead {
-      top: calc(50% - 371.5px + 202px);
+      top: calc(50% - 414.5px + 202px);
       width: 343px;
       margin-left: -171.5px;
       font-size: 18px;
@@ -168,8 +168,8 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
       margin-top: 26px;
     }
     .intro__floats {
-      top: calc(50% - 371.5px);
-      height: 743px;
+      top: calc(50% - 414.5px);
+      height: 829px;
     }
     /* на мобильном элементы не двигаются — отдельные слои под анимацию им не нужны */
     .intro__float {
@@ -182,7 +182,7 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
     .intro__float--snow img {
       height: auto;
     }
-    /* головы — поверх последних строк текста */
+    /* головы — над соседними снежинками */
     .intro__float--photo {
       z-index: 2;
     }

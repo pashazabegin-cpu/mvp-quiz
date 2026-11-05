@@ -12,6 +12,8 @@ function videoReady(video: HTMLVideoElement | null, timeout: number): Promise<vo
   if (!video || video.readyState >= 3) return Promise.resolve();
   return Promise.race([
     new Promise<void>((resolve) => video.addEventListener('canplay', () => resolve(), { once: true })),
+    // Safari не дал запустить видео и его подменяет ролик-картинка (sections/hero.ts) — видео больше не ждём
+    new Promise<void>((resolve) => video.addEventListener('hero-fallback', () => resolve(), { once: true })),
     wait(timeout),
   ]);
 }

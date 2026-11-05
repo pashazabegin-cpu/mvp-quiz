@@ -10,7 +10,8 @@ import { event, schedule } from '../../data/content';
 const lines = (text: string) => text.split('\n');
 ---
 
-<section class="schedule stage" id="schedule" data-schedule>
+<!-- data-story-row: на мобильном фон — кусок общего градиента с этой строки макета (Story.astro) -->
+<section class="schedule stage" id="schedule" data-schedule data-story-row style="--story-row: 1467px">
   <div class="stage__ui" data-flow>
     <p class="schedule__date label" data-split="dark">{event.date} · {event.venue}</p>
     <h2 class="schedule__title">

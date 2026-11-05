@@ -105,9 +105,9 @@ export function initProgram(motion: boolean): ScrollTrigger | undefined {
 /**
  * Мобильный: экран «прилипает» к верху сам (position: sticky у .program внутри дорожки .program-track),
  * поэтому не дёргается ни на входе, ни на выходе. Дорожка делится на равные трети — в каждой свой пункт.
- * Скрипт только переключает пункт, когда скролл переходит в другую треть: яркость пунктов и картинка
- * доходят CSS-переходом, описание мягко сменяется. Каждый пиксель скролла ничего не перерисовывает.
- * Возвращает триггер на время «прилипания» — по нему фон-градиент знает, где экран (story-bg.ts).
+ * Скрипт только переключает пункт (классы и яркость), когда скролл переходит в другую треть; яркость пунктов,
+ * картинка и описание сменяются CSS-переходами (Program.astro) — их ведёт браузер, а не скрипт по кадрам.
+ * Каждый пиксель скролла ничего не перерисовывает.
  */
 function initMobile(section: HTMLElement) {
   const track = section.closest<HTMLElement>('[data-program-track]') ?? section;
@@ -117,13 +117,9 @@ function initMobile(section: HTMLElement) {
   const imgs = Array.from(section.querySelectorAll<HTMLImageElement>('[data-program-img]'));
   const n = items.length;
 
-  gsap.set(infos.slice(1), { autoAlpha: 0 });
-  section.classList.add('is-ready');
-
   let active = -1;
   const select = (i: number) => {
     if (i === active) return;
-    const prev = active;
     active = i;
     items.forEach((el, j) => {
       el.style.opacity = String(itemOpacity(Math.abs(j - i)));
@@ -131,10 +127,8 @@ function initMobile(section: HTMLElement) {
       buttons[j]?.toggleAttribute('aria-current', j === i);
     });
     imgs.forEach((img, j) => (img.style.opacity = j === i ? '1' : '0'));
-    if (prev < 0) return;
     // старое описание быстро гаснет, новое проявляется следом — тексты не наслаиваются
-    gsap.to(infos[prev], { autoAlpha: 0, duration: 0.2, ease: 'power1.out', overwrite: true });
-    gsap.to(infos[i], { autoAlpha: 1, duration: 0.45, ease: 'power1.out', delay: 0.15, overwrite: true });
+    infos.forEach((el, j) => el.classList.toggle('is-current', j === i));
   };
   const pick = (progress: number) => select(Math.min(n - 1, Math.floor(progress * n)));
 
@@ -148,6 +142,7 @@ function initMobile(section: HTMLElement) {
     onRefresh: (self) => pick(self.progress),
   });
   pick(0);
+  section.classList.add('is-ready');
 
   // клик по пункту: скролл в середину его трети дорожки
   buttons.forEach((btn, i) =>

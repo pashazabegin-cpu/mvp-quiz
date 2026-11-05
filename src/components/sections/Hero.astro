@@ -90,12 +90,24 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     width: 1600px;
     height: 900px;
     will-change: transform;
+    /* постер (ставит hero.ts), пока вместо запрещённого видео грузится ролик-картинка */
+    background: 50% 50% / cover no-repeat;
   }
-  .hero__video video {
+  /* :global — картинку-ролик (Safari в энергосбережении) создаёт скрипт, у неё нет scoped-атрибута */
+  .hero__video video,
+  .hero__video :global(.hero__video-img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transform: scale(1.02);
+  }
+  /* фон, а не плеер: нажать на видео нельзя, системная кнопка запуска Safari не показывается */
+  .hero__video video {
+    pointer-events: none;
+  }
+  .hero__video video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    -webkit-appearance: none;
   }
   .hero__shade-mob {
     display: none;
@@ -253,7 +265,11 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       width: 100%;
       height: 100%;
     }
-    .hero__video video {
+    .hero__video {
+      background-position: 74% 50%;
+    }
+    .hero__video video,
+    .hero__video :global(.hero__video-img) {
       object-position: 74% 50%;
       transform: none;
     }

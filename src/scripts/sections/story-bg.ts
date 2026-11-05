@@ -5,9 +5,8 @@
  *
  * Десктоп (кадр «2», Rectangle 5879: 3622 px от y 43): кадр 1440×900 стоит по центру экрана;
  *   у его верха интро — 60, «Что будет?» — 1089 (+100 за закрепление), расписание — 1777 и дальше со списком.
- * Мобильный («2 · mobile»: градиент 2991 px от y −99): интро не закреплено (у верха экрана — строка 0),
- *   блок «Что будет?» — по центру экрана, расписание идёт потоком (его верх — 1467, дата на 40 ниже).
- * Высота градиента для каждой раскладки — в Story.astro.
+ * Мобильный — без скрипта: каждый экран несёт свой кусок градиента сам (Story.astro, data-story-row),
+ *   фон едет вместе со страницей и не дёргается при скролле пальцем.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -22,28 +21,19 @@ const LAYOUTS = {
     drift: 100,
     schedule: (h: number) => 1777 - (h - 900) / 2,
   },
-  mobile: {
-    gradTop: -99,
-    intro: () => 0,
-    program: (h: number) => 1092.4 - h / 2,
-    drift: 60,
-    schedule: () => 1467,
-  },
 };
 
 type Pin = ScrollTrigger | undefined;
 
 export function initStoryBg([intro, program, schedule]: Pin[]) {
   const grad = document.querySelector<HTMLElement>('[data-story-grad]');
-  if (!grad) return;
+  if (!grad || window.matchMedia(MOBILE_QUERY).matches) return;
   const setY = gsap.quickSetter(grad, 'y', 'px');
-  const mobile = window.matchMedia(MOBILE_QUERY);
-  let layout = LAYOUTS.desktop;
+  const layout = LAYOUTS.desktop;
 
   // опорные точки [scrollY, строка у верха экрана]; пересчитываются после закреплений
   let keys: Array<[number, number]> = [];
   const build = () => {
-    layout = mobile.matches ? LAYOUTS.mobile : LAYOUTS.desktop;
     const s = stageScale();
     const h = stageHeight();
     keys = [];

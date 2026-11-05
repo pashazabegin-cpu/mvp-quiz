@@ -18,7 +18,9 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
 <!-- дорожка закрепления: на мобильном экран «прилипает» к верху (CSS sticky) на её высоту,
      на десктопе её роль у ScrollTrigger pin, а сама она — обычная обёртка -->
 <div class="program-track" data-program-track>
-<section class="program stage" id="program" data-program>
+<!-- data-story-row: на мобильном фон экрана — кусок общего градиента с этой строки макета (Story.astro):
+     сразу под «Что мы придумали?» (кадр 829) — и прилипает вместе с экраном -->
+<section class="program stage" id="program" data-program data-story-row style="--story-row: 829px">
   <div class="stage__ui">
     <h2 class="program__title" data-split>{program.title[0]} <span class="accent">{program.title[1]}</span></h2>
 
@@ -184,11 +186,13 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
   /* мобильный (Figma: «2 · mobile» → «03 · Программа»): всё по центру, блок от заголовка
      до конца описания (613 px) — по центру экрана; список не двигается, меняется только яркость */
   @media (max-aspect-ratio: 1/1) {
-    /* закрепление без скрипта: экран «прилипает» к верху, пока проезжает дорожка (экран + 3 × 70% высоты).
-       Его ведёт сам браузер — без рывков в начале и в конце, как у закрепления из JS на телефонах */
+    /* закрепление без скрипта: экран «прилипает» к верху, пока проезжает дорожка (экран + 3 × 50% высоты).
+       Его ведёт сам браузер — без рывков в начале и в конце, как у закрепления из JS на телефонах.
+       Фон дорожки — ровный синий низа экрана: виден полосой под экраном, когда панель Safari спрятана */
     .program-track {
-      height: max(310vh, calc(520px + 210vh));
-      height: max(310svh, calc(520px + 210svh));
+      height: max(250vh, calc(520px + 150vh));
+      height: max(250svh, calc(520px + 150svh));
+      background: var(--story-blue);
     }
     .program {
       position: sticky;
@@ -237,6 +241,21 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
       width: 343px;
       margin-left: -171.5px;
       text-align: center;
+    }
+    /* смена описания (program.ts ставит .is-current): старое быстро гаснет, новое проявляется следом */
+    .program.is-ready .program__info {
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.2s ease,
+        visibility 0s linear 0.2s;
+    }
+    .program.is-ready .program__info.is-current {
+      opacity: 1;
+      visibility: visible;
+      transition:
+        opacity 0.45s ease 0.15s,
+        visibility 0s;
     }
     /* в макете строка 20 при кегле 30 — цифры не помещались бы в строку, поэтому строка 30 и сдвиг на 5 вверх.
        Строки здесь не режутся на маски (описание просто сменяется), так что номер встаёт на 515, текст — на 560 */

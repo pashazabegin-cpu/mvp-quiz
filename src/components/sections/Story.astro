@@ -2,7 +2,10 @@
 /**
  * Обёртка экранов «Что мы придумали?» → «Программа» → «Как всё пройдёт?».
  * Общий фон из макета (кадр «2»): градиент высотой 3622 px — чёрный → синий → чёрный.
- * Он «прилипает» к экрану и едет вверх вместе с экранами (scripts/sections/story-bg.ts).
+ * Десктоп: он «прилипает» к экрану и едет вверх вместе с экранами (scripts/sections/story-bg.ts).
+ * Мобильный: никакого скрипта — каждый экран сам несёт свой кусок того же градиента (data-story-row:
+ * --story-row — строка макета «2 · mobile» у верха экрана), поэтому фон едет вместе со страницей
+ * и не дёргается при скролле пальцем. У «Что будет?» кусок градиента прилипает вместе с экраном.
  */
 ---
 
@@ -17,27 +20,9 @@
   .story {
     position: relative;
     background: var(--c-bg);
-  }
-  .story__bg {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    margin-bottom: -100vh;
-    overflow: hidden;
-    pointer-events: none;
-    /* подложка: шум ниже края градиента смешивается с чёрным, а не с пустотой (иначе серая полоса) */
-    background: var(--c-bg);
-  }
-  .story__grad {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: calc(3622px * var(--ui-s));
     /* Градиент макета (чёрный 0% → синий 30.1–50.751% → чёрный 78.388%), но переходы — по плавной
        кривой (smoothstep), а не по прямой: у прямой на стыке с ровным синим излом, и глаз видит полосу. */
-    background-color: var(--c-bg);
-    background-image: linear-gradient(
+    --story-grad: linear-gradient(
       to top,
       rgb(0 63 151 / 0) 0%,
       rgb(0 63 151 / 0.028) 3.01%,
@@ -62,22 +47,57 @@
       rgb(0 63 151 / 0.028) 75.62%,
       rgb(0 63 151 / 0) 78.388%
     );
+    /* Дизеринг: тонкий шум поверх градиента разбивает «лесенку» оттенков тёмно-синего (8 бит на канал).
+       На глаз не виден, только сглаживает переходы. Прозрачность 12% — внутри картинки, чтобы шум можно было
+       положить и отдельным слоем фона (мобильный) */
+    --story-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+    /* синий, в котором градиент стоит ровно (30.1–50.751%) */
+    --story-blue: rgb(0 63 151);
+  }
+  .story__bg {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    margin-bottom: -100vh;
+    overflow: hidden;
+    pointer-events: none;
+    /* подложка: шум ниже края градиента смешивается с чёрным, а не с пустотой (иначе серая полоса) */
+    background: var(--c-bg);
+  }
+  .story__grad {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: calc(3622px * var(--ui-s));
+    background-color: var(--c-bg);
+    background-image: var(--story-grad);
     will-change: transform;
   }
-  /* мобильный макет («2 · mobile»): тот же градиент на 2991 px */
-  @media (max-aspect-ratio: 1/1) {
-    .story__grad {
-      height: calc(2991px * var(--ui-s));
-    }
-  }
-  /* Дизеринг: тонкий шум поверх градиента разбивает «лесенку» оттенков тёмно-синего (8 бит на канал).
-     На глаз не виден, только сглаживает переходы. */
   .story__bg::after {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.12;
+    background-image: var(--story-noise);
     mix-blend-mode: overlay;
+  }
+
+  /* мобильный макет («2 · mobile»: градиент 2991 px от строки −99): фон — у самих экранов, без скрипта */
+  @media (max-aspect-ratio: 1/1) {
+    .story__bg {
+      display: none;
+    }
+    .story :global([data-story-row]) {
+      background-color: var(--c-bg);
+      background-image: var(--story-noise), var(--story-grad);
+      background-size:
+        160px 160px,
+        100% calc(2991px * var(--ui-s));
+      background-position:
+        0 0,
+        0 calc((-99px - var(--story-row, 0px)) * var(--ui-s));
+      background-repeat: repeat, no-repeat;
+      background-blend-mode: overlay, normal;
+    }
   }
 </style>

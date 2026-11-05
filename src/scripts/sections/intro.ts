@@ -7,8 +7,8 @@
  *   Через MID экранов скролла сцена стоит ровно как в макете, до этого — ниже, после — уходит вверх.
  * Сцена доезжает, пока экран уже уходит после закрепления, — без рывка на стыке.
  *
- * Мобильный — упрощённо: без закрепления, текст закрашивается, пока блок проходит экран,
- * снежинки слегка отстают/опережают скролл, головы поднимаются снизу и встают поверх конца текста.
+ * Мобильный — облегчённо: без закрепления и без эффектов от скролла, всё стоит как в макете,
+ * текст просто проявляется по абзацам.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -29,7 +29,7 @@ export function initIntro(): ScrollTrigger | undefined {
   if (!section) return;
   const lead = section.querySelector<HTMLElement>('[data-intro-lead]')!;
 
-  if (window.matchMedia(MOBILE_QUERY).matches) return initMobile(section, lead);
+  if (window.matchMedia(MOBILE_QUERY).matches) return initMobile(section);
 
   // экран закреплён на 220% высоты; сам таймлайн пустой — на нём держится закрепление
   const tl = gsap.timeline({
@@ -45,28 +45,12 @@ export function initIntro(): ScrollTrigger | undefined {
 }
 
 /**
- * Мобильный: блок не закреплён. Каждый элемент сцены сдвигается от скролла по своей глубине (z):
- * пока верх блока идёт от низа экрана к верху, элемент проходит путь от +LIFT·z до 0 —
- * в момент, когда блок встал у верха экрана, всё стоит ровно как в макете. Головы (z больше)
- * поднимаются заметно быстрее текста: появляются у самого низа экрана и заезжают на последние строки.
+ * Мобильный: блок не закреплён и ничего не двигает от скролла — снежинки и головы стоят на своих местах
+ * из макета, текст по абзацам мягко проявляется при появлении (animations/soft-reveal.ts).
  * Возвращает триггер без закрепления — по нему фон-градиент знает, где блок (story-bg.ts).
  */
-const LIFT = 150;
-function initMobile(section: HTMLElement, lead: HTMLElement) {
-  const st = ScrollTrigger.create({ trigger: section, start: 'top top', end: 'top top' });
-  // без закрепления — пока низ текста не поднимется к середине экрана
-  initMagicText(lead, { end: 'bottom 55%' });
-  section.querySelectorAll<HTMLElement>('[data-float]').forEach((el) => {
-    if (getComputedStyle(el).display === 'none') return;
-    const z = Number(el.dataset.z) || 1;
-    const photo = el.classList.contains('intro__float--photo');
-    gsap.fromTo(
-      el,
-      { y: LIFT * (photo ? 1.6 : z - 0.6) },
-      { y: 0, ease: 'none', scrollTrigger: { trigger: section, start: 'top bottom', end: 'top top', scrub: true } },
-    );
-  });
-  return st;
+function initMobile(section: HTMLElement) {
+  return ScrollTrigger.create({ trigger: section, start: 'top top', end: 'top top' });
 }
 
 function initDepth(section: HTMLElement, pin: ScrollTrigger) {

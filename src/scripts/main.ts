@@ -6,6 +6,10 @@
  * Анимации прототипных блоков подключаются data-атрибутами (таблица в README.md).
  * Если пользователь включил «уменьшить движение», остаются закреплённые экраны (их ведёт сам скролл)
  * и базовое поведение — без прелоадера, плавного скролла и эффектов под курсор.
+ *
+ * Мобильная раскладка — облегчённая: родной скролл телефона (без Lenis), никаких эффектов,
+ * привязанных к каждому пикселю скролла (параллакс, закрашивание по словам, уход первого экрана),
+ * весь текст появляется одним спокойным эффектом (animations/soft-reveal.ts).
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -23,6 +27,7 @@ import { initTalks } from './sections/talks';
 import { initQuiz } from './sections/quiz';
 import { initStoryBg } from './sections/story-bg';
 import { initReveals } from './animations/reveal';
+import { SOFT_REVEAL_TARGETS, initSoftReveal } from './animations/soft-reveal';
 import { initTextReveal } from './animations/text-reveal';
 import { initParallax } from './animations/parallax';
 import { initTimeline } from './animations/timeline';
@@ -44,6 +49,8 @@ import { initSnow } from './effects/snow';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const motion = !reducedMotion;
+/** мобильная раскладка: раскладка за время жизни страницы не меняется (при смене — перезагрузка ниже) */
+const mobile = window.matchMedia(MOBILE_QUERY).matches;
 
 // экраны закреплены и ведутся скроллом — после перезагрузки всегда начинаем с обложки
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -75,14 +82,23 @@ const showText = (selector: string) => () => gsap.set(selector, { visibility: 'v
 
 // Базовое поведение — работает всегда
 run('annotations', initAnnotations);
-run('nav', initNav);
+if (!mobile) run('nav', initNav); // на мобильном нижнего меню нет (Nav.astro)
 run('rail', initRail);
 run('accordion', () => initAccordion(motion));
 run('shader', () => initShaderBackgrounds(motion));
 run('glass', initLiquidGlass);
 
-const lenis = motion ? run('smooth-scroll', initSmoothScroll) : null;
+// плавный скролл — только на десктопе: на телефоне родной скролл с инерцией и так плавный,
+// а лишний слой между пальцем и страницей даёт рывки
+const lenis = motion && !mobile ? run('smooth-scroll', initSmoothScroll) : null;
 lenis?.stop(); // скролл открывается, когда уходит прелоадер
+// на мобильном то же самое без Lenis: пока виден прелоадер, страница не прокручивается (global.css)
+const root = document.documentElement;
+if (motion && mobile) root.classList.add('is-scroll-locked');
+const unlockScroll = () => {
+  lenis?.start();
+  root.classList.remove('is-scroll-locked');
+};
 
 if (motion) run('snow', initSnow);
 
@@ -104,7 +120,9 @@ fontsReady.then(() => {
   run('logo-spin', initLogoSpin);
   run('talks', initTalks);
   run('quiz', () => initQuiz(motion));
-  if (motion) {
+  if (motion && mobile) {
+    run('soft-reveal', () => initSoftReveal(), showText(SOFT_REVEAL_TARGETS));
+  } else if (motion) {
     run('reveals', initReveals, showText('[data-split], [data-reveal], [data-stagger] > *'));
     run('text-reveal', initTextReveal, showText('[data-lines], [data-rise]'));
     run('parallax', initParallax);
@@ -117,11 +135,11 @@ fontsReady.then(() => {
 });
 
 // первый экран: если интро сломается, прелоадер уходит и скролл открывается — страница не «зависает»
-initHero({ motion, onReady: () => lenis?.start() }).catch((error) => {
+initHero({ motion, onReady: unlockScroll }).catch((error) => {
   console.error('[hero]', error);
   document.querySelector('[data-preloader]')?.remove();
   showText('[data-anim], [data-anim] *')();
-  lenis?.start();
+  unlockScroll();
 });
 
 document.documentElement.classList.add('motion-ready');

@@ -5,6 +5,8 @@
  * Экран закреплён на три шага скролла. Заголовки пунктов всегда на экране: активный — белый,
  * соседний — 20%, дальний — 5%; на десктопе список сдвигается на шаг, активный встаёт на одну линию.
  * Иконка — WebGL-переход (canvas) на десктопе, на мобильном — простая смена картинок.
+ * Мобильный: закрепление — CSS sticky внутри дорожки .program-track, пункты сменяются шагами
+ * (яркость, картинка и описание плавно сменяются, без привязки к каждому пикселю скролла).
  * Логика — scripts/sections/program.ts, scripts/effects/icon-morph.ts
  */
 import Anno from '../ui/Anno.astro';
@@ -13,6 +15,9 @@ import { withBase } from '../../lib/paths';
 const pad = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
+<!-- дорожка закрепления: на мобильном экран «прилипает» к верху (CSS sticky) на её высоту,
+     на десктопе её роль у ScrollTrigger pin, а сама она — обычная обёртка -->
+<div class="program-track" data-program-track>
 <section class="program stage" id="program" data-program>
   <div class="stage__ui">
     <h2 class="program__title" data-split>{program.title[0]} <span class="accent">{program.title[1]}</span></h2>
@@ -64,6 +69,7 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
   </div>
   <Anno kind="screen">03 · Что будет?</Anno>
 </section>
+</div>
 
 <style>
   .program {
@@ -178,6 +184,16 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
   /* мобильный (Figma: «2 · mobile» → «03 · Программа»): всё по центру, блок от заголовка
      до конца описания (613 px) — по центру экрана; список не двигается, меняется только яркость */
   @media (max-aspect-ratio: 1/1) {
+    /* закрепление без скрипта: экран «прилипает» к верху, пока проезжает дорожка (экран + 3 × 70% высоты).
+       Его ведёт сам браузер — без рывков в начале и в конце, как у закрепления из JS на телефонах */
+    .program-track {
+      height: max(310vh, calc(520px + 210vh));
+      height: max(310svh, calc(520px + 210svh));
+    }
+    .program {
+      position: sticky;
+      top: 0;
+    }
     .program__title {
       top: calc(50% - 306.6px);
       width: 300px;
@@ -194,11 +210,19 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
       text-align: center;
       will-change: auto;
     }
+    /* шаг пунктов 36, как в макете (139 → 175 → 211): отступ считаем от мобильной высоты 32,
+       а не от десктопной 45 — иначе пункты наезжали друг на друга с шагом 23 */
     .program__item {
       height: 32px;
+      margin-bottom: calc(var(--step) - 32px);
       font-size: 23px;
       line-height: 32px;
       letter-spacing: -1.15px;
+      transition: opacity 0.4s ease;
+    }
+    /* пункты сменяются шагами (program.ts): яркость и картинка доходят плавно */
+    .program__img {
+      transition: opacity 0.5s ease;
     }
     .program__icon {
       left: 50%;
@@ -214,7 +238,8 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
       margin-left: -171.5px;
       text-align: center;
     }
-    /* в макете строка 20 при кегле 30 — маска строки обрезала бы цифры, поэтому строка 30 и сдвиг на 5 вверх */
+    /* в макете строка 20 при кегле 30 — цифры не помещались бы в строку, поэтому строка 30 и сдвиг на 5 вверх.
+       Строки здесь не режутся на маски (описание просто сменяется), так что номер встаёт на 515, текст — на 560 */
     .program__num {
       margin-top: -5px;
       font-size: 30px;

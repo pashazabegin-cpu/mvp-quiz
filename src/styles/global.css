@@ -455,8 +455,11 @@ button {
  * Перекрывает страницу до загрузки шрифтов и видео первого экрана, уходит наклонными полосами.
  * Без JS или при «уменьшить движение» его нет.
  */
-.preloader { position: fixed; inset: 0; z-index: 100; display: none; background: var(--c-bg); }
+.preloader { position: fixed; inset: 0; z-index: 100; display: none; background: var(--c-bg); touch-action: none; }
 .js-motion .preloader { display: block; }
+/* мобильный: пока виден прелоадер, страница не прокручивается (на десктопе это делает Lenis — main.ts) */
+.is-scroll-locked,
+.is-scroll-locked body { overflow: hidden; }
 .preloader__anim { position: absolute; inset: 0; }
 .preloader__anim svg { display: block; }
 .is-loaded .preloader { pointer-events: none; }

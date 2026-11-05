@@ -5,7 +5,8 @@
  *   за ней следующий пункт — уже собравшиеся части остаются, как шаги вечера;
  *   темы-плашки поднимаются из-под маски (data-rise, animations/text-reveal.ts);
  *   текст под ними закрашивается по словам, как в «Что мы придумали?» (animations/magic-text.ts).
- * На мобильном содержимое идёт потоком — высоту блока ставит fitFlow.
+ * На мобильном содержимое идёт потоком — высоту блока ставит fitFlow; эффектов от скролла у текста нет:
+ * пункты, темы и абзацы просто проявляются по очереди (animations/soft-reveal.ts).
  */
 import { gsap } from 'gsap';
 import { initQuizOrbit } from './quiz-orbit';
@@ -16,9 +17,10 @@ import { refreshSoon } from '../core/refresh';
 export function initQuiz(motion: boolean) {
   const section = document.querySelector<HTMLElement>('[data-quiz]');
   if (!section) return;
-  if (window.matchMedia(MOBILE_QUERY).matches) fitFlow(section, refreshSoon);
+  const mobile = window.matchMedia(MOBILE_QUERY).matches;
+  if (mobile) fitFlow(section, refreshSoon);
   initQuizOrbit(motion);
-  if (!motion) return;
+  if (!motion || mobile) return;
 
   // строка пунктов: слова и точки по порядку, как стоят в разметке
   const line = section.querySelector<HTMLElement>('[data-quiz-steps]');

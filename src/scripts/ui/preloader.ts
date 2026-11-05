@@ -4,6 +4,7 @@
  */
 import lottie from 'lottie-web/build/player/lottie_light';
 import preloaderData from '../../assets/preloader.json';
+import { MOBILE_QUERY } from '../core/stage';
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -35,8 +36,9 @@ export async function runPreloader(el: HTMLElement | null, firstVideo: HTMLVideo
       })
     : null;
 
-  // минимум один полный цикл анимации (2 с), максимум ~6 с ожидания видео
-  await Promise.all([fonts, videoReady(firstVideo, 6000), wait(1900)]);
+  // минимум один полный цикл анимации (2 с), максимум ~6 с ожидания видео (на телефоне ~3,5 с:
+  // в энергосбережении iOS видео до касания не грузится, а под ним всё равно стоит постер)
+  await Promise.all([fonts, videoReady(firstVideo, window.matchMedia(MOBILE_QUERY).matches ? 3500 : 6000), wait(1900)]);
 
   if (anim && !anim.isPaused) {
     await Promise.race([new Promise<void>((resolve) => anim.addEventListener('loopComplete', () => resolve())), wait(2200)]);

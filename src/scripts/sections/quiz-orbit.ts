@@ -46,7 +46,8 @@ type Config = {
 
 // десктоп — по кадрам 4204:4529 / 4204:4575: соседняя ≈ 0.76 от центральной, дальше 0.5, 0.36, 0.28
 const DESKTOP: Config = { gap: 40, shrink: 0.73, arrive: 43, travel: 495, low: 18, high: 16, pace: 3.5, scroll: 0.004 };
-const MOBILE: Config = { gap: 16, shrink: 0.73, arrive: 20, travel: 340, low: 10, high: 4, pace: 3.5, scroll: 0.009 };
+// мобильный — спокойнее: лента идёт сама и медленнее, скролл её не подкручивает (только поднимает на темы)
+const MOBILE: Config = { gap: 16, shrink: 0.73, arrive: 20, travel: 340, low: 10, high: 4, pace: 5, scroll: 0 };
 /** до скольких мест от центра раскладываем ленту (дальше — точно за краем экрана) */
 const REACH = 9;
 /** как быстро лента догоняет скролл (1/с) */

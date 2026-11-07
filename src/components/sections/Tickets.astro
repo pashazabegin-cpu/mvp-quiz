@@ -4,14 +4,13 @@
  * scripts/effects/holo-ticket.ts). Форма с вырезами и линией отрыва — маска из макета (ticket-shape.svg).
  * Снег идёт только в этом блоке, позади билета, и растворяется к началу «Партнёров» (маска на canvas).
  *
- * Поверхность — тёмно-синяя карточка под ламинацией, слои снизу вверх:
- *   перламутр (__pearl) — широкий перелив по всей карточке, идёт навстречу курсору;
- *   фольга (__foil) — яркие полосы бирюзовый → голубой → тёмно-синий в пятне вокруг курсора;
- *   плёнка (__gloss) — блик за курсором и мелкое зерно покрытия.
- * Полосы не светлее среднего синего, поэтому белый текст читается всегда.
+ * Поверхность — тёмно-синяя карточка, цвет собран из мягких круглых пятен (__glow): сверху бирюзовый, за заголовком
+ * и за кнопкой ярко-голубой, слева, справа и снизу из краёв выходит тёмно-синий. Пятна чуть плывут навстречу курсору,
+ * а за самим курсором идёт круг света (__light) — так и получается перламутровый перелив. Спады с плавными шагами,
+ * цвета не смешиваются с белым и серым — поэтому переходы чистые.
  *
- * Текст реагирует на свет: поверх обычного слоя лежит его копия с «напылением» — та же геометрия, что у фольги
- * (--mx/--my, размер, угол), поэтому буквы переливаются вместе с поверхностью, и по ним проходит блик, как по металлу.
+ * Текст реагирует на свет: поверх обычного слоя лежит его копия с «напылением» — такой же круг вокруг курсора,
+ * от белого к бирюзовому кольцу, поэтому буквы переливаются вместе с поверхностью.
  * Слои собраны сеткой, а не абсолютом: background-clip: text не закрашивает текст потомков с position.
  */
 import Button from '../ui/Button.astro';
@@ -29,9 +28,9 @@ const layers = [false, true];
     <article class="ticket" data-holo>
       <span class="ticket__shadow" aria-hidden="true"></span>
       <div class="ticket__face">
-        <span class="ticket__pearl" aria-hidden="true"></span>
-        <span class="ticket__foil" aria-hidden="true"></span>
-        <span class="ticket__gloss" aria-hidden="true"></span>
+        <span class="ticket__glow" aria-hidden="true"></span>
+        <span class="ticket__light" aria-hidden="true"></span>
+        <span class="ticket__rim" aria-hidden="true"></span>
         <img class="ticket__mark" src={withBase(ticket.mark)} width="47" height="46" alt="" />
         {
           layers.map((ink) => {
@@ -110,45 +109,73 @@ const layers = [false, true];
     -webkit-mask: var(--ticket-shape) center / 100% 100% no-repeat;
     mask: var(--ticket-shape) center / 100% 100% no-repeat;
   }
-  /* перламутр: полоса отражения плёнки и широкий перелив цветов бренда, оба идут навстречу курсору */
-  .ticket__pearl {
+  /* пятна цвета; первое в списке лежит сверху. Сдвиг --sx/--sy идёт навстречу курсору */
+  .ticket__glow {
+    --sx: calc((var(--mx) - 50%) * -0.08);
+    --sy: calc((var(--my) - 50%) * -0.08);
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 0.16) 48%, rgb(255 255 255 / 0.05) 52%, transparent 62%),
-      linear-gradient(125deg, rgb(54 224 212 / 0.24), rgb(49 168 243 / 0.1) 28%, rgb(3 20 66 / 0.32) 52%, rgb(54 224 212 / 0.16) 76%, rgb(49 168 243 / 0.26));
-    background-size: 260% 100%, 220% 220%;
-    background-position: calc(100% - var(--mx)) 0, calc(100% - var(--mx)) calc(100% - var(--my));
+      /* тёмно-синий выходит слева, справа и снизу, сверху его нет */
+      radial-gradient(
+        ellipse 62% 92% at calc(50% + var(--sx)) calc(20% + var(--sy)),
+        rgb(0 28 92 / 0) 50%,
+        rgb(0 28 92 / 0.16) 62%,
+        rgb(0 26 88 / 0.46) 76%,
+        rgb(0 24 82 / 0.76) 90%,
+        rgb(0 22 78 / 0.92) 100%
+      ),
+      /* ярко-голубой за заголовком «Купить билет» */
+      radial-gradient(
+        circle 400px at calc(29% + var(--sx) * 1.6) calc(44% + var(--sy) * 1.6),
+        rgb(30 176 255 / 0.92) 0%,
+        rgb(30 176 255 / 0.78) 20%,
+        rgb(30 176 255 / 0.5) 40%,
+        rgb(30 176 255 / 0.23) 60%,
+        rgb(30 176 255 / 0.06) 80%,
+        rgb(30 176 255 / 0) 100%
+      ),
+      /* и за кнопкой */
+      radial-gradient(
+        circle 230px at calc(78.8% - var(--sx)) calc(79% - var(--sy)),
+        rgb(30 176 255 / 0.62) 0%,
+        rgb(30 176 255 / 0.48) 25%,
+        rgb(30 176 255 / 0.22) 55%,
+        rgb(30 176 255 / 0.05) 82%,
+        rgb(30 176 255 / 0) 100%
+      ),
+      /* бирюзовый сверху */
+      radial-gradient(
+        circle 640px at calc(55% - var(--sx) * 1.4) calc(-16% - var(--sy) * 1.4),
+        rgb(38 236 214 / 1) 0%,
+        rgb(38 236 214 / 0.86) 20%,
+        rgb(38 236 214 / 0.56) 40%,
+        rgb(38 236 214 / 0.26) 60%,
+        rgb(38 236 214 / 0.07) 80%,
+        rgb(38 236 214 / 0) 100%
+      );
   }
-  /* фольга из эффекта (та же геометрия, пятно следует за курсором) в цветах бренда:
-     бирюзовый → голубой (akcent) → глубокий тёмно-синий */
-  .ticket__foil {
+  /* круг света за курсором: screen только осветляет цвет под собой, поэтому не пачкает его */
+  .ticket__light {
     position: absolute;
     inset: 0;
-    background-image: repeating-linear-gradient(165deg, transparent 0%, rgb(54 224 212 / 0.62) 18%, rgb(49 168 243 / 0.64) 35%, rgb(3 20 66 / 0.72) 52%, transparent 70%);
-    background-size: 280% 280%;
-    background-position: var(--mx) var(--my);
-    -webkit-mask-image: radial-gradient(ellipse at var(--mx) var(--my), #000, transparent 85%);
-    mask-image: radial-gradient(ellipse at var(--mx) var(--my), #000, transparent 85%);
+    background-image: radial-gradient(
+      circle 360px at var(--mx) var(--my),
+      rgb(110 240 255 / 0.62) 0%,
+      rgb(90 226 255 / 0.48) 20%,
+      rgb(70 208 255 / 0.27) 42%,
+      rgb(50 190 255 / 0.1) 68%,
+      rgb(50 190 255 / 0) 100%
+    );
+    mix-blend-mode: screen;
     opacity: var(--shine);
   }
-  /* плёнка ламинации: блик за курсором, светлая кромка и зерно покрытия */
-  .ticket__gloss {
+  /* тонкая светлая кромка ламинации */
+  .ticket__rim {
     position: absolute;
     inset: 0;
     border-radius: 40px;
-    background-image: radial-gradient(ellipse 34% 62% at var(--mx) var(--my), rgb(255 255 255 / calc(var(--react) * 0.34)), transparent);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.2),
-      inset 0 0 44px rgb(120 205 255 / 0.1);
-    mix-blend-mode: overlay;
-  }
-  .ticket__gloss::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.16;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22);
   }
 
   .ticket__mark,
@@ -158,8 +185,8 @@ const layers = [false, true];
   .ticket__mark {
     left: 77px;
     top: 98px;
-    /* знак тоже разгорается на свету */
-    filter: brightness(calc(1 + var(--react) * 0.5));
+    /* знак на голубом: светлый, чуть разгорается на свету */
+    filter: brightness(0) invert(1) opacity(calc(0.86 + var(--react) * 0.14));
   }
   /* слой текста: блоки встают в одну ячейку и расставляются отступами */
   .ticket__copy {
@@ -173,19 +200,20 @@ const layers = [false, true];
     justify-self: start;
     align-self: start;
   }
-  /* напыление: тот же размер и сдвиг, что у фольги, поэтому полосы совпадают с полосами на поверхности.
-     Буквы всегда светлее фона: над голубым — белые, над тёмным — бирюзовые, сверху узкий блик */
+  /* напыление: тот же круг, что у света, — буквы переходят от белого к бирюзовому кольцу и обратно */
   .ticket__copy--ink {
     -webkit-text-fill-color: transparent;
-    background-image:
-      linear-gradient(112deg, transparent 47%, #fff 50%, transparent 53%),
-      repeating-linear-gradient(165deg, transparent 0%, #c9fff7 14%, #ffffff 30%, #5ff0e2 45%, #84d2ff 58%, transparent 70%);
-    background-size: 170% 100%, 280% 280%;
-    background-position: var(--mx) var(--my);
+    background-image: radial-gradient(
+      circle 420px at var(--mx) var(--my),
+      #fff 0%,
+      #fff 26%,
+      #b8fff5 44%,
+      #8decff 60%,
+      rgb(141 236 255 / 0.4) 76%,
+      rgb(141 236 255 / 0) 92%
+    );
     -webkit-background-clip: text;
     background-clip: text;
-    -webkit-mask-image: radial-gradient(ellipse at var(--mx) var(--my), #000 25%, transparent 72%);
-    mask-image: radial-gradient(ellipse at var(--mx) var(--my), #000 25%, transparent 72%);
     opacity: var(--react);
   }
   .ticket__copy--ink li {
@@ -208,8 +236,8 @@ const layers = [false, true];
   }
   .ticket__line--accent {
     margin-left: 67px;
-    /* голубой светлеет, когда фольга разгорается: иначе ему не хватит контраста на голубых полосах */
-    color: color-mix(in srgb, #a6e6ff calc(var(--react) * 100%), var(--c-accent));
+    /* за заголовком ярко-голубое пятно: акцентный голубой на нём потерялся бы, поэтому слово светлее */
+    color: #c6f2ff;
   }
   .ticket__text {
     margin: 274px 0 0 264px;

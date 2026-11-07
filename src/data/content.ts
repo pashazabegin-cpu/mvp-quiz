@@ -49,6 +49,7 @@ export const nav = [
   { id: 'talks', label: 'MVP Talks' },
   { id: 'quiz', label: 'Квиз' },
   { id: 'speakers', label: 'Спикеры' },
+  { id: 'partners', label: 'Партнеры' },
   { id: 'location', label: 'Локация' },
   { id: 'faq', label: 'FAQ' },
   // вернуть вместе с блоком: jury «Жюри»

@@ -1,12 +1,16 @@
 ---
-/** Плавающее меню внизу экрана. Активный пункт и «бегунок» — scripts/ui/nav.ts */
+/**
+ * Плавающее меню внизу экрана (Figma: 4228:7276). Плашка 1130×50 формы «Squircle n=3.00 r=95%»: тёмная, полупрозрачная,
+ * с размытием фона и зерном; активный пункт — золотой с чертой снизу. Масштабируется вместе с кадром.
+ * Активный пункт и черта — scripts/ui/nav.ts
+ */
 import { event, nav } from '../../data/content';
 import Button from './Button.astro';
 ---
 
-<nav class="nav" data-nav data-glass aria-label="Разделы страницы">
-  <!-- стекло: фильтр фона (scripts/effects/liquid-glass.ts) и блики поверх -->
-  <span class="nav__glass" aria-hidden="true"><span class="nav__lens" data-glass-lens></span><span class="nav__sheen"></span></span>
+<nav class="nav" data-nav aria-label="Разделы страницы">
+  <!-- стекло отдельным слоем: backdrop-filter на самой .nav отрезал бы от размытия фон страницы -->
+  <span class="nav__glass" aria-hidden="true"></span>
   <div class="nav__links" data-nav-links>
     <span class="nav__indicator" data-nav-indicator aria-hidden="true"></span>
     {
@@ -17,154 +21,103 @@ import Button from './Button.astro';
       ))
     }
   </div>
-  <Button href={event.ticketAnchor} class="nav__cta">Билеты</Button>
+  <Button href={event.ticketAnchor} class="nav__cta" magnetic={false}>Купить билет</Button>
 </nav>
 
 <style>
   .nav {
+    --nav-scale: scale(var(--ui-s));
     position: fixed;
-    left: 0;
-    right: 0;
+    left: 50%;
     bottom: 20px;
     z-index: 50;
     display: flex;
     align-items: center;
-    gap: 6px;
-    width: max-content;
-    max-width: calc(100vw - 32px);
-    margin-inline: auto;
-    padding: 6px;
-    border-radius: var(--radius-pill);
+    width: 1129.75px;
+    height: 50px;
+    margin-left: -564.875px;
+    transform: var(--nav-scale);
+    transform-origin: 50% 100%;
     transition: opacity 0.5s var(--ease-out), transform 0.6s var(--ease-out);
   }
-  /* Стекло — отдельным слоем: backdrop-filter на самой .nav отрезал бы фон страницы от линзы.
-     Лёгкий тон, светлая кромка сверху, без тени. */
+  /* заливка и зерно — как в макете; форма — те же концы, что у кнопки MVP той же высоты */
   .nav__glass {
     position: absolute;
     inset: 0;
-    border-radius: inherit;
-    background: rgb(255 255 255 / 0.04);
-    box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 0.1),
-      inset 0 1px 0 rgb(255 255 255 / 0.16);
-    pointer-events: none;
-  }
-  .nav__lens {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    -webkit-backdrop-filter: blur(18px) saturate(150%);
-    backdrop-filter: blur(18px) saturate(150%);
-  }
-  /* Chromium: преломляющий фильтр. Слой шире плашки на --glass-reach, чтобы край брал картинку снаружи,
-     видна только сама плашка */
-  .nav.is-refracting .nav__lens {
-    inset: calc(var(--glass-reach) * -1px);
-    border-radius: 0;
-    clip-path: inset(calc(var(--glass-reach) * 1px) round 999px);
-  }
-  /* два мягких блика медленно плывут по стеклу */
-  .nav__sheen {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    border-radius: inherit;
-  }
-  .nav__sheen::before {
-    content: '';
-    position: absolute;
-    inset: -60% -20%;
     background:
-      radial-gradient(28% 70% at 30% 40%, rgb(255 255 255 / 0.09), transparent 70%),
-      radial-gradient(22% 60% at 72% 62%, rgb(255 255 255 / 0.06), transparent 70%);
-    animation: nav-sheen 12s ease-in-out infinite alternate;
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.33' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='luminanceToAlpha'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3CfeComposite in='SourceGraphic' operator='in'/%3E%3C/filter%3E%3Crect width='128' height='128' fill='%23d8d8d8' fill-opacity='.25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      rgb(3 15 28 / 0.5);
+    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(50px);
+    -webkit-mask:
+      url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
+      linear-gradient(#000 0 0) center / calc(100% - 46.6px) 100% no-repeat,
+      url('/media/ui/btn-r.svg') right / auto 100% no-repeat;
+    mask:
+      url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
+      linear-gradient(#000 0 0) center / calc(100% - 46.6px) 100% no-repeat,
+      url('/media/ui/btn-r.svg') right / auto 100% no-repeat;
+    transition: background-color 0.4s;
   }
-  @keyframes nav-sheen {
-    to {
-      transform: translateX(14%);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .nav__sheen::before {
-      animation: none;
-    }
+  /* над белым экраном (scripts/ui/nav.ts) та же плашка плотнее, чтобы белый текст читался */
+  .nav--light .nav__glass {
+    background-color: rgb(3 15 28 / 0.78);
   }
   /* на первом экране меню нет (как в макете) — появляется, когда обложка уезжает (scripts/ui/nav.ts) */
   :global(html.js-motion:not(.is-past-hero)) .nav {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(24px) var(--nav-scale);
     pointer-events: none;
   }
   .nav.nav--away {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(24px) var(--nav-scale);
     pointer-events: none;
   }
   .nav__links {
     position: relative;
     display: flex;
+    flex: 1;
+    gap: 30px;
     min-width: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .nav__links::-webkit-scrollbar {
-    display: none;
+    height: 100%;
+    padding-left: 30.7px;
+    overflow: hidden;
   }
   .nav__link {
     position: relative;
     z-index: 1;
-    padding: 12px 16px;
-    border-radius: var(--radius-pill);
-    color: var(--c-muted);
-    font-size: 14px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding-top: 4px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 26px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
     white-space: nowrap;
     transition: color 0.3s;
   }
   .nav__link:hover,
   .nav__link.is-active {
-    color: var(--c-text);
+    color: #fce39c;
   }
+  /* золотая черта под активным пунктом: шириной с подпись, ездит между пунктами */
   .nav__indicator {
     position: absolute;
-    top: 0;
     left: 0;
+    bottom: 0;
     width: 0;
-    height: 100%;
-    border-radius: var(--radius-pill);
-    background: rgb(255 255 255 / 0.1);
+    height: 2px;
+    background: #fce39c;
     opacity: 0;
-  }
-  /* над белым экраном (scripts/ui/nav.ts): стекло светлее, текст тёмно-синий */
-  .nav__glass,
-  .nav__link,
-  .nav__indicator {
-    transition:
-      background-color 0.4s,
-      box-shadow 0.4s,
-      color 0.4s;
-  }
-  .nav--light .nav__glass {
-    background-color: rgb(255 255 255 / 0.45);
-    box-shadow:
-      inset 0 0 0 1px rgb(14 70 151 / 0.12),
-      inset 0 1px 0 rgb(255 255 255 / 0.9);
-  }
-  .nav--light .nav__link {
-    color: rgb(14 70 151 / 0.6);
-  }
-  .nav--light .nav__link:hover,
-  .nav--light .nav__link.is-active {
-    color: var(--c-accent-2);
-  }
-  .nav--light .nav__indicator {
-    background-color: rgb(14 70 151 / 0.08);
   }
   .nav :global(.nav__cta) {
     flex: none;
-    --btn-h: 46px;
-    min-width: 0;
-    padding: 2px 22px 0;
+    min-width: 170px;
+    padding: 2px 0 0;
   }
   /* мобильная раскладка (тот же запрос, что MOBILE_QUERY в scripts/core/stage.ts): нижнего меню нет —
      навигация будет бургером на первом экране */

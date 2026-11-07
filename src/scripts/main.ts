@@ -45,6 +45,7 @@ import { initRail } from './ui/rail';
 import { initAccordion } from './ui/accordion';
 import { initAnnotations } from './ui/annotations';
 import { initShaderBackgrounds } from './effects/shader-background';
+import { initLiquidGlass } from './effects/liquid-glass';
 import { initSnow } from './effects/snow';
 import { initHoloTicket } from './effects/holo-ticket';
 
@@ -88,6 +89,7 @@ if (!mobile) run('nav', initNav); // на мобильном нижнего ме
 run('rail', initRail);
 run('accordion', () => initAccordion(motion));
 run('shader', () => initShaderBackgrounds(motion));
+run('glass', initLiquidGlass);
 
 // плавный скролл — только на десктопе: на телефоне родной скролл с инерцией и так плавный,
 // а лишний слой между пальцем и страницей даёт рывки

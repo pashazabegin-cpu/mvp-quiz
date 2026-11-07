@@ -1,16 +1,17 @@
 ---
 /**
- * Плавающее меню внизу экрана (Figma: 4228:7276). Плашка 1130×50 формы «Squircle n=3.00 r=95%»: тёмная, полупрозрачная,
- * с размытием фона и зерном; активный пункт — золотой с чертой снизу. Масштабируется вместе с кадром.
- * Активный пункт и черта — scripts/ui/nav.ts
+ * Плавающее меню внизу экрана. Форма, размеры и шрифт — из макета (Figma: 4228:7276): плашка 1130×50, «Squircle n=3.00 r=95%»,
+ * шрифт 12, золотая черта под активным пунктом. Поверхность — стекло: фон страницы преломляется у края
+ * (scripts/effects/liquid-glass.ts), поверх лёгкий тон и блики. Активный пункт и черта — scripts/ui/nav.ts
+ * Размеры считаются от масштаба кадра прямо в px, без transform: фильтр стекла привязан к реальным пикселям плашки.
  */
 import { event, nav } from '../../data/content';
 import Button from './Button.astro';
 ---
 
-<nav class="nav" data-nav aria-label="Разделы страницы">
-  <!-- стекло отдельным слоем: backdrop-filter на самой .nav отрезал бы от размытия фон страницы -->
-  <span class="nav__glass" aria-hidden="true"></span>
+<nav class="nav" data-nav data-glass aria-label="Разделы страницы">
+  <!-- стекло: фильтр фона (scripts/effects/liquid-glass.ts) и блики поверх -->
+  <span class="nav__glass" aria-hidden="true"><span class="nav__lens" data-glass-lens></span><span class="nav__tint"><span class="nav__sheen"></span></span></span>
   <div class="nav__links" data-nav-links>
     <span class="nav__indicator" data-nav-indicator aria-hidden="true"></span>
     {
@@ -26,62 +27,110 @@ import Button from './Button.astro';
 
 <style>
   .nav {
-    --nav-scale: scale(var(--ui-s));
+    --h: calc(50px * var(--ui-s));
+    --cap: calc(var(--h) * 0.476);
     position: fixed;
     left: 50%;
     bottom: 20px;
     z-index: 50;
     display: flex;
     align-items: center;
-    width: 1129.75px;
-    height: 50px;
-    margin-left: -564.875px;
-    transform: var(--nav-scale);
-    transform-origin: 50% 100%;
+    width: calc(1129.75px * var(--ui-s));
+    height: var(--h);
+    margin-left: calc(-564.875px * var(--ui-s));
     transition: opacity 0.5s var(--ease-out), transform 0.6s var(--ease-out);
   }
-  /* заливка и зерно — как в макете; форма — те же концы, что у кнопки MVP той же высоты */
+  /* Стекло — отдельным слоем: backdrop-filter на самой .nav отрезал бы фон страницы от линзы */
   .nav__glass {
     position: absolute;
     inset: 0;
-    background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.33' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='luminanceToAlpha'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3CfeComposite in='SourceGraphic' operator='in'/%3E%3C/filter%3E%3Crect width='128' height='128' fill='%23d8d8d8' fill-opacity='.25' filter='url(%23n)'/%3E%3C/svg%3E"),
-      rgb(3 15 28 / 0.5);
-    -webkit-backdrop-filter: blur(50px);
-    backdrop-filter: blur(50px);
-    -webkit-mask:
-      url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
-      linear-gradient(#000 0 0) center / calc(100% - 46.6px) 100% no-repeat,
-      url('/media/ui/btn-r.svg') right / auto 100% no-repeat;
-    mask:
-      url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
-      linear-gradient(#000 0 0) center / calc(100% - 46.6px) 100% no-repeat,
-      url('/media/ui/btn-r.svg') right / auto 100% no-repeat;
-    transition: background-color 0.4s;
+    pointer-events: none;
   }
-  /* над белым экраном (scripts/ui/nav.ts) та же плашка плотнее, чтобы белый текст читался */
-  .nav--light .nav__glass {
-    background-color: rgb(3 15 28 / 0.78);
+  /* Форма линзы — концы кнопки MVP той же высоты; --r — запас слоя вокруг плашки */
+  .nav__lens {
+    --r: 0px;
+    position: absolute;
+    inset: 0;
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-mask:
+      url('/media/ui/btn-l.svg') var(--r) 50% / auto calc(100% - var(--r) * 2) no-repeat,
+      linear-gradient(#000 0 0) center / calc(100% - var(--r) * 2 - var(--cap) * 2 + 1px) calc(100% - var(--r) * 2) no-repeat,
+      url('/media/ui/btn-r.svg') calc(100% - var(--r)) 50% / auto calc(100% - var(--r) * 2) no-repeat;
+    mask:
+      url('/media/ui/btn-l.svg') var(--r) 50% / auto calc(100% - var(--r) * 2) no-repeat,
+      linear-gradient(#000 0 0) center / calc(100% - var(--r) * 2 - var(--cap) * 2 + 1px) calc(100% - var(--r) * 2) no-repeat,
+      url('/media/ui/btn-r.svg') calc(100% - var(--r)) 50% / auto calc(100% - var(--r) * 2) no-repeat;
+  }
+  /* Chromium: преломляющий фильтр. Слой шире плашки на --glass-reach, чтобы край брал картинку снаружи,
+     видна только сама плашка */
+  .nav.is-refracting .nav__lens {
+    --r: calc(var(--glass-reach) * 1px);
+    inset: calc(var(--glass-reach) * -1px);
+  }
+  /* Лёгкий тон, светлая кромка сверху, без тени */
+  .nav__tint {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: calc(var(--h) * 0.475);
+    background-color: rgb(255 255 255 / 0.04);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.1),
+      inset 0 1px 0 rgb(255 255 255 / 0.16);
+    transition:
+      background-color 0.4s,
+      box-shadow 0.4s;
+  }
+  @supports (corner-shape: squircle) {
+    .nav__tint {
+      corner-shape: superellipse(1.585);
+    }
+  }
+  /* два мягких блика медленно плывут по стеклу */
+  .nav__sheen {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .nav__sheen::before {
+    content: '';
+    position: absolute;
+    inset: -60% -20%;
+    background:
+      radial-gradient(28% 70% at 30% 40%, rgb(255 255 255 / 0.09), transparent 70%),
+      radial-gradient(22% 60% at 72% 62%, rgb(255 255 255 / 0.06), transparent 70%);
+    animation: nav-sheen 12s ease-in-out infinite alternate;
+  }
+  @keyframes nav-sheen {
+    to {
+      transform: translateX(14%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav__sheen::before {
+      animation: none;
+    }
   }
   /* на первом экране меню нет (как в макете) — появляется, когда обложка уезжает (scripts/ui/nav.ts) */
   :global(html.js-motion:not(.is-past-hero)) .nav {
     opacity: 0;
-    transform: translateY(24px) var(--nav-scale);
+    transform: translateY(24px);
     pointer-events: none;
   }
   .nav.nav--away {
     opacity: 0;
-    transform: translateY(24px) var(--nav-scale);
+    transform: translateY(24px);
     pointer-events: none;
   }
   .nav__links {
     position: relative;
     display: flex;
     flex: 1;
-    gap: 30px;
+    gap: calc(30px * var(--ui-s));
     min-width: 0;
     height: 100%;
-    padding-left: 30.7px;
+    padding-left: calc(30.7px * var(--ui-s));
     overflow: hidden;
   }
   .nav__link {
@@ -90,12 +139,12 @@ import Button from './Button.astro';
     display: flex;
     align-items: center;
     height: 100%;
-    padding-top: 4px;
+    padding-top: calc(4px * var(--ui-s));
     color: #fff;
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-s));
     font-weight: 300;
-    line-height: 26px;
-    letter-spacing: 0.6px;
+    line-height: calc(26px * var(--ui-s));
+    letter-spacing: calc(0.6px * var(--ui-s));
     text-transform: uppercase;
     white-space: nowrap;
     transition: color 0.3s;
@@ -110,14 +159,40 @@ import Button from './Button.astro';
     left: 0;
     bottom: 0;
     width: 0;
-    height: 2px;
+    height: calc(2px * var(--ui-s));
     background: #fce39c;
     opacity: 0;
+    transition: background-color 0.4s;
+  }
+  /* над белым экраном (scripts/ui/nav.ts): стекло светлее, текст и черта тёмно-синие */
+  .nav--light .nav__tint {
+    background-color: rgb(255 255 255 / 0.45);
+    box-shadow:
+      inset 0 0 0 1px rgb(14 70 151 / 0.12),
+      inset 0 1px 0 rgb(255 255 255 / 0.9);
+  }
+  .nav--light .nav__link {
+    color: rgb(14 70 151 / 0.7);
+  }
+  .nav--light .nav__link:hover,
+  .nav--light .nav__link.is-active {
+    color: var(--c-accent-2);
+  }
+  .nav--light .nav__indicator {
+    background-color: var(--c-accent-2);
   }
   .nav :global(.nav__cta) {
+    --btn-h: var(--h);
     flex: none;
-    min-width: 170px;
-    padding: 2px 0 0;
+    gap: calc(13.33px * var(--ui-s));
+    min-width: calc(170px * var(--ui-s));
+    padding: calc(2px * var(--ui-s)) 0 0;
+    font-size: calc(13.5px * var(--ui-s));
+    line-height: calc(22px * var(--ui-s));
+  }
+  .nav :global(.nav__cta .btn__icon) {
+    width: calc(13.51px * var(--ui-s));
+    height: calc(11.82px * var(--ui-s));
   }
   /* мобильная раскладка (тот же запрос, что MOBILE_QUERY в scripts/core/stage.ts): нижнего меню нет —
      навигация будет бургером на первом экране */

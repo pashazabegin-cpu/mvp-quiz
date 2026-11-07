@@ -1,21 +1,29 @@
 ---
 /**
- * 06 · Кто будет? — горизонтальная лента спикеров (по ТЗ, чтобы не уходить вниз).
- * Листается тачпадом/свайпом, перетаскиванием мышью и стрелками (scripts/ui/rail.ts).
+ * «Кто будет?» (Figma: кадр «2») — горизонтальная карусель спикеров, стоит по сетке блока с билетом.
+ * Листается стрелками, перетаскиванием мышью и тачпадом — всегда на целую карточку (scripts/ui/rail.ts).
+ * Крайняя правая карточка видна из-под фейда; слева фейд появляется, когда лента сдвинута.
  */
-import Anno from '../ui/Anno.astro';
-import Placeholder from '../ui/Placeholder.astro';
 import { speakers } from '../../data/content';
+import { withBase } from '../../lib/paths';
+
+const arrow = 'M13.7193 0.719346L20.7194 7.64993L13.7193 13.7193M0.719345 7.71952L19.7193 7.71952';
 ---
 
-<section class="section speakers" id="speakers">
-  <Anno kind="screen">06 · Кто будет?</Anno>
-  <div class="container section-head">
-    <h2 class="h2" data-split>{speakers.title}</h2>
-    <div class="rail-ctrl" data-reveal>
-      <button type="button" class="rail-btn" data-rail-prev aria-label="Предыдущие спикеры">←</button>
-      <button type="button" class="rail-btn" data-rail-next aria-label="Следующие спикеры">→</button>
-    </div>
+<section
+  class="speakers"
+  id="speakers"
+  style={`--btn:url(${withBase('/media/speakers/btn.svg')});--btn-shape:url(${withBase('/media/speakers/btn-shape.svg')})`}
+>
+  <h2 class="speakers__title" data-split>{speakers.title[0]} <span class="accent">{speakers.title[1]}</span></h2>
+
+  <div class="speakers__ctrl" data-reveal>
+    <button type="button" class="rail-btn rail-btn--prev" data-rail-prev aria-label="Предыдущие спикеры">
+      <svg width="21.44" height="14.44" viewBox="0 0 21.44 14.44" aria-hidden="true"><path d={arrow}></path></svg>
+    </button>
+    <button type="button" class="rail-btn" data-rail-next aria-label="Следующие спикеры">
+      <svg width="21.44" height="14.44" viewBox="0 0 21.44 14.44" aria-hidden="true"><path d={arrow}></path></svg>
+    </button>
   </div>
 
   <div class="rail" data-rail>
@@ -23,9 +31,7 @@ import { speakers } from '../../data/content';
       {
         speakers.items.map((s) => (
           <li class="speaker">
-            <div class="speaker__photo">
-              <Placeholder label="Фото спикера" src={s.photo} ratio="3/4" />
-            </div>
+            <img class="speaker__photo" src={withBase(s.photo)} width="273" height="280" alt={s.name} loading="lazy" decoding="async" draggable="false" />
             <h3 class:list={['speaker__name', { fish: s.draft }]}>{s.name}</h3>
             <p class:list={['speaker__role', { fish: s.draft }]}>{s.role}</p>
           </li>
@@ -34,96 +40,170 @@ import { speakers } from '../../data/content';
     </ul>
   </div>
 
-  <div class="container">
-    <div class="rail__progress" aria-hidden="true"><span data-rail-progress></span></div>
-    <Anno>ТЗ: горизонтальная прокрутка · фото, ФИ, должность</Anno>
-    <Anno kind="motion">лента тянется мышью с инерцией · прогресс-бар · фото приближается на ховере</Anno>
-  </div>
+  <span class="speakers__fade speakers__fade--left" aria-hidden="true"></span>
+  <span class="speakers__fade speakers__fade--right" aria-hidden="true"></span>
 </section>
 
 <style>
-  .rail-ctrl {
+  .speakers {
+    position: relative;
+    height: 727px;
+  }
+  .speakers__title {
+    position: absolute;
+    left: calc(var(--grid-x) - 7px);
+    top: 100px;
+    font-size: 65px;
+    font-weight: 300;
+    line-height: 55px;
+    letter-spacing: -3.25px;
+    white-space: nowrap;
+  }
+  .accent {
+    color: var(--c-accent);
+  }
+
+  .speakers__ctrl {
+    position: absolute;
+    left: calc(var(--grid-x) + 1010px);
+    top: 100px;
     display: flex;
     gap: 8px;
   }
   .rail-btn {
+    position: relative;
     display: grid;
     place-items: center;
-    width: 52px;
-    height: 52px;
-    border: 1px solid var(--c-line-strong);
-    border-radius: 50%;
-    font-size: 18px;
-    transition: background 0.3s, color 0.3s;
+    width: 55px;
+    height: 50px;
+    background: var(--btn) center / 100% 100% no-repeat;
+    transition: opacity 0.3s;
   }
-  .rail-btn:hover {
-    background: var(--c-text);
-    color: var(--c-bg);
+  /* заливка на наведении — той же формы, что и обводка */
+  .rail-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--c-accent-2);
+    -webkit-mask: var(--btn-shape) center / 100% 100% no-repeat;
+    mask: var(--btn-shape) center / 100% 100% no-repeat;
+    opacity: 0;
+    transition: opacity 0.35s;
+  }
+  .rail-btn:hover::before {
+    opacity: 1;
+  }
+  .rail-btn svg {
+    position: relative;
+    fill: none;
+    stroke: #fce39c;
+    stroke-width: 1.44;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.4s var(--ease-out);
+  }
+  .rail-btn--prev svg {
+    transform: scaleX(-1);
+  }
+  .rail-btn:hover svg {
+    transform: translateX(3px);
+  }
+  .rail-btn--prev:hover svg {
+    transform: scaleX(-1) translateX(3px);
   }
   .rail-btn:disabled {
-    opacity: 0.3;
+    opacity: 0.5;
+    cursor: default;
     pointer-events: none;
   }
 
+  /* лента во всю ширину экрана: карточки уходят за край, крайняя видна из-под фейда */
   .rail {
-    --rail-pad: max(var(--gutter), calc((100vw - var(--container)) / 2));
+    position: absolute;
+    left: 0;
+    top: 303px;
+    width: 100%;
+    padding-top: 20px;
     overflow-x: auto;
+    overflow-y: hidden;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--rail-pad);
-    padding-inline: var(--rail-pad);
+    scroll-padding-inline: var(--grid-x);
     scrollbar-width: none;
     cursor: grab;
   }
   .rail::-webkit-scrollbar {
     display: none;
   }
-  :global(.rail.is-dragging) {
+  :global(.rail.is-moving) {
     scroll-snap-type: none;
+  }
+  :global(.rail.is-dragging) {
     cursor: grabbing;
     user-select: none;
   }
   .rail__track {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     width: max-content;
+    /* справа на 2 px меньше: четыре карточки и поля в сумме дают кадр, в конце лента встаёт ровно на сетку */
+    padding-inline: var(--grid-x) calc(var(--grid-x) - 2px);
   }
   .speaker {
-    width: clamp(220px, 22vw, 290px);
+    flex: none;
+    width: 273px;
+    height: 395px;
     scroll-snap-align: start;
   }
   .speaker__photo {
-    overflow: hidden;
-    border-radius: var(--radius-m);
-  }
-  .speaker__photo > :global(*) {
+    width: 273px;
+    height: 280px;
     transition: transform 0.8s var(--ease-out);
   }
-  .speaker:hover .speaker__photo > :global(*) {
-    transform: scale(1.05);
+  .speaker:hover .speaker__photo {
+    transform: translateY(-6px);
   }
   .speaker__name {
-    margin-top: 16px;
-    font-size: 19px;
-    line-height: 1.2;
+    margin: 34.8px 0 0 19px;
+    color: var(--c-accent);
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 26px;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
   .speaker__role {
-    margin-top: 4px;
-    color: var(--c-muted);
-    font-size: 14px;
+    width: 180px;
+    margin: 10.8px 0 0 19px;
+    color: #7c8799;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 20px;
   }
 
-  .rail__progress {
-    position: relative;
-    height: 2px;
-    margin-top: 32px;
-    background: var(--c-line);
-  }
-  .rail__progress span {
+  /* фейд макета: x 1222, ширина до края экрана, тот же цвет, что и фон блока */
+  .speakers__fade {
     position: absolute;
-    inset: 0;
-    background: var(--c-text);
-    transform: scaleX(var(--p, 0.1));
-    transform-origin: left;
+    top: 323px;
+    width: calc(var(--ui-w) - var(--grid-x) - 1065px);
+    height: 406px;
+    background-image: linear-gradient(88.59deg, rgb(4 16 29 / 0) 16.118%, rgb(4 16 29) 111.14%);
+    pointer-events: none;
+    transition: opacity 0.45s var(--ease-out);
+  }
+  .speakers__fade--right {
+    right: 0;
+  }
+  /* левый — зеркальная копия правого */
+  .speakers__fade--left {
+    left: 0;
+    transform: scaleX(-1);
+    opacity: 0;
+  }
+  :global(.speakers.is-scrolled) .speakers__fade--left {
+    opacity: 1;
+  }
+  :global(.speakers.is-end) .speakers__fade--right {
+    opacity: 0;
   }
 </style>

@@ -25,6 +25,8 @@ export const event = {
   mapUrl: 'https://yandex.ru/maps/?text=' + encodeURIComponent('Москва, Серебрянический переулок, 12с1'),
   /** TODO: ссылка на покупку билета */
   ticketUrl: '#',
+  /** куда ведут «Купить билет» на первом экране и «Билеты» в меню — блок с билетом ниже на странице */
+  ticketAnchor: '#tickets',
   /** TODO: ссылка на регистрацию на квиз */
   quizRegisterUrl: '#',
 };
@@ -35,8 +37,7 @@ export const contacts = {
     { id: 'tg', label: 'Telegram', url: 'https://t.me/mvp_awards' },
     { id: 'vk', label: 'VK', url: 'https://vk.com/marspo' },
   ],
-  /** TODO: ссылка на политику */
-  policyUrl: '#',
+  policyUrl: 'https://mvpa.ru/files/terms/politika-obrabotki-personalnyix-dannyix-mvpa.pdf',
   consentUrl: 'https://mvpa.ru/files/terms/soglasie-na-obrabotku-personalnyix-dannyix-mvpa.pdf',
 };
 
@@ -47,7 +48,10 @@ export const nav = [
   { id: 'schedule', label: 'Расписание' },
   { id: 'talks', label: 'MVP Talks' },
   { id: 'quiz', label: 'Квиз' },
-  // вернуть вместе с блоками: speakers «Спикеры», jury «Жюри», location «Локация», faq «FAQ»
+  { id: 'speakers', label: 'Спикеры' },
+  { id: 'location', label: 'Локация' },
+  { id: 'faq', label: 'FAQ' },
+  // вернуть вместе с блоком: jury «Жюри»
 ];
 
 /** Партнёры на первом экране (по ТЗ — 2–3). */
@@ -101,18 +105,18 @@ export const intro = {
     { kind: 'snow', src: '/media/intro/snow-6.svg', x: 737, y: 669, w: 73, h: 76, z: 0.35, back: true, m: { x: 140, y: 346, w: 58.4 } },
     { kind: 'snow', src: '/media/intro/snow-1.svg', x: 252, y: 190, w: 21, h: 22, z: 1.3, m: { x: 308, y: 742, w: 21 } },
     { kind: 'snow', src: '/media/intro/snow-3.svg', x: 1035, y: 223, w: 39, h: 42, z: 1.9 },
-    { kind: 'tag', text: 'sport', color: 'accent', x: 386, y: 258, z: 1.15 },
-    { kind: 'tag', text: 'mvp', color: 'dark', x: 756, y: 325, z: 1.15 },
-    { kind: 'tag', text: 'cybersport', color: 'accent', x: 1126, y: 335, z: 1 },
+    { kind: 'tag', text: 'sport', color: 'accent', x: 395, y: 265, w: 110, h: 40, z: 1.15 },
+    { kind: 'tag', text: 'mvp', color: 'dark', x: 755, y: 323.59, w: 90, h: 40, z: 1.15 },
+    { kind: 'tag', text: 'cybersport', color: 'accent', x: 1131, y: 333.59, w: 150, h: 40, z: 1 },
     { kind: 'photo', src: '/media/intro/photo-2.png', x: 1000, y: 412, w: 179, h: 201, z: 1.45, m: { x: 191, y: 579, w: 100, h: 112 } },
-    { kind: 'tag', text: 'betting', color: 'dark', x: 179, y: 431, z: 0.9 },
+    { kind: 'tag', text: 'betting', color: 'dark', x: 176, y: 389, w: 109, h: 40, z: 0.9 },
     { kind: 'snow', src: '/media/intro/snow-5.svg', x: 102, y: 542, w: 43, h: 46, z: 1.7, m: { x: 358, y: 609, w: 34.4 } },
     { kind: 'photo', src: '/media/intro/photo-1.png', x: 255, y: 567, w: 179, h: 201, z: 1.35, m: { x: 100, y: 635, w: 100, h: 112 } },
     { kind: 'snow', src: '/media/intro/snow-7.svg', x: 1257, y: 678, w: 62, h: 67, z: 2.1 },
-    { kind: 'tag', text: 'quiz', color: 'dark', x: 925, y: 745, z: 0.95 },
+    { kind: 'tag', text: 'quiz', color: 'dark', x: 923, y: 745, w: 90, h: 40, z: 0.95 },
     { kind: 'snow', src: '/media/intro/snow-8.svg', x: 502, y: 768, w: 28, h: 30, z: 1.5, m: { x: 300, y: 40, w: 28 } },
     { kind: 'snow', src: '/media/intro/snow-8.svg', x: 0, y: 0, w: 28, h: 30, z: 1.2, mobileOnly: true, m: { x: 13, y: 663, w: 19.6 } },
-    { kind: 'tag', text: 'community', color: 'accent', x: 604, y: 812, z: 1.05 },
+    { kind: 'tag', text: 'community', color: 'accent', x: 645, y: 707, w: 150, h: 40, z: 1.05 },
   ],
 };
 
@@ -262,13 +266,16 @@ export const quiz = {
   ],
 };
 
-/** Спикеры деловой программы. Пока заглушки. */
+/**
+ * «Кто будет?» — горизонтальная карусель. Имена и должности — «рыба» из макета.
+ * В макете пять карточек; они повторяются, чтобы было что листать, пока нет настоящего списка.
+ */
 export const speakers = {
-  title: 'Кто будет?',
-  items: Array.from({ length: 8 }, () => ({
-    name: 'Имя Фамилия',
-    role: 'Должность, компания',
-    photo: '',
+  title: ['Кто', 'будет?'],
+  items: Array.from({ length: 10 }, (_, i) => ({
+    name: 'Михаил Соколов',
+    role: 'Финансовый директор',
+    photo: `/media/speakers/speaker-${(i % 5) + 1}.webp`,
     draft: true,
   })),
 };
@@ -286,30 +293,49 @@ export const jury = {
   })),
 };
 
+/** «Купить билет»: тексты пока из макета («рыба»), финальные — от заказчика */
 export const ticket = {
-  title: 'Купить билет',
-  text: 'Единый билет на весь день: финал CS2 Major на большом экране, MVP Talks и спортивный квиз.',
-  perks: ['Просмотр финала CS2 Major', 'MVP Talks & Entertainment', 'Спортивный квиз', 'Количество билетов ограничено!'],
+  title: ['Купить', 'билет'],
+  text: 'И пишем короткий текст, что участники премии проходят бесплатно бла бла бла.',
+  perks: ['Первое офлайн событие от MVP Conference', 'Три потока программы', 'Доступ на церемонию MVP Awards', 'Количество билетов ограничено!'],
   cta: 'Купить билет',
+  mark: '/media/tickets/mark.svg',
 };
 
+/**
+ * Партнёры. x, y, w, h — логотип в px макета (x — от левого края кадра 1440, y — от верха блока),
+ * roleX, roleY — центр и верх подписи. Логотипы смешиваются с фоном (color-dodge), на наведении белеют.
+ */
 export const partners = {
-  title: 'Партнёры',
+  title: 'Партнеры',
   items: [
-    { role: 'генеральный партнёр', logo: '' },
-    { role: 'стратегический партнёр', logo: '' },
-    { role: 'официальный партнёр', logo: '' },
-    { role: 'официальный партнёр', logo: '' },
-    { role: 'информационный партнёр', logo: '' },
-    { role: 'партнёр события', logo: '' },
+    { name: 'Матч ТВ', logo: '/media/partners/match.svg', role: 'Генеральный партнер', x: 163, y: 273.3, w: 139.04, h: 37.75, roleX: 230.5, roleY: 353.36 },
+    { name: 'Чемпионат', logo: '/media/partners/champ.svg', role: 'Генеральный партнер', x: 453, y: 236.5, w: 173.8, h: 74.9, roleX: 537.5, roleY: 353.36 },
+    { name: 'Советский спорт', logo: '/media/partners/sovsport.svg', role: 'Генеральный партнер', x: 788, y: 263.5, w: 174, h: 47.9, roleX: 872.5, roleY: 353.36 },
+    { name: 'Meta Ratings', logo: '/media/partners/meta.svg', role: 'Генеральный партнер', x: 1117, y: 277.79, w: 184.03, h: 42.52, roleX: 1207.5, roleY: 353.36 },
+    { name: 'Рейтинг букмекеров', logo: '/media/partners/rb.svg', role: 'Генеральный партнер', x: 256, y: 464.9, w: 188.9, h: 34.4, roleX: 348.5, roleY: 547.36 },
+    { name: 'Sports.ru', logo: '/media/partners/sports.svg', role: 'Генеральный партнер', x: 624, y: 464.9, w: 184.6, h: 43, roleX: 714.5, roleY: 547.36 },
+    { name: 'Sport24.ru', logo: '/media/partners/sport24.svg', role: 'Генеральный партнер', x: 981, y: 478, w: 220, h: 19.6, roleX: 1089.5, roleY: 547.36 },
   ],
 };
 
 export const location = {
   title: 'Локация',
   mapLabel: 'Открыть в Яндекс Картах',
-  /** Фото площадки на фон секции (2 варианта — в ТЗ, Google Drive) */
-  photo: '',
+  /**
+   * Ключ JavaScript API Яндекс Карт (developer.tech.yandex.ru). Пока его нет, на месте карты — картинка
+   * из макета (poster); с ключом появляется живая карта в стиле data/map-style.json.
+   */
+  mapApiKey: '',
+  /** долгота, широта дома 12 стр. 1 (2ГИС) — порядок как в API Яндекс Карт */
+  coords: [37.6483, 55.7502] as [number, number],
+  zoom: 16,
+  poster: '/media/location/map.webp',
+  /** Фото площадки: depth — глубина параллакса, как у фото в «Что мы придумали?» */
+  photos: [
+    { src: '/media/location/photo-dan.webp', side: 'left', depth: 0.8 },
+    { src: '/media/location/photo-reception.webp', side: 'right', depth: 1.15 },
+  ],
 };
 
 export const faq = {
@@ -329,4 +355,22 @@ export const faq = {
       draft: true,
     },
   ],
+};
+
+/** Подвал. Меню — как в макете; video — когда будет готов ролик, он встанет вместо картинки image. */
+export const footer = {
+  nav: [
+    { id: 'about', label: 'Что мы придумали?' },
+    { id: 'program', label: 'Что будет?' },
+    { id: 'schedule', label: 'Как всё пройдёт?' },
+    { id: 'talks', label: 'Программа MVP Talks & Entertainment' },
+    { id: 'quiz', label: 'Спортивный квиз' },
+    { id: 'speakers', label: 'Кто будет?' },
+    { id: 'partners', label: 'Партнеры' },
+    { id: 'location', label: 'Локация' },
+    { id: 'faq', label: 'Faq' },
+  ],
+  image: '/media/footer/glass-logo.webp',
+  video: '',
+  logo: '/media/footer/logo-kvizmas.svg',
 };

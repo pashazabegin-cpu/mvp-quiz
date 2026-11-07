@@ -129,6 +129,24 @@ const lines = (text: string) => text.split('\n');
     max-width: 500px;
     margin-top: -16px;
   }
+  /* десктоп: высоты пунктов из макета после смены плашки времени на сквиркл 40 px */
+  @media not all and (max-aspect-ratio: 1/1) {
+    .sch {
+      gap: 20px;
+    }
+    .sch:not(.sch--key) {
+      height: 88px;
+    }
+    .sch--key {
+      min-height: 263px;
+    }
+    .sch--wide {
+      margin-bottom: 8px;
+    }
+    .sch--key:last-child {
+      min-height: 213px;
+    }
+  }
 
   /* мобильный (Figma: «2 · mobile» → «04 · Как всё пройдёт?»): обычный поток без закрепления —
      дата и заголовок по центру, пункты через 29 px (высоту блока по содержимому ставит stage.ts → fitFlow) */

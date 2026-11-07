@@ -1,117 +1,248 @@
 ---
 /**
- * 09 · Локация — как на форуме + фото площадки на фоне (едет медленнее страницы).
+ * «Локация» (Figma: кадр «2»): адрес, карта во всю ширину, фото площадки на разной глубине.
+ * Карта — Яндекс Карты в стиле из data/map-style.json, адрес стоит по центру, карту можно таскать и вращать
+ * правой кнопкой (scripts/sections/location.ts). Пока нет ключа API, показывается картинка из макета.
+ * Прокрутка колесом над картой листает страницу, а не масштабирует карту.
+ * .map__inner компенсирует масштаб кадра: API карт считает курсор в экранных px, и так карта остаётся чёткой.
+ * Параллакс фото — как у фото в «Что мы придумали?» (scripts/sections/finale.ts).
  */
-import Anno from '../ui/Anno.astro';
-import Placeholder from '../ui/Placeholder.astro';
-import { event, location } from '../../data/content';
+import { event, location, ticket } from '../../data/content';
+import { withBase } from '../../lib/paths';
 ---
 
-<section class="section location" id="location">
-  <div class="location__bg" data-parallax="0.15" aria-hidden="true">
-    <Placeholder label="Фото площадки — фон (2 варианта в ТЗ)" src={location.photo} />
-  </div>
-  <Anno kind="screen">09 · Локация</Anno>
-  <div class="container">
-    <h2 class="h2 location__title" data-split>{location.title}</h2>
-    <div class="location__grid">
-      <div class="location__info" data-reveal>
-        <h3 class="location__venue">{event.venue}</h3>
-        <p class="location__address">{event.address}</p>
-        <a class="link-arrow" href={event.mapUrl} target="_blank" rel="noopener">
-          {location.mapLabel} <span class="arr">↗</span>
-        </a>
-      </div>
-      <div class="map" data-reveal>
-        <Placeholder label="Яндекс Карта (тёмная тема)" />
-        <span class="map__pin" aria-hidden="true"></span>
-      </div>
+<section class="location" id="location">
+  <h2 class="location__title" data-split>{location.title}</h2>
+  <p class="location__venue" data-lines>{event.venue}</p>
+  <p class="location__address" data-lines>{event.address}</p>
+
+  <div
+    class="map"
+    data-map
+    data-map-key={location.mapApiKey || undefined}
+    data-map-center={location.coords.join(',')}
+    data-map-zoom={location.zoom}
+  >
+    <div class="map__inner">
+      <img class="map__poster" src={withBase(location.poster)} alt={`Карта: ${event.address}`} loading="lazy" decoding="async" />
+      <div class="map__canvas" data-map-canvas></div>
+      <span class="map__pin" data-map-pin aria-hidden="true">
+        <span class="map__pin-ring"></span>
+        <span class="map__pin-body"><img src={withBase(ticket.mark)} width="36" height="35" alt="" /></span>
+      </span>
     </div>
-    <Anno>ТЗ: фото площадки где-то на фоне</Anno>
-    <Anno kind="motion">фото фона — параллакс · пин на карте пульсирует</Anno>
   </div>
+
+  {
+    location.photos.map((photo) => (
+      <div class:list={['location__photo', `location__photo--${photo.side}`]} data-depth={photo.depth}>
+        <img src={withBase(photo.src)} alt="Площадка Avulus Cyber Space" loading="lazy" decoding="async" />
+      </div>
+    ))
+  }
+
+  <a class="location__link" href={event.mapUrl} target="_blank" rel="noopener">
+    <span>{location.mapLabel}</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+      <path d="M2 12 12 2M4 2h8v8" fill="none" stroke="#fce39c" stroke-width="1.1" stroke-linecap="square"></path>
+    </svg>
+  </a>
 </section>
 
 <style>
   .location {
-    overflow: hidden;
-    isolation: isolate;
-    padding-bottom: calc(var(--section-y) + 80px);
-  }
-  .location__bg {
-    position: absolute;
-    inset: -12% 0;
-    z-index: -1;
-  }
-  .location__bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(var(--c-bg) 0%, color-mix(in srgb, var(--c-bg) 55%, transparent) 50%, var(--c-bg) 100%);
-  }
-  .location__bg :global(.ph) {
-    border: 0;
-    border-radius: 0;
-    place-items: end center;
-    padding-bottom: 18%;
+    position: relative;
+    height: 1180px;
+    color: #fff;
+    text-align: center;
   }
   .location__title {
-    margin-bottom: clamp(32px, 4vw, 56px);
-  }
-  .location__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: 48px;
-    align-items: center;
+    position: absolute;
+    left: 0;
+    top: 75px;
+    width: 100%;
+    font-size: 65px;
+    font-weight: 300;
+    line-height: 55px;
+    letter-spacing: -3.25px;
   }
   .location__venue {
-    font-size: clamp(28px, 3.2vw, 42px);
-    line-height: 1;
-    letter-spacing: -0.02em;
+    position: absolute;
+    left: 0;
+    top: 284px;
+    width: 100%;
+    color: #f5f7fa;
+    font-size: 45px;
+    font-weight: 300;
+    line-height: 36.11px;
+    letter-spacing: 6.75px;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
   .location__address {
-    margin: 16px 0 28px;
-    color: var(--c-muted);
-    font-size: 17px;
-  }
-  .map {
-    position: relative;
-    aspect-ratio: 16 / 10;
-    overflow: hidden;
-    border-radius: var(--radius-l);
-    background: var(--c-surface);
-  }
-  .map__pin {
     position: absolute;
-    top: 38%;
-    left: 64%;
-    width: 18px;
-    height: 18px;
-    margin: -9px 0 0 -9px;
-    border-radius: 50%;
-    background: var(--c-text);
+    left: 0;
+    top: 352px;
+    width: 100%;
+    font-size: 20px;
+    line-height: 26px;
   }
-  .map__pin::before {
-    content: '';
+
+  .map {
+    position: absolute;
+    left: 0;
+    top: 476px;
+    width: 100%;
+    height: 446px;
+    overflow: hidden;
+    background: #243e65;
+  }
+  .map__inner {
+    position: relative;
+    width: calc(100% * var(--ui-s));
+    height: calc(100% * var(--ui-s));
+    transform: scale(calc(1 / var(--ui-s)));
+    transform-origin: 0 0;
+  }
+  .map__canvas {
     position: absolute;
     inset: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  /* картинка из макета: тот же кадр по высоте */
+  .map__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: 50% 78%;
+    transition: opacity 0.8s ease;
+  }
+  :global(.map.is-live) .map__canvas {
+    opacity: 1;
+  }
+  :global(.map.is-live) .map__poster {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* геометка: острие — в точке адреса. На картинке стоит по центру, на живой карте её двигает YMapMarker */
+  .map__pin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    display: block;
+    width: 62px;
+    height: 72px;
+    margin-left: -31px;
+    margin-top: -72px;
+    pointer-events: none;
+  }
+  :global(.map.is-live) .map__pin {
+    left: 0;
+    top: 0;
+  }
+  .map__pin-body {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 14px 34px rgb(1 16 48 / 0.55);
+  }
+  .map__pin-body::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    border-radius: 0 0 5px 0;
+    background: #fff;
+    transform: rotate(45deg);
+    z-index: -1;
+  }
+  .map__pin-ring {
+    position: absolute;
+    left: 50%;
+    bottom: -14px;
+    width: 28px;
+    height: 28px;
+    margin-left: -14px;
+    border: 2px solid var(--c-accent);
     border-radius: 50%;
-    border: 2px solid var(--c-text);
-    animation: pin-ping 2s var(--ease-out) infinite;
+    animation: pin-ping 2.4s var(--ease-out) infinite;
   }
   @keyframes pin-ping {
     from {
-      transform: scale(1);
+      transform: scale(0.3);
       opacity: 1;
     }
     to {
-      transform: scale(4);
+      transform: scale(3.2);
       opacity: 0;
     }
   }
-  @media (max-width: 860px) {
-    .location__grid {
-      grid-template-columns: 1fr;
-    }
+
+  /* фото стоят у краёв экрана и заходят за них, как в макете */
+  .location__photo {
+    position: absolute;
+    border-radius: 40px;
+    overflow: hidden;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .location__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: bottom;
+  }
+  .location__photo--left {
+    left: -103px;
+    top: 339px;
+    width: 452px;
+    height: 273px;
+  }
+  .location__photo--right {
+    right: -69px;
+    top: 805px;
+    width: 445px;
+    height: 233px;
+  }
+
+  .location__link {
+    position: absolute;
+    left: 50%;
+    top: 1029px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    line-height: 26px;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+  .location__link span {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+    transition: background-size 0.5s var(--ease-out);
+  }
+  .location__link:hover span {
+    background-size: 100% 1px;
+  }
+  .location__link svg {
+    transition: transform 0.4s var(--ease-out);
+  }
+  .location__link:hover svg {
+    transform: translate(2px, -2px);
   }
 </style>

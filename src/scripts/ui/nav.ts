@@ -48,6 +48,15 @@ export function initNav() {
   });
   wrap.addEventListener('pointerleave', () => place(active));
 
+  // большой логотип в подвале (data-nav-away): меню уезжает, чтобы его не закрывать
+  const away = document.querySelector<HTMLElement>('[data-nav-away]');
+  if (away) {
+    const checkAway = () => nav.classList.toggle('nav--away', away.getBoundingClientRect().top < window.innerHeight - 30);
+    window.addEventListener('scroll', checkAway, { passive: true });
+    window.addEventListener('resize', checkAway);
+    checkAway();
+  }
+
   // над белыми участками (data-nav-light) — тёмный текст на светлом стекле. Проверка по положению на экране,
   // а не по триггерам: так верно и для закреплённых экранов (их триггер не знает про собственное закрепление)
   const zones = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-light]'));

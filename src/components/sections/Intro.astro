@@ -60,7 +60,7 @@ const floatStyle = (f: (typeof intro.floats)[number]) =>
             style={floatStyle(f)}
           >
             {f.kind === 'tag' ? (
-              <span class="pill" style={`--pill:var(${f.color === 'accent' ? '--c-accent' : '--c-accent-2'})`}>
+              <span class="pill pill--sq" style={`--pill:var(${f.color === 'accent' ? '--c-accent' : '--c-accent-2'})`}>
                 {f.text}
               </span>
             ) : (

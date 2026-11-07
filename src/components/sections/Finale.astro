@@ -1,0 +1,97 @@
+---
+/**
+ * Низ страницы от «Кто будет?» до подвала (Figma: кадр «2», низ) — один масштабируемый кадр на общем фоне.
+ * Блоки внутри идут потоком в px макета, высоту всего кадра ставит fitFlow: она меняется, когда открывается FAQ.
+ *
+ * Большие размытые эллипсы идут через несколько блоков, а логотипы партнёров смешиваются с ними (color-dodge).
+ * Смешивание работает только внутри одного stacking context, поэтому эллипсы и блоки лежат в одном .finale__ui —
+ * и между ними и логотипами нельзя ставить transform/opacity (см. Partners.astro).
+ *
+ * Эллипсы заранее отрисованы картинками в 1/8 размера: браузер только двигает готовую текстуру,
+ * живой filter: blur на таких размерах тормозил бы. Движение — scripts/sections/finale.ts.
+ * Мобильного макета у этих блоков пока нет: на мобильной раскладке они скрыты.
+ */
+import { withBase } from '../../lib/paths';
+
+/**
+ * x — левый край картинки от центра кадра (или от левого края, если fromLeft), y — от верха блока;
+ * speed — сдвиг от скролла, px; orbit/period — круг, по которому эллипс плывёт сам;
+ * sway — для вытянутого эллипса: покачивание на ± градусов вместо круга.
+ */
+const glows = [
+  { src: 'footer', x: -1672, y: 3208, w: 3383.93, h: 3464.01, speed: 120, orbit: 0, period: 0 },
+  { src: 'sky', x: -1253, fromLeft: true, y: 806, w: 1951.31, h: 1996.8, speed: 240, orbit: 150, period: 42 },
+  { src: 'sky-core', x: -990.3, fromLeft: true, y: 1091, w: 1412.9, h: 1445.84, overlay: true, speed: 240, orbit: 110, period: 42 },
+  { src: 'black', x: -725, y: 629, w: 2137.76, h: 2188.35, speed: 180, orbit: 190, period: 56, reverse: true },
+  { src: 'blue', x: -1106, y: 1394, w: 3517, h: 2340.7, speed: 200, sway: 9, period: 30 },
+  { src: 'blue', x: -1106, y: 1417.3, w: 3517, h: 2340.7, overlay: true, speed: 200, sway: 9, period: 30 },
+];
+---
+
+<div class="finale" data-finale>
+  <div class="finale__ui" data-flow>
+    <div class="finale__glows" aria-hidden="true">
+      {
+        glows.map((g) => (
+          <div
+            class:list={['glow', { 'glow--overlay': g.overlay }]}
+            style={`left:${g.fromLeft ? `${g.x}px` : `calc(50% + ${g.x}px)`};top:${g.y}px;width:${g.w}px;height:${g.h}px`}
+            data-glow
+            data-speed={g.speed}
+            data-orbit={g.orbit}
+            data-sway={g.sway}
+            data-period={g.period}
+            data-reverse={g.reverse ? '' : undefined}
+          >
+            <img src={withBase(`/media/glows/${g.src}.webp`)} alt="" width={g.w} height={g.h} decoding="async" />
+          </div>
+        ))
+      }
+    </div>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .finale {
+    position: relative;
+    overflow: hidden;
+    /* фон макета под всем низом страницы */
+    background: #04101d;
+    color: var(--c-text);
+    /* левый край сетки блоков: 157 при кадре 1440, на широких экранах сетка стоит по центру */
+    --grid-x: calc((var(--ui-w) - 1126px) / 2);
+  }
+  .finale__ui {
+    position: relative;
+    width: var(--ui-w);
+    transform: scale(var(--ui-s));
+    transform-origin: 0 0;
+  }
+  .finale__glows {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #04101d;
+    pointer-events: none;
+  }
+  .glow {
+    position: absolute;
+    will-change: transform;
+  }
+  .glow img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    will-change: transform;
+  }
+  .glow--overlay {
+    mix-blend-mode: overlay;
+  }
+  @media (max-aspect-ratio: 1/1) {
+    .finale {
+      display: none;
+    }
+  }
+</style>

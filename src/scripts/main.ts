@@ -25,6 +25,8 @@ import { initSchedule } from './sections/schedule';
 import { initLogoSpin } from './sections/logo-spin';
 import { initTalks } from './sections/talks';
 import { initQuiz } from './sections/quiz';
+import { initFinale } from './sections/finale';
+import { initLocationMap } from './sections/location';
 import { initStoryBg } from './sections/story-bg';
 import { initReveals } from './animations/reveal';
 import { SOFT_REVEAL_TARGETS, initSoftReveal } from './animations/soft-reveal';
@@ -45,6 +47,7 @@ import { initAnnotations } from './ui/annotations';
 import { initShaderBackgrounds } from './effects/shader-background';
 import { initLiquidGlass } from './effects/liquid-glass';
 import { initSnow } from './effects/snow';
+import { initHoloTicket } from './effects/holo-ticket';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -92,6 +95,8 @@ run('glass', initLiquidGlass);
 // а лишний слой между пальцем и страницей даёт рывки
 const lenis = motion && !mobile ? run('smooth-scroll', initSmoothScroll) : null;
 lenis?.stop(); // скролл открывается, когда уходит прелоадер
+// высота страницы меняется при пересчёте триггеров (закрепления, высота низа страницы) — Lenis узнаёт об этом сразу
+if (lenis) ScrollTrigger.addEventListener('refresh', () => lenis.resize());
 // на мобильном то же самое без Lenis: пока виден прелоадер, страница не прокручивается (global.css)
 const root = document.documentElement;
 if (motion && mobile) root.classList.add('is-scroll-locked');
@@ -100,7 +105,12 @@ const unlockScroll = () => {
   root.classList.remove('is-scroll-locked');
 };
 
-if (motion) run('snow', initSnow);
+// блоки низа страницы (снег, билет) есть только в десктопной раскладке
+if (motion && !mobile) {
+  run('snow', initSnow);
+  run('holo-ticket', initHoloTicket);
+}
+if (!mobile) run('map', initLocationMap);
 
 // Эффекты под курсор — только для мыши/тачпада
 if (motion && finePointer) {
@@ -120,6 +130,7 @@ fontsReady.then(() => {
   run('logo-spin', initLogoSpin);
   run('talks', initTalks);
   run('quiz', () => initQuiz(motion));
+  if (!mobile) run('finale', () => initFinale(motion));
   if (motion && mobile) {
     run('soft-reveal', () => initSoftReveal(), showText(SOFT_REVEAL_TARGETS));
   } else if (motion) {

@@ -1,97 +1,173 @@
 ---
-/** Подвал — как на форуме: меню, «Связаться», соцсети, документы. */
-import Anno from '../ui/Anno.astro';
-import Socials from '../ui/Socials.astro';
-import { contacts, event, nav } from '../../data/content';
+/**
+ * Подвал (Figma: кадр «2»): меню по блокам, стеклянный логотип, контакты, соцсети, документы,
+ * большой логотип MVP / Квизмас, обрезанный низом страницы. Позади идёт снег (effects/snow.ts).
+ * На месте картинки будет видео: достаточно заполнить footer.video в content.ts.
+ */
+import { contacts, footer } from '../../data/content';
+import { withBase } from '../../lib/paths';
+
+const socials = [
+  { icon: '/media/hero/vk.svg', ...contacts.socials.find((s) => s.id === 'vk')! },
+  { icon: '/media/hero/telegram.svg', ...contacts.socials.find((s) => s.id === 'tg')! },
+];
 ---
 
 <footer class="footer">
-  <canvas class="footer__snow" data-snow data-snow-density="0.5" aria-hidden="true"></canvas>
-  <Anno kind="screen">11 · Подвал</Anno>
-  <div class="container">
-    <p class="footer__mark" data-split>{event.title}</p>
-    <div class="footer__row">
-      <ul class="footer__nav">
-        {
-          nav.map((item) => (
-            <li>
-              <a href={`#${item.id}`}>{item.label}</a>
-            </li>
-          ))
-        }
-      </ul>
-      <div class="footer__contacts">
-        <a class="link-arrow" href={contacts.contactUrl} target="_blank" rel="noopener">
-          Связаться с нами <span class="arr">↗</span>
-        </a>
-        <Socials />
-      </div>
-      <ul class="footer__docs">
-        <li><a href={contacts.policyUrl}>Политика обработки персональных данных</a></li>
-        <li><a href={contacts.consentUrl} target="_blank" rel="noopener">Согласие на обработку персональных данных</a></li>
-      </ul>
-    </div>
-    <Anno kind="motion">название проявляется построчно · снег на фоне</Anno>
+  <canvas class="footer__snow" data-snow data-snow-density="0.9" aria-hidden="true"></canvas>
+
+  <ul class="footer__nav" data-stagger>
+    {
+      footer.nav.map((item) => (
+        <li>
+          <a href={`#${item.id}`}>{item.label}</a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="footer__media" data-reveal>
+    {
+      footer.video ? (
+        <video src={withBase(footer.video)} poster={withBase(footer.image)} autoplay muted loop playsinline preload="none" />
+      ) : (
+        <img src={withBase(footer.image)} width="276" height="280" alt="" loading="lazy" decoding="async" />
+      )
+    }
   </div>
+
+  <a class="footer__contact" href={contacts.contactUrl} target="_blank" rel="noopener">
+    <span>Связаться с нами</span>
+    <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true">
+      <path d="M2 12 12 2M4 2h8v8" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="square"></path>
+    </svg>
+  </a>
+
+  <ul class="footer__socials">
+    {
+      socials.map((s) => (
+        <li>
+          <a href={s.url} target="_blank" rel="noopener" aria-label={s.label} data-magnetic>
+            <img src={withBase(s.icon)} width="20" height="20" alt="" />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <ul class="footer__docs">
+    <li><a href={contacts.policyUrl} target="_blank" rel="noopener">Политика обработки персональных данных</a></li>
+    <li><a href={contacts.consentUrl} target="_blank" rel="noopener">Согласие на обработку персональных данных</a></li>
+  </ul>
+
+  <img class="footer__logo" src={withBase(footer.logo)} width="1448" height="205" alt="MVP Квизмас" loading="lazy" data-nav-away />
 </footer>
 
 <style>
+  /* макет: верх подвала — y 11403; логотип тянется на всю ширину и обрезан низом страницы */
   .footer {
+    --logo-w: calc(var(--ui-w) + 8px);
     position: relative;
-    padding: 72px 0 140px;
+    height: calc(727px + var(--logo-w) * 0.1022);
     overflow: hidden;
-    isolation: isolate;
-    border-top: 1px solid var(--c-line);
+    color: #fff;
   }
   .footer__snow {
     position: absolute;
     inset: 0;
-    z-index: -1;
     width: 100%;
     height: 100%;
+    max-width: none;
     pointer-events: none;
-  }
-  .footer__mark {
-    font-size: clamp(48px, 13vw, 190px);
-    font-weight: 700;
-    line-height: 0.85;
-    letter-spacing: -0.05em;
-    white-space: nowrap;
-  }
-  .footer__row {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 32px;
-    margin-top: 56px;
-    font-size: 14px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 240px);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 240px);
   }
   .footer__nav {
-    display: grid;
-    grid-template-columns: repeat(2, max-content);
-    gap: 10px 32px;
+    position: absolute;
+    left: calc(50% - 472px);
+    top: 100px;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 40px;
+    letter-spacing: -1px;
   }
-  .footer__nav a,
-  .footer__docs a {
-    color: var(--c-muted);
-    transition: color 0.3s;
+  .footer__nav a {
+    display: inline-block;
+    transition: color 0.3s, transform 0.4s var(--ease-out);
   }
-  .footer__nav a:hover,
-  .footer__docs a:hover {
-    color: var(--c-text);
+  .footer__nav a:hover {
+    color: var(--c-accent);
+    transform: translateX(6px);
   }
-  .footer__contacts {
-    display: grid;
-    gap: 16px;
-    align-content: start;
+  .footer__media {
+    position: absolute;
+    left: calc(50% + 258px);
+    top: 65px;
+    width: 276px;
+    height: 280px;
+    /* чёрный фон картинки растворяется в тёмном подвале */
+    mix-blend-mode: lighten;
+  }
+  .footer__media img,
+  .footer__media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .footer__contact {
+    position: absolute;
+    left: calc(50% - 472px);
+    top: 536px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .footer__contact svg {
+    transition: transform 0.4s var(--ease-out);
+  }
+  .footer__contact:hover svg {
+    transform: translate(2px, -2px);
+  }
+  .footer__socials {
+    position: absolute;
+    left: calc(50% - 36px);
+    top: 529px;
+    display: flex;
+    gap: 22px;
+  }
+  .footer__socials a {
+    display: block;
+    transition: opacity 0.3s;
+  }
+  .footer__socials a:hover {
+    opacity: 0.7;
   }
   .footer__docs {
+    position: absolute;
+    left: calc(50% + 385px);
+    top: 522px;
     display: grid;
-    gap: 10px;
-    align-content: start;
+    gap: 16.8px;
+    width: 168px;
+    font-size: 14px;
+    line-height: 1.2;
   }
-  @media (max-width: 860px) {
-    .footer__row {
-      grid-template-columns: 1fr;
-    }
+  .footer__docs a {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+    transition: background-size 0.5s var(--ease-out);
+  }
+  .footer__docs a:hover {
+    background-size: 100% 1px;
+  }
+  .footer__logo {
+    position: absolute;
+    left: 0;
+    top: 727px;
+    width: var(--logo-w);
+    max-width: none;
+    height: auto;
+    transform: translateX(-8px);
   }
 </style>

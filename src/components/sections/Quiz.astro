@@ -12,7 +12,7 @@
  * При входе в блок карусель стоит под темами, на начале текста; когда доходишь до текста —
  * поднимается на темы и открывает текст. Скролл ещё и прокручивает её по горизонтали.
  *
- * Десктоп: блок 1931 px макета, всё на местах из макета. Мобильный: содержимое идёт потоком
+ * Десктоп: блок 1607 px макета, всё на местах из макета; снизу к нему примыкает «Кто будет?». Мобильный: содержимое идёт потоком
  * (высоту блока ставит fitFlow), плашка тянется под ним; у карусели своя строка между темами и текстом —
  * она стоит на месте и не закрывает текст, только медленно идёт сама.
  */
@@ -101,7 +101,7 @@ const ring = [...quiz.icons, ...quiz.icons];
   /* фон макета (Rectangle 5881): белый до 11.5% → синий #013a8b к 46.7% → #030f1c к 97% */
   .quiz {
     position: relative;
-    height: calc(1931px * var(--ui-s));
+    height: calc(1607px * var(--ui-s));
     overflow: hidden;
     background-color: #fff;
     background-image: linear-gradient(to bottom, rgb(1 58 139 / 0) 11.531%, #013a8b 46.68%, #030f1c 96.998%);
@@ -112,12 +112,24 @@ const ring = [...quiz.icons, ...quiz.icons];
     left: 0;
     top: 0;
     width: var(--ui-w);
-    height: 1931px;
+    height: 1607px;
     transform: scale(var(--ui-s));
     transform-origin: 0 0;
   }
   .quiz__ui > * {
     position: absolute;
+  }
+
+  /* десктоп: блок короче — фон приходит в цвет «Кто будет?» (#04101d) к самому низу блока, без шва */
+  @media not all and (max-aspect-ratio: 1/1) {
+    .quiz {
+      background-image: linear-gradient(
+        to bottom,
+        rgb(1 58 139 / 0) calc(222.7px * var(--ui-s)),
+        #013a8b calc(901px * var(--ui-s)),
+        #04101d calc(1590px * var(--ui-s))
+      );
+    }
   }
 
   /* плашка 1320×1352 при 1440: поля 60, сквиркл r=260 (n=3) */

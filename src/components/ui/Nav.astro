@@ -17,7 +17,7 @@ import Button from './Button.astro';
       ))
     }
   </div>
-  <Button href={event.ticketUrl} class="nav__cta">Билеты</Button>
+  <Button href={event.ticketAnchor} class="nav__cta">Билеты</Button>
 </nav>
 
 <style>
@@ -96,6 +96,11 @@ import Button from './Button.astro';
     transform: translateY(24px);
     pointer-events: none;
   }
+  .nav.nav--away {
+    opacity: 0;
+    transform: translateY(24px);
+    pointer-events: none;
+  }
   .nav__links {
     position: relative;
     display: flex;
@@ -157,8 +162,8 @@ import Button from './Button.astro';
   }
   .nav :global(.nav__cta) {
     flex: none;
+    --btn-h: 46px;
     min-width: 0;
-    height: 46px;
     padding: 2px 22px 0;
   }
   /* мобильная раскладка (тот же запрос, что MOBILE_QUERY в scripts/core/stage.ts): нижнего меню нет —

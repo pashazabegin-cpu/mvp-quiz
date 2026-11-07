@@ -1,82 +1,101 @@
 ---
 /**
- * 08 · Партнёры — сетка логотипов как на форуме.
- * Линии сетки подсвечиваются вокруг курсора (data-pointer задаёт --mx/--my всей сетке).
+ * «Партнеры» (Figma: кадр «2»). Логотипы и подписи смешиваются с фоном в режиме color-dodge — как в макете:
+ * там, где за логотипом свет эллипса, он вспыхивает, на тёмном почти гаснет. Эллипсы движутся
+ * (scripts/sections/finale.ts), поэтому логотипы медленно разгораются и гаснут сами.
+ * На наведении логотип становится полностью белым: поверх лежит его белая копия.
+ *
+ * Важно: у родителей логотипов не должно быть transform, opacity, filter и т.п. — иначе они отрежут логотип от фона
+ * и смешивание перестанет работать. Появление — только прозрачностью самих картинок и подписей (finale.ts).
  */
-import Anno from '../ui/Anno.astro';
-import Placeholder from '../ui/Placeholder.astro';
 import { partners } from '../../data/content';
+import { withBase } from '../../lib/paths';
 ---
 
-<section class="section partners" id="partners">
-  <Anno kind="screen">08 · Партнёры</Anno>
-  <div class="container">
-    <h2 class="h2 partners__title" data-split>{partners.title}</h2>
-    <ul class="partners__grid" data-pointer data-stagger>
-      {
-        partners.items.map((p) => (
-          <li class="partner" data-spotlight>
-            <Placeholder label="Логотип" src={p.logo} class="partner__logo" />
-            <span class="partner__role">{p.role}</span>
-          </li>
-        ))
-      }
-    </ul>
-    <Anno kind="motion">линии сетки светятся вокруг курсора · логотип приподнимается на ховере</Anno>
-  </div>
+<section class="partners" id="partners">
+  <h2 class="partners__title" data-split>{partners.title}</h2>
+  <ul class="partners__list" data-partners>
+    {
+      partners.items.map((p) => (
+        <li
+          class="partner"
+          style={`--x:${p.x - 720}px;--y:${p.y}px;--w:${p.w}px;--h:${p.h}px;--role-x:${p.roleX - p.x}px;--role-y:${p.roleY - p.y}px`}
+        >
+          <img class="partner__logo" src={withBase(p.logo)} width={p.w} height={p.h} alt={p.name} loading="lazy" />
+          <img class="partner__logo partner__logo--white" src={withBase(p.logo)} width={p.w} height={p.h} alt="" loading="lazy" />
+          <span class="partner__role">{p.role}</span>
+        </li>
+      ))
+    }
+  </ul>
 </section>
 
 <style>
-  .partners__title {
-    margin-bottom: clamp(32px, 4vw, 56px);
-    text-align: center;
+  .partners {
+    position: relative;
+    height: 740px;
   }
-  .partners__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1px;
-    overflow: hidden;
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius-m);
-    /* 1px-зазоры между ячейками = линии сетки; градиент под курсором их «зажигает» */
-    background:
-      radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), var(--c-text), transparent 70%),
-      var(--c-line);
+  .partners__title {
+    position: absolute;
+    left: 0;
+    top: 50px;
+    width: 100%;
+    font-size: 65px;
+    font-weight: 300;
+    line-height: 55px;
+    letter-spacing: -3.25px;
+    text-align: center;
+    color: #fff;
   }
   .partner {
-    display: grid;
-    place-items: center;
-    align-content: center;
-    gap: 18px;
-    min-height: 200px;
-    padding: 40px 24px;
-    background: var(--c-bg);
-    text-align: center;
+    position: absolute;
+    left: calc(50% + var(--x));
+    top: var(--y);
+    width: var(--w);
+    height: var(--h);
   }
-  .partner :global(.partner__logo) {
-    width: 160px;
-    height: 56px;
-    border-radius: 8px;
-    transition: transform 0.6s var(--ease-out);
+  .partner__logo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--w);
+    height: var(--h);
+    max-width: none;
+    mix-blend-mode: color-dodge;
   }
-  .partner:hover :global(.partner__logo) {
-    transform: translateY(-6px) scale(1.04);
+  .partner__logo--white {
+    mix-blend-mode: normal;
+    filter: brightness(0) invert(1);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .partner:hover .partner__logo--white {
+    opacity: 1;
+  }
+  /* зона наведения — вместе с подписью и небольшим запасом вокруг логотипа */
+  .partner::after {
+    content: '';
+    position: absolute;
+    inset: -20px -20px calc(var(--h) - var(--role-y) - 34px);
   }
   .partner__role {
-    color: var(--c-muted);
-    font-size: 13px;
+    position: absolute;
+    left: var(--role-x);
+    top: var(--role-y);
+    transform: translateX(-50%);
+    color: var(--c-accent);
+    font-size: 12px;
+    line-height: 28px;
+    letter-spacing: 0.48px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    mix-blend-mode: color-dodge;
+    opacity: 0.55;
   }
-  @media (max-width: 720px) {
-    .partners__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .partner {
-      min-height: 150px;
-      padding: 24px 12px;
-    }
-    .partner :global(.partner__logo) {
-      width: 110px;
-      height: 44px;
-    }
+  /* первая подпись стоит на самом ярком месте — в макете она просто белая */
+  .partner:first-child .partner__role {
+    color: #fff;
+    mix-blend-mode: normal;
+    opacity: 0.3;
   }
 </style>

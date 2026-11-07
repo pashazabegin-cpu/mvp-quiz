@@ -8,11 +8,17 @@ import Schedule from '../components/sections/Schedule.astro';
 import LogoSpin from '../components/sections/LogoSpin.astro';
 import Talks from '../components/sections/Talks.astro';
 import Quiz from '../components/sections/Quiz.astro';
+import Finale from '../components/sections/Finale.astro';
+import Speakers from '../components/sections/Speakers.astro';
+import Tickets from '../components/sections/Tickets.astro';
+import Partners from '../components/sections/Partners.astro';
+import Location from '../components/sections/Location.astro';
+import Faq from '../components/sections/Faq.astro';
+import Footer from '../components/sections/Footer.astro';
 ---
 
 <!--
-  Страница собирается по макету сверху вниз. Блоки ниже квиза (Speakers, Jury, Tickets, Partners,
-  Location, Faq, Footer — прототипы в components/sections) пока сняты со страницы.
+  Страница собирается по макету сверху вниз. Жюри (Jury — прототип в components/sections) пока снято со страницы.
 -->
 <Base>
   <main>
@@ -25,5 +31,13 @@ import Quiz from '../components/sections/Quiz.astro';
     <LogoSpin />      <!-- 05 Логотип в снегу: видео перематывается скроллом -->
     <Talks />         <!-- 06 Программа MVP Talks — белый экран -->
     <Quiz />          <!-- 07 Спортивный квиз — плашка с орбитой иконок -->
+    <Finale>          <!-- общий кадр и большие эллипсы низа страницы; только десктоп: мобильного макета пока нет -->
+      <Speakers />    <!-- 08 Кто будет? — карусель -->
+      <Tickets />     <!-- 09 Купить билет — голографический билет, снег -->
+      <Partners />    <!-- 10 Партнеры — логотипы смешиваются с фоном -->
+      <Location />    <!-- 11 Локация — карта, фото с параллаксом -->
+      <Faq />         <!-- 12 FAQ -->
+      <Footer />      <!-- 13 Подвал -->
+    </Finale>
   </main>
 </Base>

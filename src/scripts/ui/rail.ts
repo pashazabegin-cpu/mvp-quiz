@@ -1,33 +1,49 @@
 import { gsap } from 'gsap';
+import { reducedMotion } from '../core/env';
+import { stageScale } from '../core/stage';
 
 /**
- * Горизонтальная лента [data-rail]: нативный скролл (тачпад, свайп),
- * перетаскивание мышью с инерцией, стрелки [data-rail-prev]/[data-rail-next]
- * и прогресс [data-rail-progress] (CSS-переменная --p).
+ * Горизонтальная лента [data-rail]: нативный скролл с прилипанием к карточкам (тачпад, свайп),
+ * стрелки [data-rail-prev]/[data-rail-next] — на одну карточку, перетаскивание мышью с докатом до карточки.
+ * Лента лежит в масштабируемом кадре: scrollLeft и offsetLeft — в px макета, координаты мыши — экранные
+ * (поэтому при перетаскивании делим на масштаб).
+ * Секции ставит классы is-scrolled / is-end — по ним показываются фейды по краям.
  */
 export function initRail() {
   document.querySelectorAll<HTMLElement>('[data-rail]').forEach((rail) => {
-    const section = rail.closest('section') ?? document;
-    const prev = section.querySelector<HTMLButtonElement>('[data-rail-prev]');
-    const next = section.querySelector<HTMLButtonElement>('[data-rail-next]');
-    const progress = section.querySelector<HTMLElement>('[data-rail-progress]');
-    const gap = 16;
-    const step = () => ((rail.querySelector('li')?.getBoundingClientRect().width ?? 280) + gap) * 2;
-
-    prev?.addEventListener('click', () => rail.scrollBy({ left: -step(), behavior: 'smooth' }));
-    next?.addEventListener('click', () => rail.scrollBy({ left: step(), behavior: 'smooth' }));
+    const section = rail.closest('section');
+    const prev = section?.querySelector<HTMLButtonElement>('[data-rail-prev]');
+    const next = section?.querySelector<HTMLButtonElement>('[data-rail-next]');
+    const items = rail.querySelectorAll<HTMLElement>('li');
+    const step = () => (items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : rail.clientWidth);
+    const maxScroll = () => rail.scrollWidth - rail.clientWidth;
 
     const update = () => {
-      const max = rail.scrollWidth - rail.clientWidth;
-      const visible = rail.clientWidth / rail.scrollWidth;
-      const p = max > 0 ? rail.scrollLeft / max : 1;
-      progress?.style.setProperty('--p', String(visible + (1 - visible) * p));
+      const max = maxScroll();
       if (prev) prev.disabled = rail.scrollLeft <= 2;
       if (next) next.disabled = rail.scrollLeft >= max - 2;
+      section?.classList.toggle('is-scrolled', rail.scrollLeft > 2);
+      section?.classList.toggle('is-end', rail.scrollLeft >= max - 2);
     };
     rail.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     update();
+
+    /** плавно доехать до карточки; прилипание браузера на это время выключено, иначе оно дёргает анимацию */
+    const moveTo = (left: number, duration = 0.9) => {
+      gsap.killTweensOf(rail);
+      rail.classList.add('is-moving');
+      gsap.to(rail, {
+        scrollLeft: gsap.utils.clamp(0, maxScroll(), left),
+        duration: reducedMotion ? 0 : duration,
+        ease: 'power3.out',
+        onUpdate: update,
+        onComplete: () => rail.classList.remove('is-moving', 'is-dragging'),
+      });
+    };
+    const page = (dir: 1 | -1) => moveTo((Math.round(rail.scrollLeft / step()) + dir) * step());
+    prev?.addEventListener('click', () => page(-1));
+    next?.addEventListener('click', () => page(1));
 
     // Перетаскивание мышью (на тач-устройствах работает нативный свайп)
     let down = false;
@@ -50,15 +66,15 @@ export function initRail() {
     });
     window.addEventListener('pointermove', (e) => {
       if (!down) return;
-      const dx = e.clientX - startX;
+      const dx = (e.clientX - startX) / stageScale();
       if (!moved && Math.abs(dx) > 4) {
         moved = true;
-        rail.classList.add('is-dragging');
+        rail.classList.add('is-moving', 'is-dragging');
       }
       if (!moved) return;
       rail.scrollLeft = startLeft - dx;
       const now = performance.now();
-      velocity = (e.clientX - lastX) / Math.max(1, now - lastT);
+      velocity = (e.clientX - lastX) / stageScale() / Math.max(1, now - lastT);
       lastX = e.clientX;
       lastT = now;
     });
@@ -66,12 +82,8 @@ export function initRail() {
       if (!down) return;
       down = false;
       if (!moved) return;
-      gsap.to(rail, {
-        scrollLeft: rail.scrollLeft - velocity * 320, // инерция после отпускания
-        duration: 0.9,
-        ease: 'power3.out',
-        onComplete: () => rail.classList.remove('is-dragging'),
-      });
+      // инерция после отпускания: докатываемся до ближайшей карточки — лента всегда стоит по сетке
+      moveTo(Math.round((rail.scrollLeft - velocity * 320) / step()) * step(), 0.8);
     });
     // не даём клику сработать после перетаскивания
     rail.addEventListener('click', (e) => moved && e.preventDefault(), true);

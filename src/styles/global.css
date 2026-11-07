@@ -159,9 +159,10 @@ button {
 }
 
 /* ---------- Кнопка MVP ----------
- * Как на mvpa.ru: золотой «сквиркл» с внутренними тенями, блик проходит при наведении,
- * средний ряд точек сдвигается на шаг вправо. Форма — скругление 25px (кнопка 50px высотой
- * почти совпадает со сквирклом из btn.svg и тянется под любую длину подписи).
+ * Как на mvpa.ru: золотой сквиркл с внутренними тенями, блик проходит при наведении,
+ * средний ряд точек сдвигается на шаг вправо. Форма — точная из макета («Squircle n=3.00 r=95%»):
+ * левый и правый концы — куски кнопки из макета (media/ui/btn-*.svg), между ними середина, поэтому кнопка
+ * тянется под любую длину подписи. Высота — только через --btn-h: от неё считаются концы.
  * Не вешать CSS transition на transform самой .btn — его анимирует GSAP (магнит, появление).
  */
 .btn {
@@ -170,12 +171,24 @@ button {
   align-items: center;
   justify-content: center;
   gap: 13.33px;
+  --btn-h: 50px;
+  --btn-cap: calc(var(--btn-h) * 0.476);
+  --btn-edge: calc(var(--btn-h) * 0.03377);
   min-width: 195px;
-  height: 50px;
+  height: var(--btn-h);
   padding: 2px 28px 0;
-  border-radius: 25px;
-  background: var(--c-gold);
-  box-shadow: inset 0 -1.69px 0 rgb(0 0 0 / 0.25), inset 0 1.69px 0 #fce39c;
+  background:
+    url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
+    url('/media/ui/btn-r.svg') right / auto 100% no-repeat,
+    linear-gradient(#fce39c var(--btn-edge), var(--c-gold) var(--btn-edge) calc(100% - var(--btn-edge)), #8d7a47 calc(100% - var(--btn-edge))) center / calc(100% - var(--btn-cap) * 2 + 1px) 100% no-repeat;
+  -webkit-mask:
+    url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
+    linear-gradient(#000 0 0) center / calc(100% - var(--btn-cap) * 2 + 1px) 100% no-repeat,
+    url('/media/ui/btn-r.svg') right / auto 100% no-repeat;
+  mask:
+    url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
+    linear-gradient(#000 0 0) center / calc(100% - var(--btn-cap) * 2 + 1px) 100% no-repeat,
+    url('/media/ui/btn-r.svg') right / auto 100% no-repeat;
   color: #fff;
   font-family: var(--font-body);
   font-size: 13.5px;
@@ -237,6 +250,31 @@ button {
   line-height: 20px;
   text-transform: uppercase;
   white-space: nowrap;
+}
+/* десктоп: плашка времени и теги «Что мы придумали?» — сквиркл из макета («Squircle n=3.00 r=100px», высота 40);
+   в мобильном макете время пока прямоугольное */
+@media not all and (max-aspect-ratio: 1/1) {
+  .time-pill {
+    height: 40px;
+  }
+  .time-pill,
+  .pill--sq {
+    -webkit-mask:
+      url('/media/ui/sq40-l.svg') left / auto 100% no-repeat,
+      linear-gradient(#000 0 0) center / calc(100% - 39px) 100% no-repeat,
+      url('/media/ui/sq40-r.svg') right / auto 100% no-repeat;
+    mask:
+      url('/media/ui/sq40-l.svg') left / auto 100% no-repeat,
+      linear-gradient(#000 0 0) center / calc(100% - 39px) 100% no-repeat,
+      url('/media/ui/sq40-r.svg') right / auto 100% no-repeat;
+  }
+  .pill--sq {
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 9px 0 5px;
+    border-radius: 0;
+  }
 }
 /* синяя подпись над заголовком: «ПРОГРАММА», дата */
 /* прозрачность — в цвете, а не opacity: иначе плашка появления тоже стала бы полупрозрачной */

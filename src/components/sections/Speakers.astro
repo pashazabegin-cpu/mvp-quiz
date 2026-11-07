@@ -3,6 +3,7 @@
  * «Кто будет?» (Figma: кадр «2») — горизонтальная карусель спикеров, стоит по сетке блока с билетом.
  * Листается стрелками, перетаскиванием мышью и тачпадом — всегда на целую карточку (scripts/ui/rail.ts).
  * Крайняя правая карточка видна из-под фейда; слева фейд появляется, когда лента сдвинута.
+ * Мобильный (Figma: «07 · Кто будет?»): заголовок по центру, лента листается пальцем, стрелок нет.
  */
 import { speakers } from '../../data/content';
 import { withBase } from '../../lib/paths';
@@ -205,5 +206,56 @@ const arrow = 'M13.7193 0.719346L20.7194 7.64993L13.7193 13.7193M0.719345 7.7195
   }
   :global(.speakers.is-end) .speakers__fade--right {
     opacity: 0;
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    .speakers {
+      height: 490px;
+    }
+    .speakers__title {
+      left: 16px;
+      top: 40px;
+      width: calc(100% - 32px);
+      font-size: 38px;
+      line-height: 36px;
+      letter-spacing: -1.9px;
+      text-align: center;
+    }
+    .speakers__ctrl,
+    .speakers__fade--left {
+      display: none;
+    }
+    .rail {
+      top: 90px;
+      scroll-padding-inline: 16px;
+    }
+    .rail__track {
+      gap: 10px;
+      padding-inline: 16px;
+    }
+    .speaker {
+      width: 240px;
+      height: 352px;
+    }
+    .speaker__photo {
+      width: 240px;
+      height: 246px;
+    }
+    .speaker__name {
+      margin: 22px 0 0 13px;
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .speaker__role {
+      width: 160px;
+      margin: 8px 0 0 13px;
+      font-size: 16px;
+      line-height: 18px;
+    }
+    .speakers__fade {
+      top: 110px;
+      width: 135px;
+      height: 352px;
+    }
   }
 </style>

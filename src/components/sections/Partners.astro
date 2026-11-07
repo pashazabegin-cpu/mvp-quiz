@@ -7,6 +7,7 @@
  *
  * Важно: у родителей логотипов не должно быть transform, opacity, filter и т.п. — иначе они отрежут логотип от фона
  * и смешивание перестанет работать. Появление — только прозрачностью самих картинок и подписей (finale.ts).
+ * Мобильный (Figma: «09 · Партнеры»): логотипы в два столбца, масштаб 0.74, логотип стоит на нижней линии ряда.
  */
 import { partners } from '../../data/content';
 import { withBase } from '../../lib/paths';
@@ -19,7 +20,7 @@ import { withBase } from '../../lib/paths';
       partners.items.map((p) => (
         <li
           class="partner"
-          style={`--x:${p.x - 720}px;--y:${p.y}px;--w:${p.w}px;--h:${p.h}px;--role-x:${p.roleX - p.x}px;--role-y:${p.roleY - p.y}px`}
+          style={`--x:${p.x - 720}px;--y:${p.y}px;--w:${p.w}px;--h:${p.h}px;--role-x:${p.roleX - p.x}px;--role-y:${p.roleY - p.y}px;--mx:${p.mx - 187.5}px;--my:${p.my}px`}
         >
           <img class="partner__logo" src={withBase(p.logo)} width={p.w} height={p.h} alt={p.name} loading="lazy" />
           <img class="partner__logo partner__logo--white" src={withBase(p.logo)} width={p.w} height={p.h} alt="" loading="lazy" />
@@ -97,5 +98,40 @@ import { withBase } from '../../lib/paths';
     color: #fff;
     mix-blend-mode: normal;
     opacity: 0.3;
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    .partners {
+      height: 640px;
+    }
+    .partners__title {
+      top: 40px;
+      font-size: 38px;
+      line-height: 36px;
+      letter-spacing: -1.9px;
+    }
+    .partner {
+      --mw: calc(var(--w) * 0.74);
+      --mh: calc(var(--h) * 0.74);
+      left: calc(50% + var(--mx) - var(--mw) / 2);
+      top: calc(var(--my) - var(--mh));
+      width: var(--mw);
+      height: var(--mh);
+    }
+    .partner__logo {
+      width: var(--mw);
+      height: var(--mh);
+    }
+    .partner__role,
+    .partner:first-child .partner__role {
+      left: 50%;
+      top: calc(var(--mh) + 10px);
+      color: var(--c-accent);
+      font-size: 10px;
+      line-height: 22px;
+      letter-spacing: 0.4px;
+      mix-blend-mode: color-dodge;
+      opacity: 0.55;
+    }
   }
 </style>

@@ -3,6 +3,7 @@
  * Загружается, когда блок подъезжает к экрану. Пока нет ключа (content.ts → location.mapApiKey) или если API
  * не загрузился, остаётся картинка из макета с меткой по центру — блок не ломается.
  * Колесо мыши карта не забирает (нет scrollZoom): оно листает страницу.
+ * Мобильный: карта без управления, иначе она перехватывала бы палец при скролле; для маршрута есть ссылка под ней.
  */
 
 type YMapsApi = {
@@ -23,7 +24,7 @@ const loadScript = (src: string) =>
     document.head.append(script);
   });
 
-export function initLocationMap() {
+export function initLocationMap(mobile = false) {
   const box = document.querySelector<HTMLElement>('[data-map]');
   const canvas = box?.querySelector<HTMLElement>('[data-map-canvas]');
   const pin = box?.querySelector<HTMLElement>('[data-map-pin]');
@@ -45,7 +46,7 @@ export function initLocationMap() {
         location: { center, zoom },
         mode: 'vector',
         // таскать, вращать и наклонять правой кнопкой мыши, на тачпаде — щипком; масштаб двойным кликом
-        behaviors: ['drag', 'mouseRotate', 'mouseTilt', 'pinchZoom', 'pinchRotate', 'panTilt', 'dblClick'],
+        behaviors: mobile ? [] : ['drag', 'mouseRotate', 'mouseTilt', 'pinchZoom', 'pinchRotate', 'panTilt', 'dblClick'],
       },
       [new YMapDefaultSchemeLayer({ customization }), new YMapDefaultFeaturesLayer({})],
     );

@@ -306,17 +306,18 @@ export const ticket = {
 /**
  * Партнёры. x, y, w, h — логотип в px макета (x — от левого края кадра 1440, y — от верха блока),
  * roleX, roleY — центр и верх подписи. Логотипы смешиваются с фоном (color-dodge), на наведении белеют.
+ * mx, my — мобильный кадр 375: центр логотипа по горизонтали и его нижний край.
  */
 export const partners = {
   title: 'Партнеры',
   items: [
-    { name: 'Матч ТВ', logo: '/media/partners/match.svg', role: 'Генеральный партнер', x: 163, y: 273.3, w: 139.04, h: 37.75, roleX: 230.5, roleY: 353.36 },
-    { name: 'Чемпионат', logo: '/media/partners/champ.svg', role: 'Генеральный партнер', x: 453, y: 236.5, w: 173.8, h: 74.9, roleX: 537.5, roleY: 353.36 },
-    { name: 'Советский спорт', logo: '/media/partners/sovsport.svg', role: 'Генеральный партнер', x: 788, y: 263.5, w: 174, h: 47.9, roleX: 872.5, roleY: 353.36 },
-    { name: 'Meta Ratings', logo: '/media/partners/meta.svg', role: 'Генеральный партнер', x: 1117, y: 277.79, w: 184.03, h: 42.52, roleX: 1207.5, roleY: 353.36 },
-    { name: 'Рейтинг букмекеров', logo: '/media/partners/rb.svg', role: 'Генеральный партнер', x: 256, y: 464.9, w: 188.9, h: 34.4, roleX: 348.5, roleY: 547.36 },
-    { name: 'Sports.ru', logo: '/media/partners/sports.svg', role: 'Генеральный партнер', x: 624, y: 464.9, w: 184.6, h: 43, roleX: 714.5, roleY: 547.36 },
-    { name: 'Sport24.ru', logo: '/media/partners/sport24.svg', role: 'Генеральный партнер', x: 981, y: 478, w: 220, h: 19.6, roleX: 1089.5, roleY: 547.36 },
+    { name: 'Матч ТВ', logo: '/media/partners/match.svg', mx: 102, my: 170, role: 'Генеральный партнер', x: 163, y: 273.3, w: 139.04, h: 37.75, roleX: 230.5, roleY: 353.36 },
+    { name: 'Чемпионат', logo: '/media/partners/champ.svg', mx: 273, my: 170, role: 'Генеральный партнер', x: 453, y: 236.5, w: 173.8, h: 74.9, roleX: 537.5, roleY: 353.36 },
+    { name: 'Советский спорт', logo: '/media/partners/sovsport.svg', mx: 102, my: 302, role: 'Генеральный партнер', x: 788, y: 263.5, w: 174, h: 47.9, roleX: 872.5, roleY: 353.36 },
+    { name: 'Meta Ratings', logo: '/media/partners/meta.svg', mx: 273, my: 302, role: 'Генеральный партнер', x: 1117, y: 277.79, w: 184.03, h: 42.52, roleX: 1207.5, roleY: 353.36 },
+    { name: 'Рейтинг букмекеров', logo: '/media/partners/rb.svg', mx: 102, my: 434, role: 'Генеральный партнер', x: 256, y: 464.9, w: 188.9, h: 34.4, roleX: 348.5, roleY: 547.36 },
+    { name: 'Sports.ru', logo: '/media/partners/sports.svg', mx: 273, my: 434, role: 'Генеральный партнер', x: 624, y: 464.9, w: 184.6, h: 43, roleX: 714.5, roleY: 547.36 },
+    { name: 'Sport24.ru', logo: '/media/partners/sport24.svg', mx: 187.5, my: 566, role: 'Генеральный партнер', x: 981, y: 478, w: 220, h: 19.6, roleX: 1089.5, roleY: 547.36 },
   ],
 };
 

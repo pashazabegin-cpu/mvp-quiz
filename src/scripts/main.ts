@@ -103,12 +103,12 @@ const unlockScroll = () => {
   root.classList.remove('is-scroll-locked');
 };
 
-// блоки низа страницы (снег, билет) есть только в десктопной раскладке
+// живые эффекты низа страницы (снег на canvas, билет за курсором) — только на десктопе, на мобильном там CSS
 if (motion && !mobile) {
   run('snow', initSnow);
   run('holo-ticket', initHoloTicket);
 }
-if (!mobile) run('map', initLocationMap);
+run('map', () => initLocationMap(mobile));
 
 // Эффекты под курсор — только для мыши/тачпада
 if (motion && finePointer) {
@@ -128,7 +128,7 @@ fontsReady.then(() => {
   run('logo-spin', initLogoSpin);
   run('talks', initTalks);
   run('quiz', () => initQuiz(motion));
-  if (!mobile) run('finale', () => initFinale(motion));
+  run('finale', () => initFinale(motion && !mobile));
   if (motion && mobile) {
     run('soft-reveal', () => initSoftReveal(), showText(SOFT_REVEAL_TARGETS));
   } else if (motion) {

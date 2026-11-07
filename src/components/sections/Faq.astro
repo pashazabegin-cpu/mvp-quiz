@@ -123,4 +123,56 @@ import { withBase } from '../../lib/paths';
     font-size: 20px;
     line-height: 26px;
   }
+
+  /* мобильный (Figma: «11 · FAQ») */
+  @media (max-aspect-ratio: 1/1) {
+    .faq {
+      padding: 78px 0 70px;
+    }
+    .faq__title {
+      left: 16px;
+      top: 30px;
+      font-size: 38px;
+      line-height: 36px;
+      letter-spacing: -1.9px;
+    }
+    .faq__list {
+      width: calc(100% - 32px);
+      margin-left: 16px;
+    }
+    .faq__item {
+      background-size: 100% 1px;
+    }
+    .faq__q,
+    .faq__item:first-child .faq__q {
+      gap: 16px;
+      min-height: 0;
+      padding: 22px 0;
+    }
+    .faq__item[open]:not(.is-closing) .faq__q {
+      padding-bottom: 14px;
+    }
+    .faq__text {
+      width: auto;
+      flex: 1;
+      font-size: 18px;
+      line-height: 26px;
+    }
+    .faq__icon {
+      width: 24px;
+      height: 24px;
+    }
+    .faq__icon::before,
+    .faq__icon::after {
+      top: 11px;
+      width: 24px;
+    }
+    .faq__a p {
+      width: auto;
+      max-width: 320px;
+      padding-bottom: 26px;
+      font-size: 16px;
+      line-height: 23px;
+    }
+  }
 </style>

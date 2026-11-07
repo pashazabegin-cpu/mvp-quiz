@@ -251,22 +251,28 @@ button {
   text-transform: uppercase;
   white-space: nowrap;
 }
-/* десктоп: плашка времени и теги «Что мы придумали?» — сквиркл из макета («Squircle n=3.00 r=100px», высота 40);
-   в мобильном макете время пока прямоугольное */
+/* плашка времени и теги «Что мы придумали?» — сквиркл из макета («Squircle n=3.00 r=100px»):
+   концы тянутся по высоте, середина заполняет остальное. Десктоп — высота 40, мобильный — 32 */
+.time-pill,
+.pill--sq {
+  --sq-mid: calc(100% - 39px);
+  -webkit-mask:
+    url('/media/ui/sq40-l.svg') left / auto 100% no-repeat,
+    linear-gradient(#000 0 0) center / var(--sq-mid) 100% no-repeat,
+    url('/media/ui/sq40-r.svg') right / auto 100% no-repeat;
+  mask:
+    url('/media/ui/sq40-l.svg') left / auto 100% no-repeat,
+    linear-gradient(#000 0 0) center / var(--sq-mid) 100% no-repeat,
+    url('/media/ui/sq40-r.svg') right / auto 100% no-repeat;
+}
+@media (max-aspect-ratio: 1/1) {
+  .time-pill {
+    --sq-mid: calc(100% - 31px);
+  }
+}
 @media not all and (max-aspect-ratio: 1/1) {
   .time-pill {
     height: 40px;
-  }
-  .time-pill,
-  .pill--sq {
-    -webkit-mask:
-      url('/media/ui/sq40-l.svg') left / auto 100% no-repeat,
-      linear-gradient(#000 0 0) center / calc(100% - 39px) 100% no-repeat,
-      url('/media/ui/sq40-r.svg') right / auto 100% no-repeat;
-    mask:
-      url('/media/ui/sq40-l.svg') left / auto 100% no-repeat,
-      linear-gradient(#000 0 0) center / calc(100% - 39px) 100% no-repeat,
-      url('/media/ui/sq40-r.svg') right / auto 100% no-repeat;
   }
   .pill--sq {
     justify-content: center;

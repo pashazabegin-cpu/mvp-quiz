@@ -12,8 +12,12 @@
  * Текст реагирует на свет: поверх обычного слоя лежит его копия с «напылением» — такой же круг вокруг курсора,
  * от белого к бирюзовому кольцу, поэтому буквы переливаются вместе с поверхностью.
  * Слои собраны сеткой, а не абсолютом: background-clip: text не закрашивает текст потомков с position.
+ *
+ * Мобильный (Figma: «08 · Купить билет»): билет вертикальный, линия отрыва поперёк. Без скриптов: пятна стоят на месте,
+ * свет сверху медленно дышит прозрачностью, снег идёт на CSS (ui/MobileSnow.astro).
  */
 import Button from '../ui/Button.astro';
+import MobileSnow from '../ui/MobileSnow.astro';
 import { event, ticket } from '../../data/content';
 import { withBase } from '../../lib/paths';
 
@@ -21,8 +25,9 @@ import { withBase } from '../../lib/paths';
 const layers = [false, true];
 ---
 
-<section class="tickets" id="tickets" data-holo-stage style={`--ticket-shape:url(${withBase('/media/tickets/ticket-shape.svg')})`}>
+<section class="tickets" id="tickets" data-holo-stage style={`--ticket-shape:url(${withBase('/media/tickets/ticket-shape.svg')});--ticket-shape-m:url(${withBase('/media/tickets/ticket-shape-m.svg')})`}>
   <canvas class="tickets__snow" data-snow data-snow-density="1.5" aria-hidden="true"></canvas>
+  <MobileSnow />
 
   <div class="ticket-wrap" data-reveal>
     <article class="ticket" data-holo>
@@ -285,5 +290,117 @@ const layers = [false, true];
   .ticket__cta :global(.btn__icon) {
     width: 17.59px;
     height: 15.39px;
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    .tickets {
+      height: 756px;
+    }
+    .tickets__snow,
+    .ticket__copy--ink,
+    .ticket__shadow {
+      display: none;
+    }
+    .ticket-wrap {
+      left: 50%;
+      top: 40px;
+      width: 343px;
+      height: 636px;
+      margin-left: -171.5px;
+      perspective: none;
+    }
+    .ticket {
+      will-change: auto;
+    }
+    .ticket__face {
+      -webkit-mask-image: var(--ticket-shape-m);
+      mask-image: var(--ticket-shape-m);
+    }
+    /* линия отрыва поперёк билета */
+    .ticket__face::after {
+      content: '';
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: 296px;
+      height: 1px;
+      background: repeating-linear-gradient(to right, #04101d 0 1px, transparent 1px 5px);
+    }
+    .ticket__glow {
+      background-image:
+        radial-gradient(250px 560px at 172px 120px, rgb(0 24 82 / 0) 50%, rgb(0 24 82 / 0.16) 62%, rgb(0 24 82 / 0.46) 76%, rgb(0 24 82 / 0.76) 90%, rgb(0 24 82 / 0.92) 100%),
+        radial-gradient(230px 230px at 130px 130px, rgb(30 176 255 / 0.9) 0%, rgb(30 176 255 / 0.774) 20%, rgb(30 176 255 / 0.495) 40%, rgb(30 176 255 / 0.225) 60%, rgb(30 176 255 / 0.063) 80%, rgb(30 176 255 / 0.0) 100%),
+        radial-gradient(160px 160px at 171px 566px, rgb(30 176 255 / 0.62) 0%, rgb(30 176 255 / 0.533) 20%, rgb(30 176 255 / 0.341) 40%, rgb(30 176 255 / 0.155) 60%, rgb(30 176 255 / 0.043) 80%, rgb(30 176 255 / 0.0) 100%),
+        radial-gradient(330px 330px at 190px -60px, rgb(38 236 214 / 1) 0%, rgb(38 236 214 / 0.86) 20%, rgb(38 236 214 / 0.55) 40%, rgb(38 236 214 / 0.25) 60%, rgb(38 236 214 / 0.07) 80%, rgb(38 236 214 / 0) 100%);
+    }
+    /* вместо света за курсором: тот же круг наверху, медленно дышит (только прозрачность) */
+    .ticket__light {
+      --mx: 62%;
+      --my: 16%;
+      background-image: radial-gradient(240px 240px at 62% 16%, rgb(110 240 255 / 0.3) 0%, rgb(90 226 255 / 0.22) 24%, rgb(70 208 255 / 0.1) 50%, rgb(50 190 255 / 0) 100%);
+      animation: ticket-breathe 7s ease-in-out infinite alternate;
+    }
+    .ticket__rim {
+      border-radius: 32px;
+    }
+    .ticket__mark {
+      left: 24px;
+      top: 34px;
+      width: 40px;
+      height: 39px;
+    }
+    .ticket__title {
+      margin: 28px 0 0 88px;
+      font-size: 38px;
+      line-height: 44px;
+      letter-spacing: -1.9px;
+    }
+    .ticket__line--accent {
+      margin-left: 40px;
+    }
+    .ticket__text {
+      width: 295px;
+      margin: 150px 0 0 24px;
+      font-size: 16px;
+      line-height: 23px;
+    }
+    .ticket__perks {
+      width: 279px;
+      margin: 322px 0 0 44px;
+      gap: 10px;
+      font-size: 16px;
+      line-height: 23px;
+    }
+    .ticket__perks li::before {
+      left: -20px;
+      top: 9.5px;
+    }
+    .ticket__cta {
+      left: 0;
+      right: 0;
+      top: 540px;
+      display: flex;
+      justify-content: center;
+    }
+    .ticket__cta :global(.btn) {
+      --btn-h: 60px;
+      min-width: 234px;
+      gap: 16px;
+      padding: 2.4px 32px 0;
+      font-size: 16.2px;
+      line-height: 26px;
+    }
+    .ticket__cta :global(.btn__icon) {
+      width: 16.2px;
+      height: 14.2px;
+    }
+  }
+  @keyframes ticket-breathe {
+    from {
+      opacity: 0.35;
+    }
+    to {
+      opacity: 1;
+    }
   }
 </style>

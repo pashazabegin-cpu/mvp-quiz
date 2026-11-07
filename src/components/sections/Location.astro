@@ -6,6 +6,7 @@
  * Прокрутка колесом над картой листает страницу, а не масштабирует карту.
  * .map__inner компенсирует масштаб кадра: API карт считает курсор в экранных px, и так карта остаётся чёткой.
  * Параллакс фото — как у фото в «Что мы придумали?» (scripts/sections/finale.ts).
+ * Мобильный (Figma: «10 · Локация»): всё стоит на месте, карта не забирает палец — скролл важнее, для маршрута есть ссылка.
  */
 import { event, location, ticket } from '../../data/content';
 import { withBase } from '../../lib/paths';
@@ -240,9 +241,86 @@ import { withBase } from '../../lib/paths';
     background-size: 100% 1px;
   }
   .location__link svg {
+    flex: none;
     transition: transform 0.4s var(--ease-out);
   }
   .location__link:hover svg {
     transform: translate(2px, -2px);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    .location {
+      height: 720px;
+    }
+    .location__title {
+      top: 30px;
+      font-size: 38px;
+      line-height: 36px;
+      letter-spacing: -1.9px;
+    }
+    .location__venue {
+      top: 104px;
+      font-size: 24px;
+      line-height: 30px;
+      letter-spacing: 3.6px;
+    }
+    .location__address {
+      left: 50%;
+      top: 146px;
+      width: 300px;
+      margin-left: -150px;
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .map {
+      top: 250px;
+      height: 300px;
+    }
+    .map__poster {
+      object-position: 50% 50%;
+    }
+    .map__pin {
+      width: 52px;
+      height: 60px;
+      margin-left: -26px;
+      margin-top: -60px;
+    }
+    .map__pin-body {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+    }
+    .map__pin-body img {
+      width: 30px;
+      height: auto;
+    }
+    .map__pin-body::after {
+      bottom: -5px;
+      width: 14px;
+      height: 14px;
+      margin-left: -7px;
+      border-radius: 0 0 4px 0;
+    }
+    .location__photo {
+      border-radius: 24px;
+      will-change: auto;
+    }
+    .location__photo--left {
+      left: -36px;
+      top: 196px;
+      width: 196px;
+      height: 118px;
+    }
+    .location__photo--right {
+      right: -37px;
+      top: 508px;
+      width: 226px;
+      height: 118px;
+    }
+    .location__link {
+      top: 652px;
+      gap: 10px;
+      font-size: 18px;
+    }
   }
 </style>

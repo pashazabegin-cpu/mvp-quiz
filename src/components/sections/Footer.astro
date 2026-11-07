@@ -3,7 +3,9 @@
  * Подвал (Figma: кадр «2»): меню по блокам, стеклянный логотип, контакты, соцсети, документы,
  * большой логотип MVP / Квизмас, обрезанный низом страницы. Позади идёт снег (effects/snow.ts).
  * На месте картинки будет видео: достаточно заполнить footer.video в content.ts.
+ * Мобильный (Figma: «12 · Подвал»): картинка по центру, меню столбиком, снег на CSS (ui/MobileSnow.astro).
  */
+import MobileSnow from '../ui/MobileSnow.astro';
 import { contacts, footer } from '../../data/content';
 import { withBase } from '../../lib/paths';
 
@@ -15,6 +17,7 @@ const socials = [
 
 <footer class="footer">
   <canvas class="footer__snow" data-snow data-snow-density="0.9" aria-hidden="true"></canvas>
+  <MobileSnow />
 
   <ul class="footer__nav" data-stagger>
     {
@@ -125,6 +128,7 @@ const socials = [
     line-height: 1.2;
   }
   .footer__contact svg {
+    flex: none;
     transition: transform 0.4s var(--ease-out);
   }
   .footer__contact:hover svg {
@@ -169,5 +173,47 @@ const socials = [
     max-width: none;
     height: auto;
     transform: translateX(-8px);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    .footer {
+      height: calc(701px + var(--logo-w) * 0.1022);
+    }
+    .footer__snow {
+      display: none;
+    }
+    .footer__media {
+      left: 50%;
+      top: 10px;
+      width: 198px;
+      height: 202px;
+      margin-left: -99px;
+    }
+    .footer__nav {
+      left: 16px;
+      top: 226px;
+      font-size: 18px;
+      line-height: 36px;
+      letter-spacing: -0.9px;
+    }
+    .footer__contact {
+      left: 16px;
+      top: 574px;
+    }
+    .footer__socials {
+      left: auto;
+      right: 16px;
+      top: 574px;
+    }
+    .footer__docs {
+      left: 16px;
+      top: 618px;
+      grid-template-columns: repeat(2, 168px);
+      gap: 7px;
+      width: auto;
+    }
+    .footer__logo {
+      top: 701px;
+    }
   }
 </style>

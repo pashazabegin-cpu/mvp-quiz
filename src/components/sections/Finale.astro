@@ -9,7 +9,8 @@
  *
  * Эллипсы заранее отрисованы картинками в 1/8 размера: браузер только двигает готовую текстуру,
  * живой filter: blur на таких размерах тормозил бы. Движение — scripts/sections/finale.ts.
- * Мобильного макета у этих блоков пока нет: на мобильной раскладке они скрыты.
+ * Мобильный (Figma: «2 · mobile», секции 07–12): вместо движущихся эллипсов — неподвижный CSS-градиент из тех же пятен,
+ * пока палец листает, скрипты здесь ничего не двигают.
  */
 import { withBase } from '../../lib/paths';
 
@@ -43,7 +44,7 @@ const glows = [
             data-period={g.period}
             data-reverse={g.reverse ? '' : undefined}
           >
-            <img src={withBase(`/media/glows/${g.src}.webp`)} alt="" width={g.w} height={g.h} decoding="async" />
+            <img src={withBase(`/media/glows/${g.src}.webp`)} alt="" width={g.w} height={g.h} loading="lazy" decoding="async" />
           </div>
         ))
       }
@@ -89,9 +90,18 @@ const glows = [
   .glow--overlay {
     mix-blend-mode: overlay;
   }
+  /* мобильный: пятна из кадра Figma, координаты от верха блока «Кто будет?» */
   @media (max-aspect-ratio: 1/1) {
-    .finale {
+    .glow {
       display: none;
+    }
+    .finale__glows {
+      background-color: #04101d;
+      background-image:
+        radial-gradient(430px 430px at -50px 1316px, rgb(49 168 243 / 0.95) 0%, rgb(49 168 243 / 0.817) 20%, rgb(49 168 243 / 0.522) 40%, rgb(49 168 243 / 0.237) 60%, rgb(49 168 243 / 0.067) 80%, rgb(49 168 243 / 0.0) 100%),
+        radial-gradient(640px 700px at 310px 2056px, rgb(0 66 215 / 1) 0%, rgb(0 66 215 / 0.86) 20%, rgb(0 66 215 / 0.55) 40%, rgb(0 66 215 / 0.25) 60%, rgb(0 66 215 / 0.07) 80%, rgb(0 66 215 / 0) 100%),
+        radial-gradient(900px 900px at 50% 3817px, rgb(0 0 0 / 0.95) 0%, rgb(0 0 0 / 0.817) 20%, rgb(0 0 0 / 0.522) 40%, rgb(0 0 0 / 0.237) 60%, rgb(0 0 0 / 0.067) 80%, rgb(0 0 0 / 0.0) 100%);
+      background-repeat: no-repeat;
     }
   }
 </style>

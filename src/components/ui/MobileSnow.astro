@@ -1,0 +1,74 @@
+---
+/**
+ * Снег для мобильной раскладки: только CSS (transform и opacity), поэтому двигает его браузер, а не скрипт,
+ * и он не мешает скроллу. На десктопе вместо него снег на canvas (scripts/effects/snow.ts).
+ * Снежинки проявляются и гаснут сами, поэтому маска на родителе не нужна — она заставляла бы перерисовывать слой.
+ */
+import { withBase } from '../../lib/paths';
+---
+
+<div class="msnow" style={`--crystal:url(${withBase('/media/intro/snow-3.svg')})`} aria-hidden="true">
+  {Array.from({ length: 14 }, () => <i></i>)}
+</div>
+
+<style>
+  .msnow {
+    display: none;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  @media (max-aspect-ratio: 1/1) {
+    .msnow {
+      display: block;
+    }
+  }
+  .msnow i {
+    position: absolute;
+    top: -30px;
+    left: var(--x);
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0;
+    animation: msnow-fall var(--t) linear var(--d) infinite;
+  }
+  /* каждая четвёртая — кристалл из «Что мы придумали?» */
+  .msnow i:nth-child(4n) {
+    border-radius: 0;
+    -webkit-mask: var(--crystal) center / contain no-repeat;
+    mask: var(--crystal) center / contain no-repeat;
+  }
+  @keyframes msnow-fall {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0);
+      opacity: 0;
+    }
+    12% {
+      opacity: var(--a);
+    }
+    78% {
+      opacity: var(--a);
+    }
+    100% {
+      transform: translate3d(var(--drift), 780px, 0) rotate(160deg);
+      opacity: 0;
+    }
+  }
+  .msnow i:nth-child(1) { --x: 6%; --s: 3px; --t: 15s; --d: -2s; --a: 0.7; --drift: 16px; }
+  .msnow i:nth-child(2) { --x: 18%; --s: 2px; --t: 19s; --d: -11s; --a: 0.5; --drift: -10px; }
+  .msnow i:nth-child(3) { --x: 29%; --s: 4px; --t: 13s; --d: -6s; --a: 0.6; --drift: 22px; }
+  .msnow i:nth-child(4) { --x: 40%; --s: 18px; --t: 21s; --d: -3s; --a: 0.55; --drift: 26px; }
+  .msnow i:nth-child(5) { --x: 51%; --s: 2px; --t: 17s; --d: -14s; --a: 0.55; --drift: -14px; }
+  .msnow i:nth-child(6) { --x: 62%; --s: 3px; --t: 14s; --d: -9s; --a: 0.7; --drift: 12px; }
+  .msnow i:nth-child(7) { --x: 72%; --s: 2px; --t: 20s; --d: -1s; --a: 0.45; --drift: -18px; }
+  .msnow i:nth-child(8) { --x: 84%; --s: 22px; --t: 24s; --d: -13s; --a: 0.5; --drift: -24px; }
+  .msnow i:nth-child(9) { --x: 93%; --s: 3px; --t: 16s; --d: -5s; --a: 0.6; --drift: -12px; }
+  .msnow i:nth-child(10) { --x: 12%; --s: 2px; --t: 18s; --d: -8s; --a: 0.5; --drift: 14px; }
+  .msnow i:nth-child(11) { --x: 34%; --s: 3px; --t: 22s; --d: -16s; --a: 0.5; --drift: -8px; }
+  .msnow i:nth-child(12) { --x: 8%; --s: 16px; --t: 26s; --d: -19s; --a: 0.5; --drift: 20px; }
+  .msnow i:nth-child(13) { --x: 57%; --s: 4px; --t: 15s; --d: -12s; --a: 0.45; --drift: 18px; }
+  .msnow i:nth-child(14) { --x: 78%; --s: 2px; --t: 19s; --d: -4s; --a: 0.55; --drift: -6px; }
+</style>

@@ -15,10 +15,10 @@
  *   свет (__light) — мягкий круг под курсором, не ярче середины: белый текст на нём читается;
  *   отражение (__gloss) — широкий блик на противоположной стороне, как отражение лампы в пластике;
  *   кромка (__edgelight) — край карты загорается с той стороны, где свет; при наклоне сильнее;
- *   фактура (__texture) — едва заметные плавные волны фольги и редкие искры у света (__spark).
- * Все слои — обычная прозрачность, без mix-blend-mode: смешивание внутри повёрнутой в 3D карточки Chrome рисовал
- * с обрезанными кусками (на билете была вертикальная граница).
- * Толщина карты: светлая кромка по краю и торец, который виден снизу (на десктопе при повороте — и сбоку).
+ *   крапинки (__specks) — мелкие белые блёстки в покрытии, как у 3D-иконок; рядом со светом вспыхивают другие (__glints).
+ * Карточка плоская (без preserve-3d): слои в 3D, стоящие друг за другом, Chrome при повороте резал на куски —
+ * на билете была вертикальная граница. Поэтому и без mix-blend-mode — все слои обычная прозрачность.
+ * Толщина карты: светлая кромка по краю и торец — полоска снизу.
  *
  * Текст реагирует на свет: поверх обычного слоя лежит его копия с «напылением» — такой же круг вокруг курсора,
  * от белого к бирюзовому кольцу, поэтому буквы переливаются вместе с поверхностью.
@@ -36,7 +36,7 @@ import { withBase } from '../../lib/paths';
 const layers = [false, true];
 ---
 
-<section class="tickets" id="tickets" data-holo-stage style={`--ticket-shape:url(${withBase('/media/tickets/ticket-shape.svg')});--ticket-shape-m:url(${withBase('/media/tickets/ticket-shape-m.svg')});--foil:url(${withBase('/media/tickets/foil.webp')});--foil-inv:url(${withBase('/media/tickets/foil-inv.webp')});--foil-spark:url(${withBase('/media/tickets/foil-spark.webp')})`}>
+<section class="tickets" id="tickets" data-holo-stage style={`--ticket-shape:url(${withBase('/media/tickets/ticket-shape.svg')});--ticket-shape-m:url(${withBase('/media/tickets/ticket-shape-m.svg')});--specks:url(${withBase('/media/tickets/specks.webp')});--glints:url(${withBase('/media/tickets/glints.webp')})`}>
   <canvas class="tickets__snow" data-snow data-snow-density="1.5" aria-hidden="true"></canvas>
   <MobileSnow />
 
@@ -47,9 +47,9 @@ const layers = [false, true];
       <div class="ticket__face">
         <span class="ticket__glow" aria-hidden="true"></span>
         <span class="ticket__holo" aria-hidden="true"></span>
-        <span class="ticket__texture" aria-hidden="true"></span>
         <span class="ticket__light" aria-hidden="true"></span>
-        <span class="ticket__spark" aria-hidden="true"></span>
+        <span class="ticket__specks" aria-hidden="true"></span>
+        <span class="ticket__glints" aria-hidden="true"></span>
         <span class="ticket__gloss" aria-hidden="true"></span>
         <span class="ticket__rim" aria-hidden="true"></span>
         <span class="ticket__glowedge" aria-hidden="true"></span>
@@ -122,18 +122,17 @@ const layers = [false, true];
     position: relative;
     width: 100%;
     height: 100%;
-    transform-style: preserve-3d;
     will-change: transform;
   }
-  /* торец карточки: тот же контур чуть ниже и позади — снизу видна полоска толщиной около миллиметра,
-     при повороте открывается и сбоку. Светлый у лица карты, темнее к низу, как срез ламинированного пластика */
+  /* торец карточки: тот же контур чуть ниже, под лицом карты — снизу видна полоска толщиной около миллиметра.
+     Светлый у лица карты, темнее к низу, как срез ламинированного пластика. Плоский слой, не 3D (см. выше) */
   .ticket__edge {
     position: absolute;
     inset: 0;
     background: linear-gradient(#9fe9ff, #2a7fd8 30%, #062a74 75%, #021645);
     -webkit-mask: var(--ticket-shape) center / 100% 100% no-repeat;
     mask: var(--ticket-shape) center / 100% 100% no-repeat;
-    transform: translateY(3px) translateZ(-6px);
+    transform: translateY(3px);
   }
   /* тень отдельным слоем: filter на билете пересчитывался бы на каждом кадре фольги */
   .ticket__shadow {
@@ -141,7 +140,6 @@ const layers = [false, true];
     inset: 24px 28px 8px;
     border-radius: 40px;
     box-shadow: 0 24px 70px rgb(0 0 0 / 0.45), 0 0 90px rgb(49 168 243 / 0.14);
-    transform: translateZ(-8px);
   }
   .ticket__face {
     position: absolute;
@@ -252,34 +250,21 @@ const layers = [false, true];
     );
     opacity: var(--lx);
   }
-  /* фактура фольги: едва заметные плавные волны (прозрачные светлые и тёмные пятна), свет на них — со стороны курсора */
-  .ticket__texture {
+  /* крапинки в покрытии: мелкие белые блёстки по всей карте */
+  .ticket__specks {
     position: absolute;
     inset: 0;
-    opacity: 0.45;
+    background: var(--specks) 0 0 / 256px repeat;
+    opacity: 0.5;
   }
-  .ticket__texture::before,
-  .ticket__texture::after {
-    content: '';
+  /* блёстки у света: другой набор крапинок, ярче, видны только вокруг курсора — при движении вспыхивают и гаснут */
+  .ticket__glints {
     position: absolute;
     inset: 0;
-    background: var(--foil) 0 0 / var(--foil-size, 512px) repeat;
-  }
-  .ticket__texture::before {
-    opacity: calc(1 - var(--lx));
-  }
-  .ticket__texture::after {
-    background-image: var(--foil-inv);
-    opacity: var(--lx);
-  }
-  /* искры: несколько блёсток вокруг света */
-  .ticket__spark {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle 300px at var(--mx) var(--my), rgb(255 255 255 / 0.55), rgb(220 250 255 / 0.2) 45%, rgb(255 255 255 / 0) 100%);
-    -webkit-mask: var(--foil-spark) 0 0 / 256px repeat;
-    mask: var(--foil-spark) 0 0 / 256px repeat;
-    opacity: calc(0.1 + var(--react) * 0.5);
+    background: var(--glints) 0 0 / 256px repeat;
+    -webkit-mask-image: radial-gradient(circle 300px at var(--mx) var(--my), #000, rgb(0 0 0 / 0.35) 45%, transparent 80%);
+    mask-image: radial-gradient(circle 300px at var(--mx) var(--my), #000, rgb(0 0 0 / 0.35) 45%, transparent 80%);
+    opacity: calc(0.25 + var(--react) * 0.75);
   }
   /* отражение: широкий мягкий блик на стороне, противоположной курсору, и светлее верхний левый угол */
   .ticket__gloss {
@@ -442,7 +427,7 @@ const layers = [false, true];
     }
     .ticket__gloss,
     .ticket__holo,
-    .ticket__spark {
+    .ticket__glints {
       --mx: 62%;
       --my: 16%;
     }
@@ -455,11 +440,10 @@ const layers = [false, true];
       opacity: 0.7;
       border-radius: 32px;
     }
-    .ticket__texture {
+    .ticket__holo {
       --lx: 0.35;
     }
-    /* на телефоне блёстки неподвижны: смешивание с маской на каждом кадре — лишняя работа */
-    .ticket__spark {
+    .ticket__glints {
       opacity: 0.6;
     }
     .ticket-wrap {
@@ -471,7 +455,6 @@ const layers = [false, true];
       perspective: none;
     }
     .ticket {
-      transform-style: flat;
       will-change: auto;
     }
     .ticket__face {

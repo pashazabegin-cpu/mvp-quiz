@@ -130,7 +130,7 @@ fontsReady.then(() => {
   run('logo-spin', initLogoSpin);
   run('talks', initTalks);
   run('quiz', () => initQuiz(motion));
-  run('finale', () => initFinale(motion && !mobile));
+  run('finale', () => initFinale(motion, mobile));
   if (motion && mobile) {
     run('soft-reveal', () => initSoftReveal(), showText(SOFT_REVEAL_TARGETS));
   } else if (motion) {

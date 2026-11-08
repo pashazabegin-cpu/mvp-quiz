@@ -50,7 +50,7 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       <img src={withBase('/media/hero/vk.svg')} width="20" height="20" alt="" />
     </a>
 
-    <p class="hero-tag" data-anim="tag"><span>{hero.date}</span></p>
+    <p class="hero-tag" data-anim="tag"><span class="sq40">{hero.date}</span></p>
     <p class="hero-address" data-anim="lines">{hero.address}</p>
     <h1 class="hero-logo" data-anim="parts">
       <img src={withBase(hero.logo)} width="534" height="75.37" alt="MVP Квизмас" />
@@ -217,14 +217,16 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     line-height: 26px;
     white-space: nowrap;
   }
+  /* плашка даты — «Squircle n=3.00 r=100px» 40 px, тёмно-синяя (Figma: main); маска — .sq40 в global.css */
   .hero-tag {
-    top: calc(50% - 450px + 283px);
+    top: calc(50% - 450px + 275px);
   }
   .hero-tag span {
     display: block;
     width: max-content;
-    padding: 6px 9px 2px;
-    background: var(--c-accent);
+    height: 40px;
+    padding: 9px 20px 5px 18px;
+    background: var(--c-accent-2);
   }
   .hero-address {
     top: calc(50% - 450px + 330px);
@@ -315,6 +317,14 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     }
     .hero-tag {
       top: calc(100% - 387px);
+    }
+    /* в мобильном макете плашка пока прежняя: голубой прямоугольник */
+    .hero-tag span {
+      height: auto;
+      padding: 6px 9px 2px;
+      background: var(--c-accent);
+      -webkit-mask: none;
+      mask: none;
     }
     .hero-address {
       top: calc(100% - 351px);

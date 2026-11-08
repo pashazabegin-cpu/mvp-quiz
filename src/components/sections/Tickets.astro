@@ -9,6 +9,10 @@
  * а за самим курсором идёт круг света (__light) — так и получается перламутровый перелив. Спады с плавными шагами,
  * цвета не смешиваются с белым и серым — поэтому переходы чистые.
  *
+ * Поверх цвета — физика пластикового ламинированного билета: тиснение (тонкий гильош по всей карточке и крупный знак MVP
+ * в углу — светлая кромка сверху-слева и тень снизу-справа), блик плёнки, который идёт навстречу курсору, лёгкое зерно
+ * покрытия и скошенная кромка. На десктопе под билетом — его торец: при повороте видна толщина карточки.
+ *
  * Текст реагирует на свет: поверх обычного слоя лежит его копия с «напылением» — такой же круг вокруг курсора,
  * от белого к бирюзовому кольцу, поэтому буквы переливаются вместе с поверхностью.
  * Слои собраны сеткой, а не абсолютом: background-clip: text не закрашивает текст потомков с position.
@@ -25,16 +29,19 @@ import { withBase } from '../../lib/paths';
 const layers = [false, true];
 ---
 
-<section class="tickets" id="tickets" data-holo-stage style={`--ticket-shape:url(${withBase('/media/tickets/ticket-shape.svg')});--ticket-shape-m:url(${withBase('/media/tickets/ticket-shape-m.svg')})`}>
+<section class="tickets" id="tickets" data-holo-stage style={`--ticket-shape:url(${withBase('/media/tickets/ticket-shape.svg')});--ticket-shape-m:url(${withBase('/media/tickets/ticket-shape-m.svg')});--guilloche:url(${withBase('/media/tickets/guilloche.svg')});--emboss-mark:url(${withBase(ticket.mark)})`}>
   <canvas class="tickets__snow" data-snow data-snow-density="1.5" aria-hidden="true"></canvas>
   <MobileSnow />
 
   <div class="ticket-wrap" data-reveal>
     <article class="ticket" data-holo>
       <span class="ticket__shadow" aria-hidden="true"></span>
+      <span class="ticket__edge" aria-hidden="true"></span>
       <div class="ticket__face">
         <span class="ticket__glow" aria-hidden="true"></span>
         <span class="ticket__light" aria-hidden="true"></span>
+        <span class="ticket__emboss" aria-hidden="true"></span>
+        <span class="ticket__gloss" aria-hidden="true"></span>
         <span class="ticket__rim" aria-hidden="true"></span>
         <img class="ticket__mark" src={withBase(ticket.mark)} width="47" height="46" alt="" />
         {
@@ -98,7 +105,17 @@ const layers = [false, true];
     position: relative;
     width: 100%;
     height: 100%;
+    transform-style: preserve-3d;
     will-change: transform;
+  }
+  /* торец карточки: тот же контур чуть позади, темнее — при повороте видна толщина */
+  .ticket__edge {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(#0a2f78, #011540);
+    -webkit-mask: var(--ticket-shape) center / 100% 100% no-repeat;
+    mask: var(--ticket-shape) center / 100% 100% no-repeat;
+    transform: translateZ(-7px);
   }
   /* тень отдельным слоем: filter на билете пересчитывался бы на каждом кадре фольги */
   .ticket__shadow {
@@ -106,6 +123,7 @@ const layers = [false, true];
     inset: 24px 28px 8px;
     border-radius: 40px;
     box-shadow: 0 24px 70px rgb(0 0 0 / 0.45), 0 0 90px rgb(49 168 243 / 0.14);
+    transform: translateZ(-8px);
   }
   .ticket__face {
     position: absolute;
@@ -175,12 +193,62 @@ const layers = [false, true];
     mix-blend-mode: screen;
     opacity: var(--shine);
   }
-  /* тонкая светлая кромка ламинации */
+  /* тиснение: тот же узор дважды со сдвигом — светлая кромка сверху-слева и тень снизу-справа, как у выдавленного рисунка.
+     Гильош — по всей карточке, крупный знак MVP — в углу, уходит за край */
+  .ticket__emboss {
+    position: absolute;
+    inset: 0;
+    --emboss-size: 160px 22px, 290px auto;
+    --emboss-pos: 0 0, calc(100% + 70px) calc(100% + 62px);
+  }
+  .ticket__emboss::before,
+  .ticket__emboss::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: var(--guilloche), var(--emboss-mark);
+    mask-image: var(--guilloche), var(--emboss-mark);
+    -webkit-mask-size: var(--emboss-size);
+    mask-size: var(--emboss-size);
+    -webkit-mask-position: var(--emboss-pos);
+    mask-position: var(--emboss-pos);
+    -webkit-mask-repeat: repeat, no-repeat;
+    mask-repeat: repeat, no-repeat;
+  }
+  .ticket__emboss::before {
+    background: rgb(255 255 255 / 0.055);
+    transform: translate(-0.7px, -0.7px);
+  }
+  .ticket__emboss::after {
+    background: rgb(0 14 52 / 0.17);
+    transform: translate(0.7px, 0.7px);
+  }
+  /* плёнка: мягкий блик идёт навстречу курсору (как отражение на пластике), светлее верхний левый угол и лёгкое зерно */
+  .ticket__gloss {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 46% 72% at calc(100% - var(--mx)) calc(100% - var(--my)), rgb(255 255 255 / 0.13), rgb(255 255 255 / 0.05) 45%, rgb(255 255 255 / 0) 75%),
+      linear-gradient(158deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0) 34%);
+    mix-blend-mode: screen;
+  }
+  .ticket__gloss::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+  }
+  /* скошенная кромка ламинации: светлая сверху и слева, тёмная снизу и справа */
   .ticket__rim {
     position: absolute;
     inset: 0;
     border-radius: 40px;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22);
+    box-shadow:
+      inset 0 1.5px 0 rgb(255 255 255 / 0.3),
+      inset 1.5px 0 0 rgb(255 255 255 / 0.1),
+      inset 0 -2px 0 rgb(0 10 40 / 0.35),
+      inset -1.5px 0 0 rgb(0 10 40 / 0.2);
   }
 
   .ticket__mark,
@@ -298,8 +366,17 @@ const layers = [false, true];
     }
     .tickets__snow,
     .ticket__copy--ink,
-    .ticket__shadow {
+    .ticket__shadow,
+    .ticket__edge {
       display: none;
+    }
+    .ticket__emboss {
+      --emboss-size: 160px 22px, 220px auto;
+      --emboss-pos: 0 0, calc(100% + 56px) calc(100% + 40px);
+    }
+    .ticket__gloss {
+      --mx: 62%;
+      --my: 16%;
     }
     .ticket-wrap {
       left: 50%;
@@ -310,6 +387,7 @@ const layers = [false, true];
       perspective: none;
     }
     .ticket {
+      transform-style: flat;
       will-change: auto;
     }
     .ticket__face {

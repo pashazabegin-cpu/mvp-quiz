@@ -182,12 +182,13 @@ const arrow = 'M13.7193 0.719346L20.7194 7.64993L13.7193 13.7193M0.719345 7.7195
     line-height: 20px;
   }
 
-  /* фейд макета: x 1222, ширина до края экрана, тот же цвет, что и фон блока */
+  /* фейд макета: x 1222, ширина до края экрана, тот же цвет, что и фон блока.
+     Начинается от верха ленты (с запасом 20 px), чтобы карточка, приподнятая на наведении, не вылезала из-под него */
   .speakers__fade {
     position: absolute;
-    top: 323px;
+    top: 303px;
     width: calc(var(--ui-w) - var(--grid-x) - 1065px);
-    height: 406px;
+    height: 426px;
     background-image: linear-gradient(88.59deg, rgb(4 16 29 / 0) 16.118%, rgb(4 16 29) 111.14%);
     pointer-events: none;
     transition: opacity 0.45s var(--ease-out);
@@ -253,9 +254,9 @@ const arrow = 'M13.7193 0.719346L20.7194 7.64993L13.7193 13.7193M0.719345 7.7195
       line-height: 18px;
     }
     .speakers__fade {
-      top: 110px;
+      top: 90px;
       width: 135px;
-      height: 352px;
+      height: 372px;
     }
   }
 </style>

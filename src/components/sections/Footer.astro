@@ -2,7 +2,8 @@
 /**
  * Подвал (Figma: кадр «2»): меню по блокам, стеклянный логотип, контакты, соцсети, документы,
  * большой логотип MVP / Квизмас, обрезанный низом страницы. Позади идёт снег (effects/snow.ts).
- * На месте картинки будет видео: достаточно заполнить footer.video в content.ts.
+ * Стеклянный логотип — зацикленное видео (footer.video) нижним слоем, снег идёт поверх него; пока видео не загрузилось — постер.
+ * Видео грузится, только когда подвал рядом (scripts/sections/finale.ts).
  * Мобильный (Figma: «12 · Подвал»): картинка по центру, меню столбиком, снег на CSS (ui/MobileSnow.astro).
  */
 import MobileSnow from '../ui/MobileSnow.astro';
@@ -16,6 +17,15 @@ const socials = [
 ---
 
 <footer class="footer">
+  <div class="footer__media" data-reveal>
+    {
+      footer.video ? (
+        <video data-src={withBase(footer.video)} poster={withBase(footer.image)} width="276" height="283" muted loop playsinline preload="none" aria-hidden="true" />
+      ) : (
+        <img src={withBase(footer.image)} width="276" height="283" alt="" loading="lazy" decoding="async" />
+      )
+    }
+  </div>
   <canvas class="footer__snow" data-snow data-snow-density="0.9" aria-hidden="true"></canvas>
   <MobileSnow />
 
@@ -29,15 +39,6 @@ const socials = [
     }
   </ul>
 
-  <div class="footer__media" data-reveal>
-    {
-      footer.video ? (
-        <video src={withBase(footer.video)} poster={withBase(footer.image)} autoplay muted loop playsinline preload="none" />
-      ) : (
-        <img src={withBase(footer.image)} width="276" height="280" alt="" loading="lazy" decoding="async" />
-      )
-    }
-  </div>
 
   <a class="footer__contact" href={contacts.contactUrl} target="_blank" rel="noopener">
     <span>Связаться с нами</span>

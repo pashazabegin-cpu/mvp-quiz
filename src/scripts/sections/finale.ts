@@ -7,24 +7,23 @@
  * Сама анимация — на картинке, скролл — на обёртке, поэтому они не мешают друг другу.
  *
  * Фото в «Локации» — та же глубина, что в «Что мы придумали?» (sections/intro.ts): фото движется со своей
- * скоростью по data-depth, чуть растёт, приближаясь к камере, и разлетается от центра к краям.
+ * скоростью по data-depth. Только сдвиг по вертикали: масштаб на каждом кадре заставлял перерисовывать фото — они мерцали.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { fitFlow, stageHeight } from '../core/stage';
 import { refreshSoon } from '../core/refresh';
 
-/** те же настройки глубины, что в intro.ts */
+/** та же скорость глубины, что в intro.ts */
 const SPEED = 420;
-const DOLLY = 0.05;
-const SPREAD = 0.08;
 
-export function initFinale(motion: boolean) {
+export function initFinale(motion: boolean, mobile: boolean) {
   const section = document.querySelector<HTMLElement>('[data-finale]');
   if (!section) return;
   // кадр масштабируется transform'ом — высоту блока ставим сами (и пересчитываем, когда открывается FAQ)
   fitFlow(section, refreshSoon);
-  if (!motion) return;
+  initLazyVideos(section, motion);
+  if (!motion || mobile) return;
   initGlows(section);
   initPhotos(section);
   initPartners(section);
@@ -70,26 +69,38 @@ function initGlows(section: HTMLElement) {
 function initPhotos(section: HTMLElement) {
   section.querySelectorAll<HTMLElement>('[data-depth]').forEach((el) => {
     const z = Number(el.dataset.depth) || 1;
-    const parent = el.offsetParent as HTMLElement | null;
     // сколько экранов скролла проходит от входа фото в кадр до середины экрана
     const reach = () => (window.innerHeight + el.getBoundingClientRect().height) / (2 * window.innerHeight);
     const distance = () => reach() * SPEED * z * (stageHeight() / 900);
-    const scale = () => reach() * DOLLY * z;
-    const sideways = () => {
-      const center = (parent?.offsetWidth ?? 1440) / 2;
-      return (el.offsetLeft + el.offsetWidth / 2 - center) * reach() * (DOLLY + SPREAD) * z;
-    };
     gsap.fromTo(
       el,
-      { y: () => distance(), x: () => -sideways(), scale: () => 1 - scale() },
+      { y: () => distance() },
       {
         y: () => -distance(),
-        x: () => sideways(),
-        scale: () => 1 + scale(),
         ease: 'none',
+        force3D: true,
         scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true },
       },
     );
+  });
+}
+
+/**
+ * Видео в подвале: грузится и играет, только когда подвал рядом с экраном, вне экрана на паузе.
+ * Без движения (reduced motion) или если браузер не дал запустить (энергосбережение на iPhone) — остаётся постер.
+ */
+function initLazyVideos(section: HTMLElement, autoplay: boolean) {
+  if (!autoplay) return;
+  section.querySelectorAll<HTMLVideoElement>('video[data-src]').forEach((video) => {
+    new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!video.getAttribute('src')) video.src = video.dataset.src!;
+          video.play().catch(() => {});
+        } else if (video.getAttribute('src')) video.pause();
+      },
+      { rootMargin: '300px 0px' },
+    ).observe(video);
   });
 }
 

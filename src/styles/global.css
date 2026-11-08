@@ -73,6 +73,18 @@ button {
   color: var(--c-on-accent);
 }
 
+/* ---------- Дизеринг ----------
+ * Браузер рисует градиенты в 8 битах, и на плавных тёмных переходах видны ступени. Больше бит не добавить,
+ * поэтому сверху лежит статичный шум ±1–2 ступени (media/ui/dither.png): глаз не видит его, а ступени исчезают.
+ * Слой неподвижный и без скриптов — на скролл не влияет. */
+.dither {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: url('/media/ui/dither.png') 0 0 / 128px 128px repeat;
+  pointer-events: none;
+}
+
 /* ---------- Layout ---------- */
 .container {
   width: 100%;
@@ -160,9 +172,11 @@ button {
 
 /* ---------- Кнопка MVP ----------
  * Как на mvpa.ru: золотой сквиркл с внутренними тенями, блик проходит при наведении,
- * средний ряд точек сдвигается на шаг вправо. Форма — точная из макета («Squircle n=3.00 r=95%»):
- * левый и правый концы — куски кнопки из макета (media/ui/btn-*.svg), между ними середина, поэтому кнопка
- * тянется под любую длину подписи. Высота — только через --btn-h: от неё считаются концы.
+ * средний ряд точек сдвигается на шаг вправо. Форма — точная из макета («Squircle n=3.00 r=95%»): маска из левого
+ * и правого конца кнопки (media/ui/btn-*.svg) и середины между ними, поэтому кнопка тянется под любую длину подписи.
+ * Концы захватывают кусок прямого участка, а середина начинается внутри него: стыки лежат на сплошной части формы
+ * и не просвечивают полосками. Фон — один градиент на всю кнопку (светлая кромка сверху, тень снизу).
+ * Высота — только через --btn-h: от неё считаются концы.
  * Не вешать CSS transition на transform самой .btn — его анимирует GSAP (магнит, появление).
  */
 .btn {
@@ -172,22 +186,20 @@ button {
   justify-content: center;
   gap: 13.33px;
   --btn-h: 50px;
+  /* где кончается скругление: 95% половины высоты */
   --btn-cap: calc(var(--btn-h) * 0.476);
   --btn-edge: calc(var(--btn-h) * 0.03377);
   min-width: 195px;
   height: var(--btn-h);
   padding: 2px 28px 0;
-  background:
-    url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
-    url('/media/ui/btn-r.svg') right / auto 100% no-repeat,
-    linear-gradient(#fce39c var(--btn-edge), var(--c-gold) var(--btn-edge) calc(100% - var(--btn-edge)), #8d7a47 calc(100% - var(--btn-edge))) center / calc(100% - var(--btn-cap) * 2 + 1px) 100% no-repeat;
+  background: linear-gradient(#fce39c var(--btn-edge), var(--c-gold) var(--btn-edge) calc(100% - var(--btn-edge)), #8d7a47 calc(100% - var(--btn-edge)));
   -webkit-mask:
     url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
-    linear-gradient(#000 0 0) center / calc(100% - var(--btn-cap) * 2 + 1px) 100% no-repeat,
+    linear-gradient(#000 0 0) center / calc(100% - (var(--btn-cap) + 2px) * 2) 100% no-repeat,
     url('/media/ui/btn-r.svg') right / auto 100% no-repeat;
   mask:
     url('/media/ui/btn-l.svg') left / auto 100% no-repeat,
-    linear-gradient(#000 0 0) center / calc(100% - var(--btn-cap) * 2 + 1px) 100% no-repeat,
+    linear-gradient(#000 0 0) center / calc(100% - (var(--btn-cap) + 2px) * 2) 100% no-repeat,
     url('/media/ui/btn-r.svg') right / auto 100% no-repeat;
   color: #fff;
   font-family: var(--font-body);
@@ -251,11 +263,14 @@ button {
   text-transform: uppercase;
   white-space: nowrap;
 }
-/* плашка времени и теги «Что мы придумали?» — сквиркл из макета («Squircle n=3.00 r=100px»):
-   концы тянутся по высоте, середина заполняет остальное. Десктоп — высота 40, мобильный — 32 */
+/* плашка времени, теги «Что мы придумали?» и дата на первом экране — сквиркл из макета («Squircle n=3.00 r=100px»).
+   Концы тянутся по высоте --sq-h и захватывают кусок прямого участка, середина начинается внутри него —
+   стыки на сплошной части, без полосок. Десктоп — высота 40, мобильный — 32 */
 .time-pill,
-.pill--sq {
-  --sq-mid: calc(100% - 39px);
+.pill--sq,
+.sq40 {
+  --sq-h: 40px;
+  --sq-mid: calc(100% - var(--sq-h) - 4px);
   -webkit-mask:
     url('/media/ui/sq40-l.svg') left / auto 100% no-repeat,
     linear-gradient(#000 0 0) center / var(--sq-mid) 100% no-repeat,
@@ -267,7 +282,7 @@ button {
 }
 @media (max-aspect-ratio: 1/1) {
   .time-pill {
-    --sq-mid: calc(100% - 31px);
+    --sq-h: 32px;
   }
 }
 @media not all and (max-aspect-ratio: 1/1) {

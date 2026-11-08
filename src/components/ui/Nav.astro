@@ -55,11 +55,11 @@ import Button from './Button.astro';
     backdrop-filter: blur(18px) saturate(150%);
     -webkit-mask:
       url('/media/ui/btn-l.svg') var(--r) 50% / auto calc(100% - var(--r) * 2) no-repeat,
-      linear-gradient(#000 0 0) center / calc(100% - var(--r) * 2 - var(--cap) * 2 + 1px) calc(100% - var(--r) * 2) no-repeat,
+      linear-gradient(#000 0 0) center / calc(100% - var(--r) * 2 - (var(--cap) + 2px) * 2) calc(100% - var(--r) * 2) no-repeat,
       url('/media/ui/btn-r.svg') calc(100% - var(--r)) 50% / auto calc(100% - var(--r) * 2) no-repeat;
     mask:
       url('/media/ui/btn-l.svg') var(--r) 50% / auto calc(100% - var(--r) * 2) no-repeat,
-      linear-gradient(#000 0 0) center / calc(100% - var(--r) * 2 - var(--cap) * 2 + 1px) calc(100% - var(--r) * 2) no-repeat,
+      linear-gradient(#000 0 0) center / calc(100% - var(--r) * 2 - (var(--cap) + 2px) * 2) calc(100% - var(--r) * 2) no-repeat,
       url('/media/ui/btn-r.svg') calc(100% - var(--r)) 50% / auto calc(100% - var(--r) * 2) no-repeat;
   }
   /* Chromium: преломляющий фильтр. Слой шире плашки на --glass-reach, чтобы край брал картинку снаружи,

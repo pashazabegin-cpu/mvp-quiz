@@ -1,0 +1,226 @@
+---
+/**
+ * Мобильное меню (Figma: «main · menu», 375×700) — открывается кнопкой «Меню» на первом экране (Hero.astro).
+ * Тёмный экран поверх страницы: «Закрыть» с золотым крестиком, соцсети, пункты по блокам, «Связаться с нами» внизу.
+ * Кадр 375 масштабируется, как остальные мобильные экраны (--ui-s); 700 по высоте влезает в любой телефон (stage.ts).
+ * Открытие и закрытие — только CSS-переход прозрачности; логика — scripts/ui/mobile-menu.ts.
+ */
+import { contacts, footer } from '../../data/content';
+import { withBase } from '../../lib/paths';
+
+const tg = contacts.socials.find((s) => s.id === 'tg');
+const vk = contacts.socials.find((s) => s.id === 'vk');
+---
+
+<div class="mmenu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" data-menu hidden>
+  <div class="mmenu__ui">
+    <button class="mmenu__close" type="button" data-menu-close>
+      <span class="mmenu__cross" aria-hidden="true"></span>
+      <span class="mmenu__close-label">Закрыть</span>
+    </button>
+    <a class="mmenu__social mmenu__social--tg" href={tg?.url} target="_blank" rel="noopener" aria-label="Telegram">
+      <img src={withBase('/media/hero/telegram.svg')} width="20" height="20" alt="" />
+    </a>
+    <a class="mmenu__social mmenu__social--vk" href={vk?.url} target="_blank" rel="noopener" aria-label="ВКонтакте">
+      <img src={withBase('/media/hero/vk.svg')} width="20" height="20" alt="" />
+    </a>
+
+    <nav class="mmenu__nav" aria-label="Разделы">
+      <ul>
+        {
+          footer.nav.map((item) => {
+            // «Программа MVP Talks & Entertainment» — в две строки, как в макете
+            const [first, second] = item.label.split(' & ');
+            return (
+              <li>
+                <a href={`#${item.id}`} data-menu-link>
+                  {second ? (
+                    <>
+                      <span class="mmenu__l1">{first}</span>
+                      <span class="mmenu__l2">& {second}</span>
+                    </>
+                  ) : (
+                    item.label
+                  )}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <a class="mmenu__contact" href={contacts.contactUrl} target="_blank" rel="noopener">
+      <span>Связаться с нами</span>
+      <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true">
+        <path d="M1.857 11.143 11.143 1.857M11.143 9.286V1.857H3.715" fill="none" stroke="#fce39c" stroke-width="1.02" stroke-linecap="square"></path>
+      </svg>
+    </a>
+  </div>
+</div>
+
+<style>
+  .mmenu {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #030f1c;
+    color: #fff;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.35s ease,
+      visibility 0s linear 0.35s;
+  }
+  .mmenu[hidden] {
+    display: none;
+  }
+  :global(.is-menu-open) .mmenu {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.35s ease,
+      visibility 0s;
+  }
+  /* на десктопе меню нет: кнопка «Меню» показывается только в мобильной раскладке */
+  @media not all and (max-aspect-ratio: 1/1) {
+    .mmenu {
+      display: none;
+    }
+  }
+
+  .mmenu__ui {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--ui-w);
+    height: var(--ui-h);
+    transform: scale(var(--ui-s));
+    transform-origin: 0 0;
+  }
+  .mmenu__ui > * {
+    position: absolute;
+  }
+
+  /* крестик — две золотые линии 30 px под ±45° в квадрате 21.2 (x 25.4, y 23.4) */
+  .mmenu__close {
+    left: 13px;
+    top: 14px;
+    width: 110px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mmenu__cross::before,
+  .mmenu__cross::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 19.5px;
+    width: 30px;
+    height: 1px;
+    background: #fce39c;
+    transform: rotate(45deg);
+  }
+  .mmenu__cross::after {
+    transform: rotate(-45deg);
+  }
+  .mmenu__close-label {
+    position: absolute;
+    left: 49px;
+    top: 12px;
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .mmenu__social {
+    top: 26px;
+    width: 20px;
+    height: 20px;
+  }
+  .mmenu__social img {
+    width: 20px;
+    height: 20px;
+  }
+  .mmenu__social--tg {
+    right: 52px;
+  }
+  .mmenu__social--vk {
+    right: 16px;
+  }
+
+  .mmenu__nav {
+    left: 25px;
+    top: 95px;
+    width: 300px;
+  }
+  .mmenu__nav ul {
+    display: grid;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .mmenu__nav a {
+    display: block;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 36px;
+    letter-spacing: -0.9px;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mmenu__l1,
+  .mmenu__l2 {
+    display: block;
+  }
+  .mmenu__l2 {
+    line-height: 30px;
+  }
+  /* пункты чуть всплывают при открытии — переход, а не анимация от скролла */
+  .mmenu__nav li {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.4s ease,
+      transform 0.5s var(--ease-out);
+  }
+  :global(.is-menu-open) .mmenu__nav li {
+    opacity: 1;
+    transform: none;
+  }
+  :global(.is-menu-open) .mmenu__nav li:nth-child(2) { transition-delay: 0.03s; }
+  :global(.is-menu-open) .mmenu__nav li:nth-child(3) { transition-delay: 0.06s; }
+  :global(.is-menu-open) .mmenu__nav li:nth-child(4) { transition-delay: 0.09s; }
+  :global(.is-menu-open) .mmenu__nav li:nth-child(5) { transition-delay: 0.12s; }
+  :global(.is-menu-open) .mmenu__nav li:nth-child(6) { transition-delay: 0.15s; }
+  :global(.is-menu-open) .mmenu__nav li:nth-child(7) { transition-delay: 0.18s; }
+  :global(.is-menu-open) .mmenu__nav li:nth-child(8) { transition-delay: 0.21s; }
+  :global(.is-menu-open) .mmenu__nav li:nth-child(9) { transition-delay: 0.24s; }
+
+  /* «Связаться с нами» — у низа экрана (в кадре 700 — на 632) */
+  .mmenu__contact {
+    left: 25px;
+    top: max(632px, calc(var(--ui-h) - 68px));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .mmenu__contact svg {
+    flex: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mmenu,
+    .mmenu__nav li {
+      transition: none;
+    }
+  }
+</style>

@@ -3,7 +3,7 @@
  * «Кто будет?» (Figma: кадр «2») — горизонтальная карусель спикеров, стоит по сетке блока с билетом.
  * Листается стрелками, перетаскиванием мышью и тачпадом — всегда на целую карточку (scripts/ui/rail.ts).
  * Крайняя правая карточка видна из-под фейда; слева фейд появляется, когда лента сдвинута.
- * Мобильный (Figma: «07 · Кто будет?»): заголовок по центру, лента листается пальцем, стрелок нет.
+ * Мобильный (Figma: «07 · Кто будет?»): заголовок по центру, лента листается пальцем, стрелок нет, карточки мельче.
  */
 import { speakers } from '../../data/content';
 import { withBase } from '../../lib/paths';
@@ -215,7 +215,7 @@ const arrow = 'M13.7193 0.719346L20.7194 7.64993L13.7193 13.7193M0.719345 7.7195
     }
     .speakers__title {
       left: 16px;
-      top: 40px;
+      top: 0;
       width: calc(100% - 32px);
       font-size: 38px;
       line-height: 36px;
@@ -226,37 +226,43 @@ const arrow = 'M13.7193 0.719346L20.7194 7.64993L13.7193 13.7193M0.719345 7.7195
     .speakers__fade--left {
       display: none;
     }
+    /* карточки 187 (Figma: «07 · Кто будет?» — компонент M/Speaker в 0.78), верх карточек на 129 */
     .rail {
-      top: 90px;
+      top: 109px;
       scroll-padding-inline: 16px;
     }
     .rail__track {
-      gap: 10px;
+      gap: 7.8px;
       padding-inline: 16px;
     }
     .speaker {
-      width: 240px;
-      height: 352px;
+      width: 187.1px;
+      height: 262.3px;
     }
     .speaker__photo {
-      width: 240px;
-      height: 246px;
+      width: 187.1px;
+      height: 191.9px;
     }
     .speaker__name {
-      margin: 22px 0 0 13px;
-      font-size: 16px;
-      line-height: 22px;
+      margin: 17.15px 0 0 10.1px;
+      font-size: 14px;
+      line-height: 17.15px;
     }
     .speaker__role {
-      width: 160px;
-      margin: 8px 0 0 13px;
-      font-size: 16px;
-      line-height: 18px;
+      width: 125px;
+      margin: 6.24px 0 0 10.1px;
+      font-size: 12px;
+      line-height: 14.03px;
     }
+    /* фейд из макета: 197 шириной от x 240 в кадре 375 — уходит на 62 за правый край, у края он ещё не сплошной */
     .speakers__fade {
-      top: 90px;
-      width: 135px;
-      height: 372px;
+      top: 120px;
+      width: 197px;
+      height: 370px;
+      background-image: linear-gradient(to right, rgb(4 16 29 / 0) 16%, rgb(4 16 29) 100%);
+    }
+    .speakers__fade--right {
+      right: -62px;
     }
   }
 </style>

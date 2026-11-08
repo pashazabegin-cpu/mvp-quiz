@@ -532,7 +532,9 @@ button {
 .js-motion .preloader { display: block; }
 /* мобильный: пока виден прелоадер, страница не прокручивается (на десктопе это делает Lenis — main.ts) */
 .is-scroll-locked,
-.is-scroll-locked body { overflow: hidden; }
+.is-scroll-locked body,
+.is-menu-open,
+.is-menu-open body { overflow: hidden; }
 .preloader__anim { position: absolute; inset: 0; }
 .preloader__anim svg { display: block; }
 .is-loaded .preloader { pointer-events: none; }

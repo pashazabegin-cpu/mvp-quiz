@@ -345,8 +345,9 @@ export const location = {
   poster: '/media/location/map.webp',
   /** Фото площадки: depth — глубина параллакса, как у фото в «Что мы придумали?» */
   photos: [
-    { src: '/media/location/photo-dan.webp', side: 'left', depth: 0.8 },
-    { src: '/media/location/photo-reception.webp', side: 'right', depth: 1.15 },
+    // на десктопе — фрагмент снимка ровно по кадрированию макета, на мобильном — снимок целиком (в макете «заполнить»)
+    { src: '/media/location/photo-dan.webp', srcMobile: '/media/location/photo-dan-m.webp', side: 'left', depth: 0.8 },
+    { src: '/media/location/photo-reception.webp', srcMobile: '/media/location/photo-reception-m.webp', side: 'right', depth: 1.15 },
   ],
 };
 

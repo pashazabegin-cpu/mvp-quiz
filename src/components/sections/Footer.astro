@@ -176,45 +176,46 @@ const socials = [
     transform: translateX(-8px);
   }
 
+  /* мобильный (Figma: «12 · Подвал», 949): документы друг под другом, логотип внизу целиком, не обрезан */
   @media (max-aspect-ratio: 1/1) {
     .footer {
-      height: calc(701px + var(--logo-w) * 0.1022);
+      height: calc(895px + var(--logo-w) * 0.1416);
     }
     .footer__snow {
       display: none;
     }
+    /* в макете стеклянный логотип чуть выше подвала (y −17) и срезан его верхом */
     .footer__media {
       left: 50%;
-      top: 10px;
+      top: -17px;
       width: 198px;
       height: 202px;
       margin-left: -99px;
     }
     .footer__nav {
       left: 16px;
-      top: 226px;
+      top: 265px;
       font-size: 18px;
       line-height: 36px;
       letter-spacing: -0.9px;
     }
     .footer__contact {
       left: 16px;
-      top: 574px;
+      top: 640px;
     }
     .footer__socials {
       left: auto;
       right: 16px;
-      top: 574px;
+      top: 640px;
     }
     .footer__docs {
       left: 16px;
-      top: 618px;
-      grid-template-columns: repeat(2, 168px);
-      gap: 7px;
-      width: auto;
+      top: 749px;
+      gap: 10px;
+      width: 168px;
     }
     .footer__logo {
-      top: 701px;
+      top: 895px;
     }
   }
 </style>

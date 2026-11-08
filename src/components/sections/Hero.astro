@@ -35,6 +35,11 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
   <i class="hero__fade" data-hero-fade aria-hidden="true"></i>
 
   <div class="stage__ui hero__ui" data-hero-ui>
+    <!-- мобильный: меню бургером (ui/MobileMenu.astro), партнёр уходит в блок под первым экраном -->
+    <button class="hc-menu" type="button" data-menu-open aria-controls="mobile-menu" aria-expanded="false" data-intro>
+      <span class="hc-menu__lines" aria-hidden="true"></span>
+      <span class="hc-menu__label">Меню</span>
+    </button>
     <a class="hc-partner" href={hero.partner.url} target="_blank" rel="noopener" data-intro>
       <img src={withBase(hero.partner.logo)} width="136" height="23.8" alt={hero.partner.name} />
       <span>{hero.partner.caption}</span>
@@ -61,6 +66,16 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
 
   <Anno kind="screen">01 · Первый экран</Anno>
 </section>
+
+<!-- мобильный: официальный партнёр сразу под первым экраном (Figma: «main · mobile», y 848) -->
+<div class="hero-partner">
+  <div class="hero-partner__ui">
+    <a href={hero.partner.url} target="_blank" rel="noopener">
+      <img src={withBase(hero.partner.logo)} width="136" height="23.8" alt={hero.partner.name} />
+      <span>{hero.partner.caption}</span>
+    </a>
+  </div>
+</div>
 
 <style>
   .hero {
@@ -136,6 +151,10 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
   }
 
   /* ── шапка (как на MVP) ── */
+  .hc-menu,
+  .hero-partner {
+    display: none;
+  }
   .hc-partner {
     left: 60px;
     top: 76.1px;
@@ -285,20 +304,48 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       background: linear-gradient(to bottom, rgb(0 1 11 / 0), #00010b);
       pointer-events: none;
     }
-    .hc-partner {
-      left: 16px;
-      top: 24px;
-    }
-    .hc-partner img {
-      width: 102px;
-      height: 17.85px;
-    }
-    .hc-partner span {
-      margin-top: 8px;
-      font-size: 10px;
-    }
+    .hc-partner,
     .hc-contact {
       display: none;
+    }
+    /* «Меню»: две золотые линии (30 и 13, по правому краю) и подпись; кнопка шире рисунка — палец попадает легко */
+    .hc-menu {
+      display: block;
+      left: 13px;
+      top: 18px;
+      width: 100px;
+      height: 40px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+      pointer-events: auto;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hc-menu__lines::before,
+    .hc-menu__lines::after {
+      content: '';
+      position: absolute;
+      right: 62px;
+      height: 1px;
+      background: #fce39c;
+    }
+    .hc-menu__lines::before {
+      top: 15.5px;
+      width: 30px;
+    }
+    .hc-menu__lines::after {
+      top: 22.5px;
+      width: 13px;
+    }
+    .hc-menu__label {
+      position: absolute;
+      left: 49px;
+      top: 8px;
+      font-size: 16px;
+      line-height: 22px;
     }
     .hc-social {
       top: 26px;
@@ -318,13 +365,12 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     .hero-tag {
       top: calc(100% - 387px);
     }
-    /* в мобильном макете плашка пока прежняя: голубой прямоугольник */
+    /* плашка даты: голубая, 30 высотой (Figma: «Дата»), форма — тот же сквиркл, что на десктопе (.sq40 тянется по высоте) */
     .hero-tag span {
-      height: auto;
-      padding: 6px 9px 2px;
+      --sq-h: 30px;
+      height: 30px;
+      padding: 6px 13px 2px;
       background: var(--c-accent);
-      -webkit-mask: none;
-      mask: none;
     }
     .hero-address {
       top: calc(100% - 351px);
@@ -347,9 +393,53 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       font-size: 16px;
       line-height: 22px;
     }
+    /* кнопка по центру (Figma: «btm» 195×50) */
     .hero__ui :global(.hero-btn) {
-      left: 16px;
+      left: 0;
+      right: 0;
+      width: max-content;
+      margin-inline: auto;
       top: calc(100% - 98px);
+    }
+
+    /* блок партнёра: 164 px кадра под первым экраном — логотип на 36, подпись на 72 */
+    /* фон — от тёмно-синего первого экрана к чёрному «Что мы придумали?», чтобы не было ступеньки на стыке */
+    .hero-partner {
+      display: block;
+      position: relative;
+      height: calc(164px * var(--ui-s));
+      background: linear-gradient(#00010b, var(--c-bg));
+      color: #fff;
+    }
+    .hero-partner__ui {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: var(--ui-w);
+      height: 164px;
+      transform: scale(var(--ui-s));
+      transform-origin: 0 0;
+    }
+    .hero-partner a {
+      position: absolute;
+      left: 50%;
+      top: 36px;
+      width: 160px;
+      margin-left: -79.5px;
+      text-align: center;
+    }
+    .hero-partner img {
+      display: block;
+      width: 136px;
+      height: 23.8px;
+      margin: 0 auto;
+    }
+    .hero-partner span {
+      display: block;
+      margin-top: 12px;
+      font-size: 12px;
+      line-height: 1.2;
+      white-space: nowrap;
     }
   }
 </style>

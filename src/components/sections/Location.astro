@@ -36,15 +36,16 @@ import { withBase } from '../../lib/paths';
 
   {
     location.photos.map((photo) => (
-      <img
-        class:list={['location__photo', `location__photo--${photo.side}`]}
-        data-depth={photo.depth}
-        src={withBase(photo.src)}
-        width="1024"
-        height="683"
-        alt="Площадка Avulus Cyber Space"
-        loading="lazy"
-      />
+      <picture>
+        <source media="(max-aspect-ratio: 1/1)" srcset={withBase(photo.srcMobile)} />
+        <img
+          class:list={['location__photo', `location__photo--${photo.side}`]}
+          data-depth={photo.depth}
+          src={withBase(photo.src)}
+          alt="Площадка Avulus Cyber Space"
+          loading="lazy"
+        />
+      </picture>
     ))
   }
 
@@ -308,7 +309,8 @@ import { withBase } from '../../lib/paths';
       border-radius: 0 0 4px 0;
     }
     .location__photo {
-      border-radius: 24px;
+      border-radius: 10px;
+      object-position: 50% 50%;
       will-change: auto;
     }
     .location__photo--left {
@@ -318,10 +320,10 @@ import { withBase } from '../../lib/paths';
       height: 118px;
     }
     .location__photo--right {
-      right: -37px;
-      top: 508px;
-      width: 226px;
-      height: 118px;
+      right: -20px;
+      top: 512px;
+      width: 209px;
+      height: 110px;
     }
     .location__link {
       top: 652px;

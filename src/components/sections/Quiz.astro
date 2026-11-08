@@ -26,7 +26,12 @@ import { paragraph } from '../../lib/text';
 const ring = [...quiz.icons, ...quiz.icons];
 ---
 
-<section class="quiz" id="quiz" data-quiz>
+<section
+  class="quiz"
+  id="quiz"
+  data-quiz
+  style={['tl', 'tr', 'bl', 'br'].map((k) => `--plate-${k}:url(${withBase(`/media/quiz/plate-m-${k}.svg`)})`).join(';')}
+>
   <div class="quiz__ui" data-quiz-ui data-flow>
     <div class="quiz__plate" aria-hidden="true"></div>
 
@@ -296,22 +301,43 @@ const ring = [...quiz.icons, ...quiz.icons];
   /* мобильный («2 · mobile» → «06»): плашка во всю ширину, скругление 74; содержимое идёт потоком,
      пункты — столбиком, темы переносятся по ширине */
   @media (max-aspect-ratio: 1/1) {
+    /* снизу: кнопка → низ плашки 79, плашка → «Кто будет?» 29 (Figma: «06 · Квиз · низ плашки») */
     .quiz__ui {
       height: auto;
-      padding: 130px 16px 199px;
+      padding: 130px 16px 108px;
     }
     .quiz__ui > * {
       position: relative;
     }
     /* плашка и слой карусели остаются поверх потока (селектор сильнее правила выше) */
+    /*
+     * Плашка — сквиркл из мобильного макета («Squircle n=3.00 r=260px», 375×954: углы ~74 px). Высота плашки
+     * зависит от текста, поэтому форма собрана маской из четырёх углов (media/quiz/plate-m-*.svg) и двух полос.
+     * Полосы заходят внутрь углов, где форма сплошная, — на стыках нет швов.
+     */
     .quiz__ui > .quiz__plate {
       position: absolute;
       left: 0;
       top: 63px;
-      bottom: 120px;
+      bottom: 29px;
       width: var(--ui-w);
       height: auto;
-      border-radius: 74px;
+      border-radius: 0;
+      --strip: linear-gradient(#000, #000);
+      -webkit-mask:
+        var(--plate-tl) left top / 100px 100px no-repeat,
+        var(--plate-tr) right top / 100px 100px no-repeat,
+        var(--plate-bl) left bottom / 100px 100px no-repeat,
+        var(--plate-br) right bottom / 100px 100px no-repeat,
+        var(--strip) center / calc(100% - 196px) 100% no-repeat,
+        var(--strip) center / 100% calc(100% - 196px) no-repeat;
+      mask:
+        var(--plate-tl) left top / 100px 100px no-repeat,
+        var(--plate-tr) right top / 100px 100px no-repeat,
+        var(--plate-bl) left bottom / 100px 100px no-repeat,
+        var(--plate-br) right bottom / 100px 100px no-repeat,
+        var(--strip) center / calc(100% - 196px) 100% no-repeat,
+        var(--strip) center / 100% calc(100% - 196px) no-repeat;
     }
     /* свечение мельче — плашка уже в 3.5 раза */
     .quiz__plate::before {

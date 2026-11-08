@@ -41,6 +41,7 @@ import { initMagnetic } from './interactions/magnetic';
 import { initRepel } from './interactions/repel';
 import { initMouseDepth } from './interactions/mouse-depth';
 import { initNav } from './ui/nav';
+import { initMobileMenu } from './ui/mobile-menu';
 import { initRail } from './ui/rail';
 import { initAccordion } from './ui/accordion';
 import { initAnnotations } from './ui/annotations';
@@ -85,7 +86,8 @@ const showText = (selector: string) => () => gsap.set(selector, { visibility: 'v
 
 // Базовое поведение — работает всегда
 run('annotations', initAnnotations);
-if (!mobile) run('nav', initNav); // на мобильном нижнего меню нет (Nav.astro)
+if (!mobile) run('nav', initNav); // на мобильном нижнего меню нет (Nav.astro) — вместо него бургер на первом экране
+else run('mobile-menu', initMobileMenu);
 run('rail', initRail);
 run('accordion', () => initAccordion(motion));
 run('shader', () => initShaderBackgrounds(motion));

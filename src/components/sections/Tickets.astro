@@ -24,21 +24,35 @@
  * от белого к бирюзовому кольцу, поэтому буквы переливаются вместе с поверхностью.
  * Слои собраны сеткой, а не абсолютом: background-clip: text не закрашивает текст потомков с position.
  *
- * Мобильный (Figma: «08 · Купить билет»): билет вертикальный, линия отрыва поперёк. Без скриптов: пятна стоят на месте,
- * свет сверху медленно дышит прозрачностью, снег идёт на CSS (ui/MobileSnow.astro).
+ * Мобильный (Figma: «08 · Купить билет»): билет вертикальный, линия отрыва поперёк. Проще десктопа и без анимации:
+ * только цветные пятна из макета, без фольги, света и блёсток; знак и заголовок по центру, снежинки вокруг неподвижны.
  */
 import Button from '../ui/Button.astro';
-import MobileSnow from '../ui/MobileSnow.astro';
 import { event, ticket } from '../../data/content';
 import { withBase } from '../../lib/paths';
 
 // обычный текст и его копия-напыление (для скринридеров копия скрыта)
 const layers = [false, true];
+// мобильный: неподвижные снежинки вокруг билета, x/y — в кадре 375 (Figma: «08 · Купить билет»)
+const flakes = [
+  { x: 20, y: 10, w: 21 },
+  { x: 318, y: 6, w: 23.4 },
+  { x: 330, y: 700, w: 26 },
+  { x: 12, y: 700, w: 19.6 },
+  { x: 170, y: 716, w: 21 },
+  { x: 250, y: 690, w: 26 },
+];
 ---
 
 <section class="tickets" id="tickets" data-holo-stage style={`--ticket-shape:url(${withBase('/media/tickets/ticket-shape.svg')});--ticket-shape-m:url(${withBase('/media/tickets/ticket-shape-m.svg')});--specks:url(${withBase('/media/tickets/specks.webp')});--glints:url(${withBase('/media/tickets/glints.webp')})`}>
   <canvas class="tickets__snow" data-snow data-snow-density="1.5" aria-hidden="true"></canvas>
-  <MobileSnow />
+  <div class="tickets__flakes" aria-hidden="true">
+    {
+      flakes.map((f, i) => (
+        <img src={withBase(`/media/tickets/snow-m-${i + 1}.svg`)} style={`--x:${f.x}px;--y:${f.y}px;--w:${f.w}px`} alt="" />
+      ))
+    }
+  </div>
 
   <div class="ticket-wrap" data-reveal>
     <article class="ticket" data-holo>
@@ -418,36 +432,41 @@ const layers = [false, true];
     height: 15.39px;
   }
 
+  .tickets__flakes {
+    display: none;
+  }
+
   @media (max-aspect-ratio: 1/1) {
     .tickets {
       height: 756px;
     }
+    /* без фольги, света, блёсток и кромки: остаются цветные пятна, текст и кнопка */
     .tickets__snow,
     .ticket__copy--ink,
     .ticket__shadow,
-    .ticket__edge {
+    .ticket__edge,
+    .ticket__holo,
+    .ticket__light,
+    .ticket__specks,
+    .ticket__glints,
+    .ticket__gloss,
+    .ticket__rim,
+    .ticket__glowedge,
+    .ticket__edgelight {
       display: none;
     }
-    .ticket__gloss,
-    .ticket__holo,
-    .ticket__glints {
-      --mx: 62%;
-      --my: 16%;
+    .tickets__flakes {
+      display: block;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
     }
-    .ticket__glowedge {
-      --ex: 62%;
-      --ey: 0%;
-    }
-    .ticket__edgelight {
-      --la: 20;
-      opacity: 0.7;
-      border-radius: 32px;
-    }
-    .ticket__holo {
-      --lx: 0.35;
-    }
-    .ticket__glints {
-      opacity: 0.6;
+    .tickets__flakes img {
+      position: absolute;
+      left: calc(50% - 187.5px + var(--x));
+      top: var(--y);
+      width: var(--w);
+      height: auto;
     }
     .ticket-wrap {
       left: 50%;
@@ -481,36 +500,38 @@ const layers = [false, true];
         radial-gradient(160px 160px at 171px 566px, rgb(30 176 255 / 0.62) 0%, rgb(30 176 255 / 0.533) 20%, rgb(30 176 255 / 0.341) 40%, rgb(30 176 255 / 0.155) 60%, rgb(30 176 255 / 0.043) 80%, rgb(30 176 255 / 0.0) 100%),
         radial-gradient(330px 330px at 190px -60px, rgb(38 236 214 / 1) 0%, rgb(38 236 214 / 0.86) 20%, rgb(38 236 214 / 0.55) 40%, rgb(38 236 214 / 0.25) 60%, rgb(38 236 214 / 0.07) 80%, rgb(38 236 214 / 0) 100%);
     }
-    /* вместо света за курсором: тот же круг наверху, медленно дышит (только прозрачность) */
-    .ticket__light {
-      --mx: 62%;
-      --my: 16%;
-      background-image: radial-gradient(240px 240px at 62% 16%, rgb(110 240 255 / 0.3) 0%, rgb(90 226 255 / 0.22) 24%, rgb(70 208 255 / 0.1) 50%, rgb(50 190 255 / 0) 100%);
-      animation: ticket-breathe 7s ease-in-out infinite alternate;
-    }
-    .ticket__rim {
-      border-radius: 32px;
-    }
     .ticket__mark {
-      left: 24px;
-      top: 34px;
+      left: 50%;
+      top: 37px;
       width: 40px;
       height: 39px;
+      margin-left: -19.5px;
+      filter: brightness(0) invert(1);
+    }
+    /* «Купить билет» одной строкой по центру, весь белый */
+    .ticket__copy > .ticket__title,
+    .ticket__copy > .ticket__text {
+      justify-self: center;
     }
     .ticket__title {
-      margin: 28px 0 0 88px;
+      margin: 98px 0 0;
       font-size: 38px;
       line-height: 44px;
       letter-spacing: -1.9px;
     }
+    .ticket__line {
+      display: inline;
+    }
     .ticket__line--accent {
-      margin-left: 40px;
+      margin-left: 0.24em;
+      color: #fff;
     }
     .ticket__text {
       width: 295px;
-      margin: 150px 0 0 24px;
+      margin: 164px 0 0;
       font-size: 16px;
       line-height: 23px;
+      text-align: center;
     }
     .ticket__perks {
       width: 279px;
@@ -541,14 +562,6 @@ const layers = [false, true];
     .ticket__cta :global(.btn__icon) {
       width: 16.2px;
       height: 14.2px;
-    }
-  }
-  @keyframes ticket-breathe {
-    from {
-      opacity: 0.35;
-    }
-    to {
-      opacity: 1;
     }
   }
 </style>

@@ -90,6 +90,13 @@ const glows = [
   .glow--overlay {
     mix-blend-mode: overlay;
   }
+  /* дизеринг над эллипсами, под блоками (global.css → --dither); кадр масштабирован, поэтому зерно делим на масштаб */
+  .finale__glows::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--dither) 0 0 / calc(var(--dither-size) / var(--ui-s)) repeat;
+  }
   /* мобильный: пятна из кадра Figma, координаты от верха блока «Кто будет?» */
   @media (max-aspect-ratio: 1/1) {
     .glow {

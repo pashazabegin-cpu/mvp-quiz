@@ -104,7 +104,9 @@ const ring = [...quiz.icons, ...quiz.icons];
     height: calc(1607px * var(--ui-s));
     overflow: hidden;
     background-color: #fff;
-    background-image: linear-gradient(to bottom, rgb(1 58 139 / 0) 11.531%, #013a8b 46.68%, #030f1c 96.998%);
+    background-image: var(--dither), linear-gradient(to bottom, rgb(1 58 139 / 0) 11.531%, #013a8b 46.68%, #030f1c 96.998%);
+    background-size: var(--dither-size), auto;
+    background-repeat: repeat, no-repeat;
     color: var(--c-text);
   }
   .quiz__ui {
@@ -123,7 +125,7 @@ const ring = [...quiz.icons, ...quiz.icons];
   /* десктоп: блок короче — фон приходит в цвет «Кто будет?» (#04101d) к самому низу блока, без шва */
   @media not all and (max-aspect-ratio: 1/1) {
     .quiz {
-      background-image: linear-gradient(
+      background-image: var(--dither), linear-gradient(
         to bottom,
         rgb(1 58 139 / 0) calc(222.7px * var(--ui-s)),
         #013a8b calc(901px * var(--ui-s)),

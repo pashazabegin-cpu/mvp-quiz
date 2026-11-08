@@ -41,6 +41,8 @@ export function initHoloTicket() {
     card.style.transform = `rotateX(${now.rx.toFixed(3)}deg) rotateY(${now.ry.toFixed(3)}deg) scale(${now.scale.toFixed(4)})`;
     card.style.setProperty('--mx', `${now.mx.toFixed(2)}%`);
     card.style.setProperty('--my', `${now.my.toFixed(2)}%`);
+    // свет на фактуре фольги: 0 — слева, 1 — справа
+    card.style.setProperty('--lx', Math.min(1, Math.max(0, now.mx / 100)).toFixed(3));
     card.style.setProperty('--shine', now.shine.toFixed(3));
     card.style.setProperty('--react', Math.max(0, (now.shine - REACT_FROM) / (SHINE_ACTIVE - REACT_FROM)).toFixed(3));
   };

@@ -9,9 +9,15 @@
  * а за самим курсором идёт круг света (__light) — так и получается перламутровый перелив. Спады с плавными шагами,
  * цвета не смешиваются с белым и серым — поэтому переходы чистые.
  *
- * Поверх цвета — голографическая фольга, как у фольгированной визитки: переливающиеся полосы в цветах бренда
- * (голубой, бирюзовый, тёмно-синий, капля фиолетового и розового) идут навстречу курсору, мятая фактура фольги
- * (media/tickets/foil*.webp) освещена то с одной, то с другой стороны — складки играют при наклоне, на гранях вспыхивают блики.
+ * Поверх цвета — голографическая фольга, как у фольгированной визитки. Главное в ней — поведение света и цвета:
+ *   перелив (__holo) — два набора мягких полос в цветах бренда (бирюза/голубой и голубой/лаванда с каплей розового):
+ *     какой сильнее, решает сторона, с которой свет, а сами полосы едут навстречу курсору — цвет меняется от угла;
+ *   свет (__light) — мягкий круг под курсором, не ярче середины: белый текст на нём читается;
+ *   отражение (__gloss) — широкий блик на противоположной стороне, как отражение лампы в пластике;
+ *   кромка (__edgelight) — край карты загорается с той стороны, где свет; при наклоне сильнее;
+ *   фактура (__texture) — едва заметные плавные волны фольги и редкие искры у света (__spark).
+ * Все слои — обычная прозрачность, без mix-blend-mode: смешивание внутри повёрнутой в 3D карточки Chrome рисовал
+ * с обрезанными кусками (на билете была вертикальная граница).
  * Толщина карты: светлая кромка по краю и торец, который виден снизу (на десктопе при повороте — и сбоку).
  *
  * Текст реагирует на свет: поверх обычного слоя лежит его копия с «напылением» — такой же круг вокруг курсора,
@@ -46,6 +52,8 @@ const layers = [false, true];
         <span class="ticket__spark" aria-hidden="true"></span>
         <span class="ticket__gloss" aria-hidden="true"></span>
         <span class="ticket__rim" aria-hidden="true"></span>
+        <span class="ticket__glowedge" aria-hidden="true"></span>
+        <span class="ticket__edgelight" aria-hidden="true"></span>
         <img class="ticket__mark" src={withBase(ticket.mark)} width="47" height="46" alt="" />
         {
           layers.map((ink) => {
@@ -105,8 +113,12 @@ const layers = [false, true];
     --shine: 0.4;
     /* 0 — покой, 1 — курсор над блоком: насколько текст реагирует на свет */
     --react: 0.2;
-    /* откуда свет на фактуре фольги: 0 — слева, 1 — справа */
+    /* откуда свет: 0 — слева, 1 — справа; --la — направление на свет от центра билета, градусы */
     --lx: 0.35;
+    --la: -30;
+    /* точка на краю билета в сторону света */
+    --ex: 30%;
+    --ey: 0%;
     position: relative;
     width: 100%;
     height: 100%;
@@ -184,93 +196,127 @@ const layers = [false, true];
         rgb(38 236 214 / 0) 100%
       );
   }
-  /* круг света за курсором: screen только осветляет цвет под собой, поэтому не пачкает его */
+  /* свет под курсором: мягкий круг, не ярче середины — белый текст на нём остаётся читаемым */
   .ticket__light {
     position: absolute;
     inset: 0;
     background-image: radial-gradient(
-      circle 360px at var(--mx) var(--my),
-      rgb(110 240 255 / 0.62) 0%,
-      rgb(90 226 255 / 0.48) 20%,
-      rgb(70 208 255 / 0.27) 42%,
-      rgb(50 190 255 / 0.1) 68%,
-      rgb(50 190 255 / 0) 100%
+      circle 380px at var(--mx) var(--my),
+      rgb(150 245 255 / 0.26) 0%,
+      rgb(140 238 255 / 0.2) 20%,
+      rgb(120 225 255 / 0.11) 44%,
+      rgb(100 210 255 / 0.04) 70%,
+      rgb(100 210 255 / 0) 100%
     );
-    mix-blend-mode: screen;
     opacity: var(--shine);
   }
-  /* голографические полосы: мягкие, широкие, в цветах бренда с каплей фиолетового и розового; едут навстречу курсору */
+  /* перелив: два набора полос. Свет слева — сильнее бирюза и голубой, справа — голубой с лавандой и каплей розового.
+     Полосы едут навстречу курсору, поэтому при повороте карты цвет на одном месте меняется */
   .ticket__holo {
     position: absolute;
     inset: 0;
+  }
+  .ticket__holo::before,
+  .ticket__holo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-size: 260% 180%;
+    background-position: calc(100% - var(--mx)) calc(100% - var(--my));
+  }
+  .ticket__holo::before {
     background-image: linear-gradient(
       118deg,
-      rgb(30 176 255 / 0) 0%,
-      rgb(38 236 214 / 0.5) 13%,
-      rgb(30 176 255 / 0.42) 24%,
-      rgb(122 112 255 / 0.3) 33%,
-      rgb(255 138 214 / 0.2) 39%,
-      rgb(38 236 214 / 0.42) 49%,
-      rgb(30 176 255 / 0.46) 61%,
-      rgb(14 70 151 / 0) 78%,
-      rgb(38 236 214 / 0.3) 90%,
-      rgb(30 176 255 / 0) 100%
+      rgb(80 240 220 / 0) 0%,
+      rgb(80 240 220 / 0.46) 14%,
+      rgb(80 200 255 / 0.38) 27%,
+      rgb(40 140 235 / 0) 41%,
+      rgb(90 238 226 / 0.38) 55%,
+      rgb(90 205 255 / 0.4) 69%,
+      rgb(90 205 255 / 0) 85%,
+      rgb(80 240 220 / 0) 100%
     );
-    background-size: 260% 100%;
-    background-position: calc(100% - var(--mx)) 50%;
-    mix-blend-mode: screen;
-    opacity: 0.9;
+    opacity: calc(1 - var(--lx));
   }
-  /* мятая фольга: рельеф, освещённый сверху-слева и (инвертированный) снизу-справа; что сильнее — решает курсор (--lx) */
+  .ticket__holo::after {
+    background-image: linear-gradient(
+      118deg,
+      rgb(90 170 255 / 0) 0%,
+      rgb(100 180 255 / 0.4) 15%,
+      rgb(150 140 255 / 0.32) 27%,
+      rgb(255 160 225 / 0.16) 35%,
+      rgb(80 205 255 / 0.38) 46%,
+      rgb(60 140 240 / 0) 62%,
+      rgb(130 150 255 / 0.3) 76%,
+      rgb(90 170 255 / 0) 92%
+    );
+    opacity: var(--lx);
+  }
+  /* фактура фольги: едва заметные плавные волны (прозрачные светлые и тёмные пятна), свет на них — со стороны курсора */
   .ticket__texture {
     position: absolute;
     inset: 0;
-    mix-blend-mode: overlay;
+    opacity: 0.45;
   }
   .ticket__texture::before,
   .ticket__texture::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: var(--foil) 0 0 / var(--foil-size, 256px) repeat;
+    background: var(--foil) 0 0 / var(--foil-size, 512px) repeat;
   }
   .ticket__texture::before {
-    opacity: calc((1 - var(--lx)) * 0.5);
+    opacity: calc(1 - var(--lx));
   }
   .ticket__texture::after {
     background-image: var(--foil-inv);
-    opacity: calc(var(--lx) * 0.5);
+    opacity: var(--lx);
   }
-  /* блёстки: блик вокруг света, видный только на гранях фактуры */
+  /* искры: несколько блёсток вокруг света */
   .ticket__spark {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle 340px at var(--mx) var(--my), rgb(255 255 255 / 0.9), rgb(210 250 255 / 0.45) 40%, rgb(255 255 255 / 0) 100%);
-    -webkit-mask: var(--foil-spark) 0 0 / var(--foil-size, 256px) repeat;
-    mask: var(--foil-spark) 0 0 / var(--foil-size, 256px) repeat;
-    mix-blend-mode: screen;
-    opacity: calc(0.25 + var(--react) * 0.75);
+    background: radial-gradient(circle 300px at var(--mx) var(--my), rgb(255 255 255 / 0.55), rgb(220 250 255 / 0.2) 45%, rgb(255 255 255 / 0) 100%);
+    -webkit-mask: var(--foil-spark) 0 0 / 256px repeat;
+    mask: var(--foil-spark) 0 0 / 256px repeat;
+    opacity: calc(0.1 + var(--react) * 0.5);
   }
-  /* плёнка: мягкий блик идёт навстречу курсору (как отражение на пластике), светлее верхний левый угол и лёгкое зерно */
+  /* отражение: широкий мягкий блик на стороне, противоположной курсору, и светлее верхний левый угол */
   .ticket__gloss {
     position: absolute;
     inset: 0;
     background-image:
-      radial-gradient(ellipse 46% 72% at calc(100% - var(--mx)) calc(100% - var(--my)), rgb(255 255 255 / 0.13), rgb(255 255 255 / 0.05) 45%, rgb(255 255 255 / 0) 75%),
-      linear-gradient(158deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0) 34%);
-    mix-blend-mode: screen;
+      radial-gradient(ellipse 46% 72% at calc(100% - var(--mx)) calc(100% - var(--my)), rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.04) 45%, rgb(255 255 255 / 0) 75%),
+      linear-gradient(158deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0) 34%);
   }
-  /* кромка: край карты ловит свет — тонкая светлая линия по всему контуру, ярче сверху, и мягкое свечение у края */
+  /* кромка: тонкая светлая линия по контуру — у карты есть край */
   .ticket__rim {
     position: absolute;
     inset: 0;
     border-radius: 40px;
     box-shadow:
-      inset 0 0 0 1px rgb(200 245 255 / 0.22),
-      inset 0 1.5px 0 rgb(255 255 255 / 0.45),
-      inset 1px 0 0 rgb(255 255 255 / 0.12),
-      inset 0 -1.5px 0 rgb(0 12 48 / 0.35),
-      inset 0 0 14px rgb(120 220 255 / 0.22);
+      inset 0 0 0 1px rgb(200 245 255 / 0.18),
+      inset 0 1.5px 0 rgb(255 255 255 / 0.32),
+      inset 0 -1.5px 0 rgb(0 12 48 / 0.3);
+  }
+  /* край ловит свет: светится сторона, обращённая к свету, — кольцо по краю и мягкое свечение внутрь */
+  .ticket__edgelight {
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: 40px;
+    background: linear-gradient(calc(var(--la) * 1deg), rgb(160 230 255 / 0) 35%, rgb(190 240 255 / 0.35) 70%, rgb(235 252 255 / 0.95) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    opacity: calc(0.35 + var(--react) * 0.65);
+  }
+  /* мягкое свечение внутрь от освещённого края: точка на краю в сторону света (--ex/--ey) */
+  .ticket__glowedge {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 300px 170px at var(--ex) var(--ey), rgb(160 235 255 / 0.3), rgb(160 235 255 / 0.1) 45%, rgb(160 235 255 / 0) 75%);
+    opacity: calc(0.3 + var(--react) * 0.7);
   }
 
   .ticket__mark,
@@ -295,17 +341,19 @@ const layers = [false, true];
     justify-self: start;
     align-self: start;
   }
-  /* напыление: тот же круг, что у света, — буквы переходят от белого к бирюзовому кольцу и обратно */
+  /* напыление: свет, проходя по тексту, переливает буквы — от белого к бирюзовому, лавандовому и обратно.
+     Все цвета светлые, поэтому текст читается в любом месте круга */
   .ticket__copy--ink {
     -webkit-text-fill-color: transparent;
     background-image: radial-gradient(
-      circle 420px at var(--mx) var(--my),
+      circle 400px at var(--mx) var(--my),
       #fff 0%,
-      #fff 26%,
-      #b8fff5 44%,
-      #8decff 60%,
-      rgb(141 236 255 / 0.4) 76%,
-      rgb(141 236 255 / 0) 92%
+      #e3faff 16%,
+      #a6f1ff 32%,
+      #c8bcff 47%,
+      #94efe2 61%,
+      rgb(200 245 255 / 0.5) 74%,
+      rgb(255 255 255 / 0) 88%
     );
     -webkit-background-clip: text;
     background-clip: text;
@@ -333,15 +381,6 @@ const layers = [false, true];
     margin-left: 67px;
     /* за заголовком ярко-голубое пятно: акцентный голубой на нём потерялся бы, поэтому слово светлее */
     color: #c6f2ff;
-  }
-  /* мелкий текст на фактуре фольги: лёгкая тень снизу, как у краски на фольге, — буквы не теряются в складках */
-  .ticket__text,
-  .ticket__perks {
-    text-shadow: 0 1px 2px rgb(0 20 70 / 0.4);
-  }
-  .ticket__copy--ink .ticket__text,
-  .ticket__copy--ink .ticket__perks {
-    text-shadow: none;
   }
   .ticket__text {
     margin: 274px 0 0 264px;
@@ -406,6 +445,15 @@ const layers = [false, true];
     .ticket__spark {
       --mx: 62%;
       --my: 16%;
+    }
+    .ticket__glowedge {
+      --ex: 62%;
+      --ey: 0%;
+    }
+    .ticket__edgelight {
+      --la: 20;
+      opacity: 0.7;
+      border-radius: 32px;
     }
     .ticket__texture {
       --lx: 0.35;

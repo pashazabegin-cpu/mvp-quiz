@@ -43,7 +43,7 @@ const socials = [
   <a class="footer__contact" href={contacts.contactUrl} target="_blank" rel="noopener">
     <span>Связаться с нами</span>
     <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true">
-      <path d="M2 12 12 2M4 2h8v8" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="square"></path>
+      <path d="M2 12 12 2M4 2h8v8" fill="none" stroke="#fce39c" stroke-width="1.1" stroke-linecap="square"></path>
     </svg>
   </a>
 
@@ -52,7 +52,7 @@ const socials = [
       socials.map((s) => (
         <li>
           <a href={s.url} target="_blank" rel="noopener" aria-label={s.label} data-magnetic>
-            <img src={withBase(s.icon)} width="20" height="20" alt="" />
+            <span class="footer__icon" style={`--icon:url(${withBase(s.icon)})`} aria-hidden="true"></span>
           </a>
         </li>
       ))
@@ -99,9 +99,26 @@ const socials = [
     display: inline-block;
     transition: color 0.3s, transform 0.4s var(--ease-out);
   }
-  .footer__nav a:hover {
-    color: var(--c-accent);
-    transform: translateX(6px);
+  /* наведение — золотой, как у кнопки: золотой на сайте подчёркивает действие.
+     Только там, где есть курсор: на телефоне после нажатия ссылка не остаётся «наведённой» */
+  @media (hover: hover) {
+    .footer__nav a:hover {
+      color: var(--c-gold);
+      transform: translateX(6px);
+    }
+    .footer__contact:hover {
+      color: var(--c-gold);
+    }
+    .footer__contact:hover svg {
+      transform: translate(2px, -2px);
+    }
+    .footer__socials a:hover .footer__icon {
+      background-color: var(--c-gold);
+    }
+    .footer__docs a:hover {
+      color: var(--c-gold);
+      background-size: 100% 1px;
+    }
   }
   .footer__media {
     position: absolute;
@@ -127,13 +144,12 @@ const socials = [
     gap: 10px;
     font-size: 14px;
     line-height: 1.2;
+    transition: color 0.3s;
   }
+  /* стрелка золотая всегда (Figma: «Связаться с нами» — #fce39c) */
   .footer__contact svg {
     flex: none;
     transition: transform 0.4s var(--ease-out);
-  }
-  .footer__contact:hover svg {
-    transform: translate(2px, -2px);
   }
   .footer__socials {
     position: absolute;
@@ -144,10 +160,16 @@ const socials = [
   }
   .footer__socials a {
     display: block;
-    transition: opacity 0.3s;
   }
-  .footer__socials a:hover {
-    opacity: 0.7;
+  /* иконка — маска по белой фигуре со знаком-прорезью: так её можно перекрасить в золотой при наведении */
+  .footer__icon {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+    transition: background-color 0.3s;
   }
   .footer__docs {
     position: absolute;
@@ -161,10 +183,9 @@ const socials = [
   }
   .footer__docs a {
     background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
-    transition: background-size 0.5s var(--ease-out);
-  }
-  .footer__docs a:hover {
-    background-size: 100% 1px;
+    transition:
+      color 0.3s,
+      background-size 0.5s var(--ease-out);
   }
   .footer__logo {
     position: absolute;

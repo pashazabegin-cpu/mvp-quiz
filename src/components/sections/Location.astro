@@ -5,7 +5,7 @@
  * правой кнопкой (scripts/sections/location.ts). Пока нет ключа API, показывается картинка из макета.
  * Прокрутка колесом над картой листает страницу, а не масштабирует карту.
  * .map__inner компенсирует масштаб кадра: API карт считает курсор в экранных px, и так карта остаётся чёткой.
- * Параллакс фото — как у фото в «Что мы придумали?» (scripts/sections/finale.ts).
+ * Параллакс фото — как у фото в «Что мы придумали?», с привязкой к пикселям экрана (scripts/sections/finale.ts).
  * Мобильный (Figma: «10 · Локация»): всё стоит на месте, карта не забирает палец — скролл важнее, для маршрута есть ссылка.
  */
 import { event, location, ticket } from '../../data/content';
@@ -36,9 +36,15 @@ import { withBase } from '../../lib/paths';
 
   {
     location.photos.map((photo) => (
-      <div class:list={['location__photo', `location__photo--${photo.side}`]} data-depth={photo.depth}>
-        <img src={withBase(photo.src)} alt="Площадка Avulus Cyber Space" loading="lazy" decoding="async" />
-      </div>
+      <img
+        class:list={['location__photo', `location__photo--${photo.side}`]}
+        data-depth={photo.depth}
+        src={withBase(photo.src)}
+        width="1024"
+        height="683"
+        alt="Площадка Avulus Cyber Space"
+        loading="lazy"
+      />
     ))
   }
 
@@ -194,31 +200,31 @@ import { withBase } from '../../lib/paths';
     }
   }
 
-  /* фото стоят у краёв экрана и заходят за них, как в макете */
+  /*
+   * Фото — одна картинка со скруглением, без обёртки с overflow: hidden: движется один слой без маски обрезки.
+   * Стоят от краёв экрана, как в макете.
+   */
   .location__photo {
     position: absolute;
-    border-radius: 40px;
-    overflow: hidden;
+    display: block;
+    max-width: none;
+    border-radius: 20px;
+    object-fit: cover;
+    object-position: bottom;
     pointer-events: none;
     will-change: transform;
   }
-  .location__photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: bottom;
-  }
   .location__photo--left {
-    left: -103px;
-    top: 339px;
-    width: 452px;
-    height: 273px;
+    left: 60px;
+    top: 341px;
+    width: 325px;
+    height: 241px;
   }
   .location__photo--right {
-    right: -69px;
-    top: 805px;
-    width: 445px;
-    height: 233px;
+    right: 93px;
+    top: 819px;
+    width: 379px;
+    height: 205px;
   }
 
   .location__link {

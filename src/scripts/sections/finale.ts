@@ -7,11 +7,12 @@
  * Сама анимация — на картинке, скролл — на обёртке, поэтому они не мешают друг другу.
  *
  * Фото в «Локации» — та же глубина, что в «Что мы придумали?» (sections/intro.ts): фото движется со своей
- * скоростью по data-depth. Только сдвиг по вертикали: масштаб на каждом кадре заставлял перерисовывать фото — они мерцали.
+ * скоростью по data-depth. Только сдвиг по вертикали и ровно по пикселям экрана: масштаб на каждом кадре
+ * и дробный сдвиг заставляли фото мерцать.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { fitFlow, stageHeight } from '../core/stage';
+import { fitFlow, stageHeight, stageScale } from '../core/stage';
 import { refreshSoon } from '../core/refresh';
 
 /** та же скорость глубины, что в intro.ts */
@@ -66,22 +67,53 @@ function initGlows(section: HTMLElement) {
   });
 }
 
+/**
+ * Фото едет от +distance до −distance, пока проходит экран (от входа снизу до ухода вверх).
+ * Сдвиг округляется до целых пикселей экрана: при дробном сдвиге браузер на каждом кадре сглаживает фото
+ * по-разному — оно то резче, то мягче, и тонкие неоновые линии мерцают. По X фото тоже ставится в целый пиксель.
+ * Границы считаются от раскладки без сдвига: сдвиг самого фото не влияет на то, где оно начинает двигаться.
+ */
 function initPhotos(section: HTMLElement) {
   section.querySelectorAll<HTMLElement>('[data-depth]').forEach((el) => {
     const z = Number(el.dataset.depth) || 1;
-    // сколько экранов скролла проходит от входа фото в кадр до середины экрана
-    const reach = () => (window.innerHeight + el.getBoundingClientRect().height) / (2 * window.innerHeight);
-    const distance = () => reach() * SPEED * z * (stageHeight() / 900);
-    gsap.fromTo(
-      el,
-      { y: () => distance() },
-      {
-        y: () => -distance(),
-        ease: 'none',
-        force3D: true,
-        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true },
+    const host = el.offsetParent as HTMLElement;
+    let top = 0; // верх фото без сдвига, px страницы
+    let distance = 0; // px кадра
+    let x = 0; // px кадра: поправка до целого пикселя по горизонтали
+    let s = 1;
+    let dpr = 1;
+
+    const measure = () => {
+      s = stageScale();
+      dpr = window.devicePixelRatio || 1;
+      const box = host.getBoundingClientRect();
+      top = box.top + window.scrollY + el.offsetTop * s;
+      const height = el.offsetHeight * s;
+      // сколько экранов скролла проходит от входа фото в кадр до середины экрана
+      const reach = (window.innerHeight + height) / (2 * window.innerHeight);
+      distance = reach * SPEED * z * (stageHeight() / 900);
+      const left = box.left + el.offsetLeft * s;
+      x = (Math.round(left * dpr) / dpr - left) / s;
+    };
+
+    const render = (self: ScrollTrigger) => {
+      const y = distance * (1 - 2 * self.progress);
+      // экранный верх фото — в целый пиксель экрана
+      const rest = top - self.scroll();
+      const snapped = (Math.round((rest + y * s) * dpr) / dpr - rest) / s;
+      el.style.transform = `translate3d(${x.toFixed(4)}px, ${snapped.toFixed(4)}px, 0)`;
+    };
+
+    // мерить — в момент расчёта начала: закрепления выше по странице к этому времени уже на месте
+    ScrollTrigger.create({
+      start: () => {
+        measure();
+        return top - window.innerHeight;
       },
-    );
+      end: () => top + el.offsetHeight * s,
+      onRefresh: render,
+      onUpdate: render,
+    });
   });
 }
 

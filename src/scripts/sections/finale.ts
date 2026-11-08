@@ -23,6 +23,10 @@ export function initFinale(motion: boolean, mobile: boolean) {
   if (!section) return;
   // кадр масштабируется transform'ом — высоту блока ставим сами (и пересчитываем, когда открывается FAQ)
   fitFlow(section, refreshSoon);
+  // блок не должен прокручиваться изнутри (переход по #faq сдвигал содержимое, Finale.astro); где нет overflow: clip — сбрасываем
+  section.addEventListener('scroll', () => {
+    if (section.scrollTop || section.scrollLeft) section.scrollTo(0, 0);
+  });
   initLazyVideos(section, motion);
   if (!motion || mobile) return;
   initGlows(section);

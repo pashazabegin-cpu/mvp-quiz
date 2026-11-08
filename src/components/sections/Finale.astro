@@ -54,9 +54,15 @@ const glows = [
 </div>
 
 <style>
+  /*
+   * Обрезка — clip, а не hidden: блок с overflow: hidden браузер может прокрутить изнутри. Переход по ссылке #faq
+   * (меню, адрес с #faq) сдвигал всё содержимое вверх внутри блока — под подвалом оставалась пустая полоса.
+   * hidden — запасной вариант для старых браузеров, там прокрутку сбрасывает finale.ts.
+   */
   .finale {
     position: relative;
     overflow: hidden;
+    overflow: clip;
     /* фон макета под всем низом страницы */
     background: #04101d;
     color: var(--c-text);

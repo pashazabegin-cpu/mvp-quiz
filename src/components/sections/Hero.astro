@@ -49,10 +49,10 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       <img class="hc-contact__arrow" src={withBase('/media/hero/arrow.svg')} width="14.84" height="13.55" alt="" />
     </a>
     <a class="hc-social hc-social--tg" href={tg?.url} target="_blank" rel="noopener" aria-label="Telegram" data-intro>
-      <img src={withBase('/media/hero/telegram.svg')} width="20" height="20" alt="" />
+      <span class="hc-social__icon" style={`--icon:url(${withBase('/media/hero/telegram.svg')})`} aria-hidden="true"></span>
     </a>
     <a class="hc-social hc-social--vk" href={vk?.url} target="_blank" rel="noopener" aria-label="ВКонтакте" data-intro>
-      <img src={withBase('/media/hero/vk.svg')} width="20" height="20" alt="" />
+      <span class="hc-social__icon" style={`--icon:url(${withBase('/media/hero/vk.svg')})`} aria-hidden="true"></span>
     </a>
 
     <p class="hero-tag" data-anim="tag"><span class="sq40">{hero.date}</span></p>
@@ -184,6 +184,7 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
   .hc-contact span {
     position: relative;
     top: 1.2px;
+    transition: color 0.3s;
   }
   .hc-contact span::after {
     content: '';
@@ -197,29 +198,46 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     transform-origin: right;
     transition: transform 0.5s var(--ease-out);
   }
-  .hc-contact:hover span::after {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
+  /* стрелка золотая всегда, как в макете (media/hero/arrow.svg — #fce39c) */
   .hc-contact__arrow {
     width: 14.84px;
     height: 13.55px;
     transform: rotate(-45deg);
     transition: transform 0.5s var(--ease-out);
   }
-  .hc-contact:hover .hc-contact__arrow {
-    transform: rotate(-45deg) translateX(4px);
-  }
   .hc-social {
     top: 77px;
     width: 20px;
     height: 20px;
   }
-  .hc-social img {
-    transition: transform 0.4s var(--ease-out);
+  /* иконка — маска по белой фигуре со знаком-прорезью: при наведении перекрашивается в золотой */
+  .hc-social__icon {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+    transition:
+      transform 0.4s var(--ease-out),
+      background-color 0.3s;
   }
-  .hc-social:hover img {
-    transform: translateY(-3px);
+  /* наведение — золотой, как у кнопки (цвет действия); только там, где есть курсор */
+  @media (hover: hover) {
+    .hc-contact:hover span {
+      color: var(--c-gold);
+    }
+    .hc-contact:hover span::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    .hc-contact:hover .hc-contact__arrow {
+      transform: rotate(-45deg) translateX(4px);
+    }
+    .hc-social:hover .hc-social__icon {
+      background-color: var(--c-gold);
+      transform: translateY(-3px);
+    }
   }
   .hc-social--tg {
     right: 102px;

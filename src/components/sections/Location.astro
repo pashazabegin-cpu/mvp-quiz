@@ -41,7 +41,7 @@ import { withBase } from '../../lib/paths';
         <source media="(max-aspect-ratio: 1/1)" srcset={withBase(photo.srcMobile)} />
         <img
           class:list={['location__photo', `location__photo--${photo.side}`]}
-          data-depth={photo.depth}
+          data-scroll-depth={photo.depth}
           src={withBase(photo.src)}
           alt="Площадка Avulus Cyber Space"
           fetchpriority="low"

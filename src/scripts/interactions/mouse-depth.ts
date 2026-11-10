@@ -3,6 +3,8 @@ import { gsap } from 'gsap';
 /**
  * Параллакс от курсора: слои [data-depth="1.5"] смещаются за мышью.
  * Чем больше число, тем сильнее (слой «ближе» к зрителю).
+ * Только для слоёв, которые больше ничем не двигаются: эффект пишет transform. Глубина от скролла —
+ * отдельный атрибут (data-scroll-depth у фото «Локации», sections/finale.ts), иначе два скрипта спорят за одно фото.
  */
 export function initMouseDepth() {
   const layers = gsap.utils.toArray<HTMLElement>('[data-depth]').map((el) => ({

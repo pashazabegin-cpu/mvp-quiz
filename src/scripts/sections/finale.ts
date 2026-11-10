@@ -7,7 +7,8 @@
  * Сама анимация — на картинке, скролл — на обёртке, поэтому они не мешают друг другу.
  *
  * Фото в «Локации» — та же глубина, что в «Что мы придумали?» (sections/intro.ts): фото движется со своей
- * скоростью по data-depth. Только сдвиг по вертикали и ровно по пикселям экрана: масштаб на каждом кадре
+ * скоростью по data-scroll-depth. Не data-depth: этот атрибут забирает эффект под курсором (interactions/mouse-depth.ts),
+ * и два скрипта по очереди ставили фото каждый в своё место — фото дёргалось и мигало, стоило двинуть мышью. Только сдвиг по вертикали и ровно по пикселям экрана: масштаб на каждом кадре
  * и дробный сдвиг заставляли фото мерцать.
  */
 import { gsap } from 'gsap';
@@ -78,8 +79,8 @@ function initGlows(section: HTMLElement) {
  * Границы считаются от раскладки без сдвига: сдвиг самого фото не влияет на то, где оно начинает двигаться.
  */
 function initPhotos(section: HTMLElement) {
-  section.querySelectorAll<HTMLElement>('[data-depth]').forEach((el) => {
-    const z = Number(el.dataset.depth) || 1;
+  section.querySelectorAll<HTMLElement>('[data-scroll-depth]').forEach((el) => {
+    const z = Number(el.dataset.scrollDepth) || 1;
     const host = el.offsetParent as HTMLElement;
     let top = 0; // верх фото без сдвига, px страницы
     let distance = 0; // px кадра

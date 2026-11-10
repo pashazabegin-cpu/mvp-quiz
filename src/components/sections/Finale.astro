@@ -44,7 +44,7 @@ const glows = [
             data-period={g.period}
             data-reverse={g.reverse ? '' : undefined}
           >
-            <img src={withBase(`/media/glows/${g.src}.webp`)} alt="" width={g.w} height={g.h} loading="lazy" decoding="async" />
+            <img src={withBase(`/media/glows/${g.src}.webp`)} alt="" width={g.w} height={g.h} fetchpriority="low" />
           </div>
         ))
       }

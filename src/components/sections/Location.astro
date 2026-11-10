@@ -6,6 +6,7 @@
  * Прокрутка колесом над картой листает страницу, а не масштабирует карту.
  * .map__inner компенсирует масштаб кадра: API карт считает курсор в экранных px, и так карта остаётся чёткой.
  * Параллакс фото — как у фото в «Что мы придумали?», с привязкой к пикселям экрана (scripts/sections/finale.ts).
+ * Фото и карта грузятся сразу (с низким приоритетом), а не лениво: при быстром переходе к блоку они не появлялись рывком.
  * Мобильный (Figma: «10 · Локация»): всё стоит на месте, карта не забирает палец — скролл важнее, для маршрута есть ссылка.
  */
 import { event, location, ticket } from '../../data/content';
@@ -25,7 +26,7 @@ import { withBase } from '../../lib/paths';
     data-map-zoom={location.zoom}
   >
     <div class="map__inner">
-      <img class="map__poster" src={withBase(location.poster)} alt={`Карта: ${event.address}`} loading="lazy" decoding="async" />
+      <img class="map__poster" src={withBase(location.poster)} alt={`Карта: ${event.address}`} fetchpriority="low" />
       <div class="map__canvas" data-map-canvas></div>
       <span class="map__pin" data-map-pin aria-hidden="true">
         <span class="map__pin-ring"></span>
@@ -43,7 +44,7 @@ import { withBase } from '../../lib/paths';
           data-depth={photo.depth}
           src={withBase(photo.src)}
           alt="Площадка Avulus Cyber Space"
-          loading="lazy"
+          fetchpriority="low"
         />
       </picture>
     ))

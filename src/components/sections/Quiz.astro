@@ -12,7 +12,9 @@
  * При входе в блок карусель стоит под темами, на начале текста; когда доходишь до текста —
  * поднимается на темы и открывает текст. Скролл ещё и прокручивает её по горизонтали.
  *
- * Десктоп: блок 1607 px макета, всё на местах из макета; снизу к нему примыкает «Кто будет?». Мобильный: содержимое идёт потоком
+ * Логотип «Квиз, плиз!» — над заголовком в плашке (Figma: «w_2 1»), на мобильном в той же пропорции.
+ *
+ * Десктоп: блок 1689 px макета, всё на местах из макета; снизу к нему примыкает «Кто будет?». Мобильный: содержимое идёт потоком
  * (высоту блока ставит fitFlow), плашка тянется под ним; у карусели своя строка между темами и текстом —
  * она стоит на месте и не закрывает текст, только медленно идёт сама.
  */
@@ -34,6 +36,8 @@ const ring = [...quiz.icons, ...quiz.icons];
 >
   <div class="quiz__ui" data-quiz-ui data-flow>
     <div class="quiz__plate" aria-hidden="true"></div>
+
+    <img class="quiz__logo" src={withBase(quiz.logo.src)} width={quiz.logo.w} height={quiz.logo.h} alt={quiz.logo.name} data-reveal />
 
     <h2 class="quiz__title" data-split>{quiz.title[0]}<br /><span class="accent">{quiz.title[1]}</span></h2>
 
@@ -106,7 +110,7 @@ const ring = [...quiz.icons, ...quiz.icons];
   /* фон макета (Rectangle 5881): белый до 11.5% → синий #013a8b к 46.7% → #030f1c к 97% */
   .quiz {
     position: relative;
-    height: calc(1607px * var(--ui-s));
+    height: calc(1689px * var(--ui-s));
     overflow: hidden;
     background-color: #fff;
     background-image: var(--dither), linear-gradient(to bottom, rgb(1 58 139 / 0) 11.531%, #013a8b 46.68%, #030f1c 96.998%);
@@ -119,7 +123,7 @@ const ring = [...quiz.icons, ...quiz.icons];
     left: 0;
     top: 0;
     width: var(--ui-w);
-    height: 1607px;
+    height: 1689px;
     transform: scale(var(--ui-s));
     transform-origin: 0 0;
   }
@@ -134,18 +138,18 @@ const ring = [...quiz.icons, ...quiz.icons];
         to bottom,
         rgb(1 58 139 / 0) calc(222.7px * var(--ui-s)),
         #013a8b calc(901px * var(--ui-s)),
-        #04101d calc(1590px * var(--ui-s))
+        #04101d calc(1672px * var(--ui-s))
       );
     }
   }
 
-  /* плашка 1320×1352 при 1440: поля 60, сквиркл r=260 (n=3) */
+  /* плашка 1320×1452 при 1440: поля 60, сквиркл r=260 (n=3) */
   .quiz__plate {
     z-index: 2;
     left: 60px;
     top: 110px;
     width: calc(var(--ui-w) - 120px);
-    height: 1352px;
+    height: 1452px;
     border-radius: 260px;
     background: #030f1c;
     /* свечение не выходит за форму плашки (в макете — маска по сквирклу) */
@@ -195,11 +199,21 @@ const ring = [...quiz.icons, ...quiz.icons];
     width: 100%;
     text-align: center;
   }
+  /* логотип над заголовком: 96 от верха плашки, по центру */
+  .quiz__logo {
+    z-index: 3;
+    left: 50%;
+    top: 206px;
+    width: 157px;
+    height: 53.4px;
+    max-width: none;
+    margin-left: -78.5px;
+  }
   .accent {
     color: var(--c-accent);
   }
   .quiz__title {
-    top: 234px;
+    top: 340px;
     font-size: 65px;
     font-weight: 300;
     line-height: 80px;
@@ -208,7 +222,7 @@ const ring = [...quiz.icons, ...quiz.icons];
 
   /* «Настраиваемся • Играем • Кайфуем» — одна строка 35/45, точки акцентные */
   .quiz__steps {
-    top: 444px;
+    top: 551px;
     display: flex;
     justify-content: center;
     gap: 22px;
@@ -227,7 +241,7 @@ const ring = [...quiz.icons, ...quiz.icons];
 
   /* темы: плашки 61 px, три строки по центру, между строками 19.6, между плашками 8 */
   .quiz__topics {
-    top: 531px;
+    top: 665px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -253,7 +267,7 @@ const ring = [...quiz.icons, ...quiz.icons];
   }
 
   .quiz__lead {
-    top: 842px;
+    top: 949px;
     left: 50%;
     width: 694px;
     margin-left: -347px;
@@ -264,7 +278,7 @@ const ring = [...quiz.icons, ...quiz.icons];
     margin-top: 1.45em;
   }
   .quiz__cta {
-    top: 1298px;
+    top: 1434px;
     display: flex;
     justify-content: center;
   }
@@ -304,7 +318,17 @@ const ring = [...quiz.icons, ...quiz.icons];
     /* снизу: кнопка → низ плашки 79, плашка → «Кто будет?» 29 (Figma: «06 · Квиз · низ плашки») */
     .quiz__ui {
       height: auto;
-      padding: 130px 16px 108px;
+      padding: 111px 16px 108px;
+    }
+    /* логотип — в потоке над заголовком, в пропорции десктопа к мобильному заголовку (38 / 65): 92 px, 48 от верха плашки */
+    .quiz__ui > .quiz__logo {
+      position: relative;
+      left: auto;
+      top: auto;
+      display: block;
+      width: 92px;
+      height: auto;
+      margin: 0 auto 40px;
     }
     .quiz__ui > * {
       position: relative;

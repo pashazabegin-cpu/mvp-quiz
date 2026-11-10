@@ -55,21 +55,26 @@ export const nav = [
   // вернуть вместе с блоком: jury «Жюри»
 ];
 
-/** Партнёры на первом экране (по ТЗ — 2–3). */
-export const heroPartners = [
-  { role: 'генеральный партнёр', logo: '' },
-  { role: 'стратегический партнёр', logo: '' },
-  { role: 'официальный партнёр', logo: '', optional: true },
-];
-
 /** 01 · Первый экран — как слайд «Квизмас» на MVP (Figma: кадр «main», 1440×900). */
 export const hero = {
-  partner: { name: 'BetBoom', logo: '/media/hero/betboom.svg', caption: 'официальный партнер', url: 'https://betboom.ru' },
+  /**
+   * Партнёры в шапке (десктоп) и сеткой 2×2 под первым экраном (мобильный). w/h — размер логотипа в десктопном макете,
+   * x — центр логотипа в колонках сетки от левого поля (60 + --col × x): при кадре 1440 — 190, 401, 622, 846.
+   */
+  partners: [
+    { name: 'Матч ТВ', logo: '/media/hero/partners/match.svg', w: 67.68, h: 18.38, x: 1.377 },
+    { name: 'Чемпионат', logo: '/media/hero/partners/champ.svg', w: 84.6, h: 36.24, x: 3.62 },
+    { name: 'Советский спорт', logo: '/media/hero/partners/sovsport.svg', w: 84.69, h: 23.35, x: 5.964 },
+    { name: 'Meta Ratings', logo: '/media/hero/partners/meta.svg', w: 89.59, h: 20.7, x: 8.334 },
+  ],
+  partnerCaption: 'официальный партнер',
   /** В макете 13 декабря 2027 — в ТЗ и остальных блоках 2026, оставлено 2026 */
   date: event.date,
+  venue: event.venue,
   address: event.address,
   logo: '/media/hero/logo-full.png',
-  lead: 'Предновогоднее событие для спортивной, киберспортивной и беттинг-индустрии.',
+  // «и беттинг-индустрии» не разрываются: на мобильном это третья строка, как в макете
+  lead: 'Предновогоднее событие для спортивной, киберспортивной и беттинг-индустрии.',
   cta: 'Купить билет',
   video: '/media/hero/kvizmas-1080.mp4',
   poster: '/media/hero/poster.jpg',
@@ -237,6 +242,8 @@ export const talks = {
  * Текст под иконками в макете пока повторяет «Что мы придумали?» — нужен свой.
  */
 export const quiz = {
+  /** логотип партнёра квиза над заголовком (Figma: «w_2 1», 157×53.4) */
+  logo: { src: '/media/quiz/quiz-please.svg', name: 'Квиз, плиз!', w: 157, h: 53.4 },
   title: ['Спортивный', 'квиз'],
   steps: ['Настраиваемся', 'Играем', 'Кайфуем'],
   /** темы вопросов — плашки под пунктами, по строкам как в макете */

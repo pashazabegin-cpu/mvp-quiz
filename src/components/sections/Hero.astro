@@ -35,15 +35,21 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
   <i class="hero__fade" data-hero-fade aria-hidden="true"></i>
 
   <div class="stage__ui hero__ui" data-hero-ui>
-    <!-- мобильный: меню бургером (ui/MobileMenu.astro), партнёр уходит в блок под первым экраном -->
+    <!-- мобильный: меню бургером (ui/MobileMenu.astro), партнёры уходят в блок под первым экраном -->
     <button class="hc-menu" type="button" data-menu-open aria-controls="mobile-menu" aria-expanded="false" data-intro>
       <span class="hc-menu__lines" aria-hidden="true"></span>
       <span class="hc-menu__label">Меню</span>
     </button>
-    <a class="hc-partner" href={hero.partner.url} target="_blank" rel="noopener" data-intro>
-      <img src={withBase(hero.partner.logo)} width="136" height="23.8" alt={hero.partner.name} />
-      <span>{hero.partner.caption}</span>
-    </a>
+    {
+      hero.partners.map((p) => (
+        <div class="hc-partner" style={`--x:${p.x}`} data-intro>
+          <span class="hp-logo">
+            <img src={withBase(p.logo)} width={p.w} height={p.h} style={`--w:${p.w}px;--h:${p.h}px`} alt={p.name} />
+          </span>
+          <span class="hp-caption">{hero.partnerCaption}</span>
+        </div>
+      ))
+    }
     <a class="hc-contact" href={contacts.contactUrl} target="_blank" rel="noopener" data-intro>
       <span>Связаться с нами</span>
       <img class="hc-contact__arrow" src={withBase('/media/hero/arrow.svg')} width="14.84" height="13.55" alt="" />
@@ -56,6 +62,7 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     </a>
 
     <p class="hero-tag" data-anim="tag"><span class="sq40">{hero.date}</span></p>
+    <p class="hero-venue" data-anim="lines">{hero.venue}</p>
     <p class="hero-address" data-anim="lines">{hero.address}</p>
     <h1 class="hero-logo" data-anim="parts">
       <img src={withBase(hero.logo)} width="534" height="75.37" alt="MVP Квизмас" />
@@ -67,14 +74,20 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
   <Anno kind="screen">01 · Первый экран</Anno>
 </section>
 
-<!-- мобильный: официальный партнёр сразу под первым экраном (Figma: «main · mobile», y 848) -->
-<div class="hero-partner">
-  <div class="hero-partner__ui">
-    <a href={hero.partner.url} target="_blank" rel="noopener">
-      <img src={withBase(hero.partner.logo)} width="136" height="23.8" alt={hero.partner.name} />
-      <span>{hero.partner.caption}</span>
-    </a>
-  </div>
+<!-- мобильный: партнёры сеткой 2×2 сразу под первым экраном (Figma: «main · mobile», y 833–1002) -->
+<div class="hero-partners">
+  <ul class="hero-partners__ui">
+    {
+      hero.partners.map((p) => (
+        <li>
+          <span class="hp-logo">
+            <img src={withBase(p.logo)} width={p.w} height={p.h} style={`--w:${p.w}px;--h:${p.h}px`} alt={p.name} />
+          </span>
+          <span class="hp-caption">{hero.partnerCaption}</span>
+        </li>
+      ))
+    }
+  </ul>
 </div>
 
 <style>
@@ -150,29 +163,45 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     pointer-events: auto;
   }
 
-  /* ── шапка (как на MVP) ── */
+  /* ── шапка: четыре партнёра слева, «Связаться с нами» и соцсети справа (Figma: main) ── */
   .hc-menu,
-  .hero-partner {
+  .hero-partners {
     display: none;
   }
+  /* партнёр: логотипы стоят низом на одной линии (y 111), подписи — на 126; центр — по колонкам сетки (--x) */
   .hc-partner {
-    left: 60px;
-    top: 76.1px;
+    left: calc(60px + var(--col) * var(--x) - 70px);
+    top: 74.76px;
+    width: 140px;
   }
-  .hc-partner img {
-    width: 136px;
-    height: 23.8px;
+  /* общий вид логотипа с подписью — и в шапке, и в мобильной сетке (там всё крупнее в --k раз) */
+  .hp-logo {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: calc(36.24px * var(--k, 1));
   }
-  .hc-partner span {
+  .hp-logo img {
     display: block;
-    margin-top: 12px;
-    font-size: 12px;
+    width: calc(var(--w) * var(--k, 1));
+    height: calc(var(--h) * var(--k, 1));
+    max-width: none;
+  }
+  .hp-caption {
+    display: block;
+    margin-top: calc(15px * var(--k, 1));
+    color: rgb(255 255 255 / 0.6);
+    font-size: calc(8px * var(--k, 1));
+    font-weight: 300;
     line-height: 1.2;
+    letter-spacing: calc(1.2px * var(--k, 1));
+    text-align: center;
+    text-transform: uppercase;
     white-space: nowrap;
   }
   .hc-contact {
-    left: calc(60px + var(--col) * 11);
-    top: 78.03px;
+    right: calc(60px + var(--col) * 2 + 1px);
+    top: 89px;
     display: flex;
     align-items: center;
     gap: 7px;
@@ -206,7 +235,7 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     transition: transform 0.5s var(--ease-out);
   }
   .hc-social {
-    top: 77px;
+    top: 88px;
     width: 20px;
     height: 20px;
   }
@@ -239,24 +268,35 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       transform: translateY(-3px);
     }
   }
+  /* соцсети — у правого поля сетки, зеркально левому краю текста */
   .hc-social--tg {
-    right: 102px;
+    right: calc(60px + var(--col) + 42px);
   }
   .hc-social--vk {
-    right: 60px;
+    right: calc(60px + var(--col));
   }
 
-  /* ── контент: x — от 2-й колонки сетки (155 при 1440), y — из макета, от центра экрана ── */
+  /* ── контент: x — от 2-й колонки сетки (153 при 1440), y — из макета, от центра экрана ── */
   .hero-tag,
+  .hero-venue,
   .hero-address {
-    left: calc(60px + var(--col) - 13px);
+    left: calc(60px + var(--col) - 1.3px);
     font-size: 20px;
     line-height: 26px;
     white-space: nowrap;
   }
   /* плашка даты — «Squircle n=3.00 r=100px» 40 px, тёмно-синяя (Figma: main); маска — .sq40 в global.css */
   .hero-tag {
-    top: calc(50% - 450px + 275px);
+    top: calc(50% - 450px + 235px);
+  }
+  /* место проведения — голубым капсом над адресом */
+  .hero-venue {
+    top: calc(50% - 450px + 314px);
+    color: rgb(49 168 243 / 0.8);
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
   }
   .hero-tag span {
     display: block;
@@ -266,11 +306,11 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     background: var(--c-accent-2);
   }
   .hero-address {
-    top: calc(50% - 450px + 330px);
+    top: calc(50% - 450px + 342px);
   }
   .hero-logo {
     left: calc(60px + var(--col) - 2px);
-    top: calc(50% - 450px + 423px);
+    top: calc(50% - 450px + 439px);
     width: 534px;
     height: 75.37px;
   }
@@ -280,14 +320,14 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
   }
   .hero-lead {
     left: calc(60px + var(--col) - 2px);
-    top: calc(50% - 450px + 529px);
+    top: calc(50% - 450px + 545px);
     width: 433px;
     font-size: 20px;
     line-height: 30px;
   }
   .hero__ui :global(.hero-btn) {
     left: calc(60px + var(--col));
-    top: calc(50% - 450px + 663px);
+    top: calc(50% - 450px + 676px);
   }
 
   /* ── мобильный (Figma: «main · mobile»): кадр 375 по ширине, KV сверху, текст от низа ── */
@@ -299,26 +339,27 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       height: 64%;
       transform: none;
     }
+    /* видео крупнее блока KV (Figma: 1112×626 со сдвигом −537, −106 в кадре 375×520) — в процентах от KV */
     .hero__video {
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-    .hero__video {
-      background-position: 74% 50%;
+      left: -143.2%;
+      top: -20.38%;
+      width: 296.53%;
+      height: 120.38%;
+      background-position: 50% 50%;
     }
     .hero__video video,
     .hero__video :global(.hero__video-img) {
-      object-position: 74% 50%;
+      object-position: 50% 50%;
       transform: none;
     }
+    /* затемнение 140–524 в кадре 812 */
     .hero__shade-mob {
       display: block;
       position: absolute;
       left: 0;
       right: 0;
-      top: 30%;
-      height: 34.5%;
+      top: 17.24%;
+      height: 47.29%;
       background: linear-gradient(to bottom, rgb(0 1 11 / 0), #00010b);
       pointer-events: none;
     }
@@ -374,35 +415,39 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
     .hc-social--vk {
       right: 16px;
     }
-    .hero-tag,
-    .hero-address {
-      left: 16px;
-      font-size: 16px;
-      line-height: 22px;
-    }
+    /* плашка даты: тёмно-синий сквиркл 150×30 (Figma: «main · mobile»), .sq40 тянется по высоте */
     .hero-tag {
-      top: calc(100% - 387px);
+      left: 22px;
+      top: calc(100% - 424px);
+      font-size: 15px;
+      line-height: 19.5px;
     }
-    /* плашка даты: голубая, 30 высотой (Figma: «Дата»), форма — тот же сквиркл, что на десктопе (.sq40 тянется по высоте) */
     .hero-tag span {
       --sq-h: 30px;
       height: 30px;
-      padding: 6px 13px 2px;
-      background: var(--c-accent);
+      padding: 6.5px 16px 4px 13.5px;
+    }
+    .hero-venue {
+      left: 23px;
+      top: calc(100% - 382px);
+      font-size: 13px;
+      line-height: 20px;
+      letter-spacing: 1.95px;
     }
     .hero-address {
-      top: calc(100% - 351px);
-      white-space: normal;
-      width: 300px;
+      left: 23px;
+      top: calc(100% - 362px);
+      font-size: 14px;
+      line-height: 22px;
     }
     .hero-logo,
     .hero-logo img {
       left: 16px;
-      width: 300px;
-      height: 42.34px;
+      width: 335px;
+      height: 47.28px;
     }
     .hero-logo {
-      top: calc(100% - 287px);
+      top: calc(100% - 289.5px);
     }
     .hero-lead {
       left: 16px;
@@ -420,44 +465,35 @@ const vk = contacts.socials.find((s) => s.id === 'vk');
       top: calc(100% - 98px);
     }
 
-    /* блок партнёра: 164 px кадра под первым экраном — логотип на 36, подпись на 72 */
-    /* фон — от тёмно-синего первого экрана к чёрному «Что мы придумали?», чтобы не было ступеньки на стыке */
-    .hero-partner {
+    /*
+     * Партнёры под первым экраном: 284 px кадра, сетка 2×2 с центрами колонок на 99 и 276 (±88.5 от центра).
+     * Логотипы и подписи — те же, что в шапке десктопа, крупнее в 1.0985 раза: низ логотипов на 60.7 и 162.6.
+     * Фон — от тёмно-синего первого экрана к чёрному «Что мы придумали?», чтобы не было ступеньки на стыке.
+     */
+    .hero-partners {
       display: block;
       position: relative;
-      height: calc(164px * var(--ui-s));
+      height: calc(284px * var(--ui-s));
       background: linear-gradient(#00010b, var(--c-bg));
       color: #fff;
     }
-    .hero-partner__ui {
+    .hero-partners__ui {
+      --k: 1.0985;
       position: absolute;
       left: 0;
       top: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 177px);
+      justify-content: center;
+      align-content: start;
+      row-gap: 35.06px;
       width: var(--ui-w);
-      height: 164px;
+      height: 284px;
+      margin: 0;
+      padding: 20.9px 0 0;
+      list-style: none;
       transform: scale(var(--ui-s));
       transform-origin: 0 0;
-    }
-    .hero-partner a {
-      position: absolute;
-      left: 50%;
-      top: 36px;
-      width: 160px;
-      margin-left: -79.5px;
-      text-align: center;
-    }
-    .hero-partner img {
-      display: block;
-      width: 136px;
-      height: 23.8px;
-      margin: 0 auto;
-    }
-    .hero-partner span {
-      display: block;
-      margin-top: 12px;
-      font-size: 12px;
-      line-height: 1.2;
-      white-space: nowrap;
     }
   }
 </style>

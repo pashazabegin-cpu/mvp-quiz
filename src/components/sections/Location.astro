@@ -1,7 +1,7 @@
 ---
 /**
  * «Локация» (Figma: кадр «2»): логотип площадки, адрес, карта во всю ширину, фото площадки на разной глубине.
- * Название площадки строкой убрано — его заменяет логотип (в макете с 12.11).
+ * Название площадки строкой убрано — его заменяет логотип; заголовок, логотип и адрес — одной строкой (в макете с 12.11).
  * Карта — Яндекс Карты в стиле из data/map-style.json, адрес стоит по центру, карту можно таскать и вращать
  * правой кнопкой (scripts/sections/location.ts). Пока нет ключа API, показывается картинка из макета.
  * Прокрутка колесом над картой листает страницу, а не масштабирует карту.
@@ -16,7 +16,7 @@ import { withBase } from '../../lib/paths';
 
 <section class="location" id="location">
   <h2 class="location__title" data-split>{location.title}</h2>
-  <img class="location__logo" src={withBase(location.logo.src)} width={location.logo.w} height={location.logo.h} alt={location.logo.name} data-reveal />
+  <img class="location__logo" src={withBase(location.logo.src)} width={location.logo.w} height={location.logo.h} alt={location.logo.name} />
   <p class="location__address" data-lines>{event.address}</p>
 
   <div
@@ -66,12 +66,17 @@ import { withBase } from '../../lib/paths';
     color: #fff;
     text-align: center;
   }
-  /* под заголовком логотип площадки, под ним адрес; карта и фото — на прежних местах */
+  /*
+   * Одна строка над картой (Figma, 12.11): заголовок слева по сетке, логотип площадки по центру, адрес справа.
+   * Логотип — голубой #6dc7ff на 80% в режиме «жёсткий свет»: смешивается с синим фоном низа страницы
+   * (как логотипы партнёров, поэтому на нём самом и на родителях — без transform и opacity, см. Finale.astro).
+   * Карта и фото — на прежних местах.
+   */
   .location__title {
     position: absolute;
-    left: 0;
-    top: 6px;
-    width: 100%;
+    left: calc(50% - 563px);
+    top: 115px;
+    width: 255px;
     font-size: 65px;
     font-weight: 300;
     line-height: 55px;
@@ -80,19 +85,21 @@ import { withBase } from '../../lib/paths';
   .location__logo {
     position: absolute;
     left: 50%;
-    top: 179px;
-    width: 296px;
-    height: 128px;
+    top: 40px;
+    width: 411px;
+    height: 170.37px;
     max-width: none;
-    margin-left: -148px;
+    margin-left: -205.5px;
+    mix-blend-mode: hard-light;
   }
   .location__address {
     position: absolute;
-    left: 0;
-    top: 333px;
-    width: 100%;
+    left: calc(50% + 293px);
+    top: 107px;
+    width: 337px;
     font-size: 20px;
     line-height: 26px;
+    text-align: left;
   }
 
   .map {
@@ -255,18 +262,20 @@ import { withBase } from '../../lib/paths';
   }
 
   @media (max-aspect-ratio: 1/1) {
-    /* в мобильном макете логотипа нет — в пропорции десктопа (×0.585): 173×75 под заголовком, адрес под ним, блок ниже сдвинут на 86 */
+    /* в мобильном макете логотипа нет — столбиком по центру: заголовок, логотип 200 px, адрес; блок ниже сдвинут на 86 */
     .location {
       height: 806px;
     }
     .location__logo {
-      top: 135px;
-      width: 173px;
-      height: 74.8px;
-      margin-left: -86.5px;
+      top: 128px;
+      width: 200px;
+      height: 82.9px;
+      margin-left: -100px;
     }
     .location__title {
+      left: 0;
       top: 30px;
+      width: 100%;
       font-size: 38px;
       line-height: 36px;
       letter-spacing: -1.9px;
@@ -278,6 +287,7 @@ import { withBase } from '../../lib/paths';
       margin-left: -150px;
       font-size: 16px;
       line-height: 22px;
+      text-align: center;
     }
     .map {
       top: 336px;

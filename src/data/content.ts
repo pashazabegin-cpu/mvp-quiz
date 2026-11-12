@@ -340,8 +340,8 @@ export const partners = {
 };
 
 export const location = {
-  /** логотип площадки под заголовком (Figma: «Avulus 1» в «Локации», 188×81) */
-  logo: { src: '/media/location/avulus.webp', name: 'Avulus Cyberspace', w: 188, h: 81 },
+  /** логотип площадки под заголовком (Figma: «Avulus 1» в «Локации», 296×128) — вместо строки с названием площадки */
+  logo: { src: '/media/location/avulus.webp', name: 'Avulus Cyberspace', w: 296, h: 128 },
   title: 'Локация',
   mapLabel: 'Открыть в Яндекс Картах',
   /**

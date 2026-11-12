@@ -74,6 +74,24 @@ export function initQuizOrbit(motion: boolean) {
   // доля рамки, которую занимает картинка по ширине (узкая бутылка — меньше, широкий свисток — вся рамка)
   const fill = items.map((el) => Math.min(1, Number(el.dataset.ratio) || 1));
 
+  // иконка не загрузилась (сбой сети, вкладка открыта со старой версии сайта) — один повтор, потом прячем:
+  // вместо рамки с «?» (так браузер рисует сломанную картинку) остаётся пустое место, промежутки ленты те же
+  items.forEach((el) => {
+    const img = el.querySelector('img');
+    if (!img) return;
+    let retried = false;
+    const onError = () => {
+      if (!retried) {
+        retried = true;
+        img.src = `${img.src.split('?')[0]}?retry=1`;
+        return;
+      }
+      img.style.visibility = 'hidden';
+    };
+    img.addEventListener('error', onError);
+    if (img.complete && img.naturalWidth === 0 && img.currentSrc) onError();
+  });
+
   let box = 260; // сторона рамки центральной иконки, px макета
   let cx = 720; // центр ленты по горизонтали
   let low = 860;

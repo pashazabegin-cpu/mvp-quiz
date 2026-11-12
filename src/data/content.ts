@@ -242,8 +242,8 @@ export const talks = {
  * Текст под иконками в макете пока повторяет «Что мы придумали?» — нужен свой.
  */
 export const quiz = {
-  /** логотип партнёра квиза над заголовком (Figma: «w_2 1», 157×53.4) */
-  logo: { src: '/media/quiz/quiz-please.svg', name: 'Квиз, плиз!', w: 157, h: 53.4 },
+  /** логотип партнёра квиза над заголовком (Figma: «w_2 1», 229×78) */
+  logo: { src: '/media/quiz/quiz-please.svg', name: 'Квиз, плиз!', w: 229, h: 78 },
   title: ['Спортивный', 'квиз'],
   steps: ['Настраиваемся', 'Играем', 'Кайфуем'],
   /** темы вопросов — плашки под пунктами, по строкам как в макете */
@@ -339,6 +339,8 @@ export const partners = {
 };
 
 export const location = {
+  /** эмблема площадки под заголовком (Figma: «Vector» в «Локации», 97×118) */
+  logo: { src: '/media/location/avulus.svg', name: 'Avulus Cyber Space', w: 97, h: 118 },
   title: 'Локация',
   mapLabel: 'Открыть в Яндекс Картах',
   /**

@@ -15,6 +15,7 @@ import { withBase } from '../../lib/paths';
 
 <section class="location" id="location">
   <h2 class="location__title" data-split>{location.title}</h2>
+  <img class="location__logo" src={withBase(location.logo.src)} width={location.logo.w} height={location.logo.h} alt={location.logo.name} data-reveal />
   <p class="location__venue" data-lines>{event.venue}</p>
   <p class="location__address" data-lines>{event.address}</p>
 
@@ -65,15 +66,25 @@ import { withBase } from '../../lib/paths';
     color: #fff;
     text-align: center;
   }
+  /* заголовок поднят над блоком (в макете −90 к прежнему месту), под ним эмблема площадки */
   .location__title {
     position: absolute;
     left: 0;
-    top: 75px;
+    top: -15px;
     width: 100%;
     font-size: 65px;
     font-weight: 300;
     line-height: 55px;
     letter-spacing: -3.25px;
+  }
+  .location__logo {
+    position: absolute;
+    left: 50%;
+    top: 118px;
+    width: 97px;
+    height: 118px;
+    max-width: none;
+    margin-left: -48.5px;
   }
   .location__venue {
     position: absolute;
@@ -257,8 +268,15 @@ import { withBase } from '../../lib/paths';
   }
 
   @media (max-aspect-ratio: 1/1) {
+    /* эмблемы в мобильном макете нет — в пропорции десктопа: 56×68 под заголовком, блок ниже сдвинут на 86 */
     .location {
-      height: 720px;
+      height: 806px;
+    }
+    .location__logo {
+      top: 98px;
+      width: 56px;
+      height: 68.1px;
+      margin-left: -28px;
     }
     .location__title {
       top: 30px;
@@ -267,21 +285,21 @@ import { withBase } from '../../lib/paths';
       letter-spacing: -1.9px;
     }
     .location__venue {
-      top: 104px;
+      top: 190px;
       font-size: 24px;
       line-height: 30px;
       letter-spacing: 3.6px;
     }
     .location__address {
       left: 50%;
-      top: 146px;
+      top: 232px;
       width: 300px;
       margin-left: -150px;
       font-size: 16px;
       line-height: 22px;
     }
     .map {
-      top: 250px;
+      top: 336px;
       height: 300px;
     }
     .map__poster {
@@ -316,18 +334,18 @@ import { withBase } from '../../lib/paths';
     }
     .location__photo--left {
       left: -36px;
-      top: 196px;
+      top: 282px;
       width: 196px;
       height: 118px;
     }
     .location__photo--right {
       right: -20px;
-      top: 512px;
+      top: 598px;
       width: 209px;
       height: 110px;
     }
     .location__link {
-      top: 652px;
+      top: 738px;
       gap: 10px;
       font-size: 18px;
     }

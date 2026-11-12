@@ -94,10 +94,7 @@ const ring = [...quiz.icons, ...quiz.icons];
       {
         ring.map((icon) => (
           <div class="orbit__item" data-orbit-item data-ratio={icon.ratio}>
-            <picture>
-              <source srcset={withBase(`/media/quiz/${icon.name}.avif`)} type="image/avif" />
-              <img src={withBase(`/media/quiz/${icon.name}.png`)} alt="" width="260" height="260" loading="lazy" decoding="async" />
-            </picture>
+            <img src={withBase(`/media/quiz/${icon.name}.webp`)} alt="" width="260" height="260" loading="lazy" decoding="async" />
           </div>
         ))
       }

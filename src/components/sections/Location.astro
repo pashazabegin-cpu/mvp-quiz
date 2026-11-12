@@ -66,7 +66,7 @@ import { withBase } from '../../lib/paths';
     color: #fff;
     text-align: center;
   }
-  /* заголовок поднят над блоком (в макете −90 к прежнему месту), под ним эмблема площадки */
+  /* заголовок поднят над блоком (в макете −90 к прежнему месту), под ним логотип площадки */
   .location__title {
     position: absolute;
     left: 0;
@@ -80,11 +80,11 @@ import { withBase } from '../../lib/paths';
   .location__logo {
     position: absolute;
     left: 50%;
-    top: 118px;
-    width: 97px;
-    height: 118px;
+    top: 145px;
+    width: 188px;
+    height: 81px;
     max-width: none;
-    margin-left: -48.5px;
+    margin-left: -94px;
   }
   .location__venue {
     position: absolute;
@@ -268,15 +268,15 @@ import { withBase } from '../../lib/paths';
   }
 
   @media (max-aspect-ratio: 1/1) {
-    /* эмблемы в мобильном макете нет — в пропорции десктопа: 56×68 под заголовком, блок ниже сдвинут на 86 */
+    /* логотипа в мобильном макете нет — в пропорции десктопа: 110×47 под заголовком, блок ниже сдвинут на 86 */
     .location {
       height: 806px;
     }
     .location__logo {
-      top: 98px;
-      width: 56px;
-      height: 68.1px;
-      margin-left: -28px;
+      top: 115px;
+      width: 110px;
+      height: 47.4px;
+      margin-left: -55px;
     }
     .location__title {
       top: 30px;

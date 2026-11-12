@@ -254,7 +254,8 @@ export const quiz = {
   draft: true,
   cta: 'Зарегистрироваться',
   /**
-   * Иконки карусели: public/media/quiz/<name>.avif (+ .png для старых браузеров).
+   * Иконки карусели: public/media/quiz/<name>.webp, 420 px. Не AVIF: часть файлов без бренда miaf Firefox не открывал
+   * (пустые рамки вместо иконок), а на запасной PNG из <picture> он при этом не переключается.
    * ratio — ширина/высота картинки: по нему считается видимая ширина, чтобы промежутки между иконками были равными.
    * Порядок — как в макете слева направо, по центру кубок.
    */
@@ -339,8 +340,8 @@ export const partners = {
 };
 
 export const location = {
-  /** эмблема площадки под заголовком (Figma: «Vector» в «Локации», 97×118) */
-  logo: { src: '/media/location/avulus.svg', name: 'Avulus Cyber Space', w: 97, h: 118 },
+  /** логотип площадки под заголовком (Figma: «Avulus 1» в «Локации», 188×81) */
+  logo: { src: '/media/location/avulus.webp', name: 'Avulus Cyberspace', w: 188, h: 81 },
   title: 'Локация',
   mapLabel: 'Открыть в Яндекс Картах',
   /**
